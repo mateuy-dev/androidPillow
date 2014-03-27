@@ -14,16 +14,19 @@
  * limitations under the License.
  *
  */
-package cat.my.lib.restvolley;
+package cat.my.lib.restvolley.pathbuilders;
 
 import org.atteo.evo.inflector.English;
 
 import com.android.volley.Request.Method;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import cat.my.lib.restvolley.models.IdentificableModel;
 import cat.my.lib.restvolley.util.CaseFormat;
 
-public class RailsPathBuilder {
+public class RailsPathBuilder implements IPathBuilder {
 	String prefix;
 	CaseFormat caseFormat = new CaseFormat();
 	
@@ -31,44 +34,58 @@ public class RailsPathBuilder {
 		this.prefix = prefix;
 	}
 	
+	@Override
 	public Route getIndexPath(Class<?> clazz){
 		return new Route(Method.GET, getPath(clazz));
 	}
 	
+	@Override
 	public Route getCreatePath(IdentificableModel model){
 		return new Route(Method.POST, getPath(model.getClass()));
 	}
 	
+	@Override
 	public Route getShowPath(IdentificableModel model){
 		return new Route(Method.GET, getPath(model));
 	}
 	
+	@Override
 	public Route getUpdatePath(IdentificableModel model){
 		return new Route(Method.PUT, getPath(model));
 	}
 	
+	@Override
 	public Route getDestroyPath(IdentificableModel model){
 		return new Route(Method.DELETE, getPath(model));
+	}
+	
+	@Override
+	public Gson getSerializer(){
+		return new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 	}
 	
 	private String getPath(IdentificableModel model){
 		return getPath(model.getClass(), model.getId());
 	}
 	
-	private String getPath(Class<?> clazz, String id){
+	protected String getPath(Class<?> clazz, String id){
 		String modelName = getModelName(clazz);
 		String plural = English.plural(modelName);
 		return prefix + "/" + plural +"/"+ id +".json";
 	}
 	
-	private String getPath(Class<?> clazz){
+	protected String getPath(Class<?> clazz){
 		String modelName = getModelName(clazz);
 		String plural = English.plural(modelName);
 		return prefix + "/" + plural + ".json";
 	}
 	
-	private String getModelName(Class<?> clazz){
-		return caseFormat.cammelCaseToSnakeCase(clazz.getSimpleName());
+	protected String getModelName(Class<?> clazz){
+		return getModelName(clazz.getSimpleName());
+	}
+	
+	protected String getModelName(String modelName){
+		return caseFormat.cammelCaseToSnakeCase(modelName);
 	}
 	
 	public class Route{

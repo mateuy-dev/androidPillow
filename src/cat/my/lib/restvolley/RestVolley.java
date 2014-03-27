@@ -18,12 +18,15 @@ package cat.my.lib.restvolley;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONObject;
 
-import cat.my.lib.restvolley.RailsPathBuilder.Route;
 import cat.my.lib.restvolley.models.IdentificableModel;
+import cat.my.lib.restvolley.pathbuilders.IPathBuilder;
+import cat.my.lib.restvolley.pathbuilders.RailsPathBuilder.Route;
 import cat.my.lib.restvolley.requests.GsonCollectionRequest;
 import cat.my.lib.restvolley.requests.GsonRequest;
 
@@ -41,20 +44,18 @@ import android.content.Context;
 import android.util.Log;
 
 public class RestVolley {
-	RailsPathBuilder pathBuilder;
+	IPathBuilder pathBuilder;
 	RequestQueue volleyQueue;
-	Gson gson;
 
-	public RestVolley(Context context, RailsPathBuilder pathBuilder, Gson gson) {
+	public RestVolley(Context context, IPathBuilder pathBuilder) {
 		this.volleyQueue = Volley.newRequestQueue(context);
 		this.pathBuilder = pathBuilder;
-		this.gson = gson;
 	}
 	
 	
 	public <T extends IdentificableModel> void index(Class<T> clazz, Type collectionType, Listener<Collection<T>> listener, ErrorListener errorListener) {
 		Route route = pathBuilder.getIndexPath(clazz);
-		GsonCollectionRequest<T> gsonRequest = new GsonCollectionRequest<T>(gson, route, collectionType, null, listener, errorListener);
+		GsonCollectionRequest<T> gsonRequest = new GsonCollectionRequest<T>(pathBuilder.getSerializer(), route, collectionType, null, listener, errorListener);
 		gsonRequest.setShouldCache(false);
 		volleyQueue.add(gsonRequest);
 	}
@@ -69,10 +70,17 @@ public class RestVolley {
 		addRoute(route, clazz, model, listener, errorListener);
 	}
 	
-	public <T extends IdentificableModel> void update(Class<T> clazz, T model, Listener<Void> listener, ErrorListener errorListener) {
+	/**
+	 * 
+	 * @param clazz
+	 * @param model
+	 * @param listener ATENTION: update operation may return emty result on server. This will result in null T in the listener. Return the T from the server if required
+	 * @param errorListener
+	 */
+	public <T extends IdentificableModel> void update(Class<T> clazz, T model, Listener<T> listener, ErrorListener errorListener) {
 		Route route = pathBuilder.getUpdatePath(model);
-		Listener<T> proxyListener = new VoidListenerProxy<T>(listener);
-		addRoute(route, clazz, model, proxyListener, errorListener);
+		//Listener<T> proxyListener = new VoidListenerProxy<T>(listener);
+		addRoute(route, clazz, model, listener, errorListener);
 		
 	}
 	
@@ -89,9 +97,11 @@ public class RestVolley {
 	private <T> void addRoute(Route route, Class<T> clazz, T model, Listener<T> listener, ErrorListener errorListener){
 		String requestBody=null;
 		if(model!=null){
-			requestBody = gson.toJson(model);
+			Map<String, T> map=new HashMap<String, T>();
+			map.put("post", model);
+			requestBody = pathBuilder.getSerializer().toJson(map);
 		}
-		GsonRequest<T> gsonRequest = new GsonRequest<T>(gson, route, clazz, requestBody, listener, errorListener);
+		GsonRequest<T> gsonRequest = new GsonRequest<T>(pathBuilder.getSerializer(), route, clazz, requestBody, listener, errorListener);
 		gsonRequest.setShouldCache(false);
 		volleyQueue.add(gsonRequest);
 	}
@@ -102,7 +112,7 @@ public class RestVolley {
 	public interface OnGetListener<T> {
 	}
 	
-	private class VoidListenerProxy<T> implements Listener<T>{
+	public class VoidListenerProxy<T> implements Listener<T>{
 		Listener<Void> listener;
 		public VoidListenerProxy(Listener<Void> listener){
 			this.listener = listener;

@@ -17,7 +17,8 @@
 package cat.my.lib.restvolley.requests;
 
  
-import cat.my.lib.restvolley.RailsPathBuilder.Route;
+import android.util.Log;
+import cat.my.lib.restvolley.pathbuilders.RailsPathBuilder.Route;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -61,6 +62,7 @@ public class GsonRequest<T> extends JsonRequest<T> {
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JsonSyntaxException e) {
+        	e.printStackTrace();
             return Response.error(new ParseError(e));
         }
     }
