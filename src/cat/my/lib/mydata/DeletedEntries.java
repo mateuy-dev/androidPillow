@@ -7,7 +7,7 @@ import com.android.volley.Response.Listener;
 import cat.my.lib.android.CursorUtil;
 import cat.my.lib.orm.DBModelController;
 import cat.my.lib.orm.DBUtil;
-import cat.my.lib.restvolley.RestVolley;
+import cat.my.lib.restvolley.RestVolleyDataSource;
 import cat.my.lib.restvolley.models.IdentificableModel;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -31,11 +31,11 @@ public class DeletedEntries {
 			");";
 
 	SQLiteOpenHelper dbHelper;
-	RestVolley restVolley;
+	RestVolleyDataSource restVolley;
 
 	public static final String WHERE_ID_SELECTION = ID_COLUMN + " == ?";
 
-	public DeletedEntries(RestVolley restVolley, SQLiteOpenHelper dbHelper) {
+	public DeletedEntries(RestVolleyDataSource restVolley, SQLiteOpenHelper dbHelper) {
 		this.dbHelper = dbHelper;
 		this.restVolley = restVolley;
 	}
@@ -61,7 +61,7 @@ public class DeletedEntries {
 	}
 	
 	public <T extends IdentificableModel>void setAllreadyDeleted(Class<T> clazz, T model){
-		restVolley.destroy(clazz, model, new OnServerDeletedListener(model.getId()), MyData.dummyErrorListener);
+		restVolley.destroy(clazz, model, new OnServerDeletedListener(model.getId()), SynchDataSource.dummyErrorListener);
 	}
 	
 	public void setAsDeleted(SQLiteDatabase db, String id) {

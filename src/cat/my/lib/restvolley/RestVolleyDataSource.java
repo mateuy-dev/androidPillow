@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
+import cat.my.lib.mydata.IDataSource;
 import cat.my.lib.restvolley.models.IdentificableModel;
 import cat.my.lib.restvolley.pathbuilders.IPathBuilder;
 import cat.my.lib.restvolley.pathbuilders.RailsPathBuilder.Route;
@@ -43,16 +44,16 @@ import com.google.gson.Gson;
 import android.content.Context;
 import android.util.Log;
 
-public class RestVolley {
+public class RestVolleyDataSource implements IDataSource{
 	IPathBuilder pathBuilder;
 	RequestQueue volleyQueue;
 	ISessionData sessionData = new NoneSessionData();
 
-	public RestVolley(Context context, IPathBuilder pathBuilder) {
+	public RestVolleyDataSource(Context context, IPathBuilder pathBuilder) {
 		this(context, pathBuilder, new NoneSessionData());
 	}
 	
-	public RestVolley(Context context, IPathBuilder pathBuilder, ISessionData sessionData) {
+	public RestVolleyDataSource(Context context, IPathBuilder pathBuilder, ISessionData sessionData) {
 		this.volleyQueue = Volley.newRequestQueue(context);
 		this.pathBuilder = pathBuilder;
 		this.sessionData = sessionData;

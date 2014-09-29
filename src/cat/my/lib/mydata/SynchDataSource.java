@@ -13,7 +13,7 @@ import cat.my.lib.orm.DBModelController;
 import cat.my.lib.orm.DBModelControllerManager;
 import cat.my.lib.orm.IDBModelControllerManager;
 import cat.my.lib.orm.IMapperController;
-import cat.my.lib.restvolley.RestVolley;
+import cat.my.lib.restvolley.RestVolleyDataSource;
 import cat.my.lib.restvolley.models.IdentificableModel;
 
 
@@ -22,12 +22,12 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 
-public class MyData {
-	RestVolley restVolley;
+public class SynchDataSource implements IDataSource{
+	RestVolleyDataSource restVolley;
 	IDBModelControllerManager dbModelControllerManager;
 	DeletedEntries deletedEntries;
 		
-	public MyData(RestVolley restVolley, IMapperController mapperController, SQLiteOpenHelper dbHelper) {
+	public SynchDataSource(RestVolleyDataSource restVolley, IMapperController mapperController, SQLiteOpenHelper dbHelper) {
 //		this.dbMapper = dbMapper;
 		this.restVolley = restVolley;
 		this.deletedEntries = new DeletedEntries(restVolley, dbHelper);

@@ -25,7 +25,7 @@ import java.util.concurrent.Future;
 
 import org.json.JSONObject;
 
-import cat.my.lib.restvolley.RestVolley.ISessionData;
+import cat.my.lib.restvolley.RestVolleyDataSource.ISessionData;
 import cat.my.lib.restvolley.models.IdentificableModel;
 import cat.my.lib.restvolley.pathbuilders.IPathBuilder;
 import cat.my.lib.restvolley.pathbuilders.RailsPathBuilder.Route;
@@ -46,7 +46,7 @@ import android.content.Context;
 import android.util.Log;
 
 public class RestVolleySync {
-	RestVolley restVolley;
+	RestVolleyDataSource restVolley;
 	
 	private class ResultWaitListener<T> implements Listener<T>, ErrorListener{
 		T result;
@@ -87,11 +87,11 @@ public class RestVolleySync {
 	}
 
 	public RestVolleySync(Context context, IPathBuilder pathBuilder) {
-		this.restVolley = new RestVolley(context, pathBuilder);
+		this.restVolley = new RestVolleyDataSource(context, pathBuilder);
 	}
 	
 	public RestVolleySync(Context context, IPathBuilder pathBuilder, ISessionData sessionData) {
-		this.restVolley = new RestVolley(context, pathBuilder, sessionData);
+		this.restVolley = new RestVolleyDataSource(context, pathBuilder, sessionData);
 	}
 	
 	
