@@ -80,7 +80,7 @@ public class RailsPathBuilder implements IPathBuilder {
 		return prefix + "/" + plural + ".json";
 	}
 	
-	protected String getModelName(Class<?> clazz){
+	public String getModelName(Class<?> clazz){
 		return getModelName(clazz.getSimpleName());
 	}
 	

@@ -18,4 +18,5 @@ package cat.my.lib.restvolley.models;
 
 public interface IdentificableModel {
 	public String getId();
+	public void setId(String id);
 }

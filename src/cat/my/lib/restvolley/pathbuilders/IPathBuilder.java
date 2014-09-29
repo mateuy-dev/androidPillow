@@ -18,5 +18,7 @@ public interface IPathBuilder {
 	public Route getDestroyPath(IdentificableModel model);
 	
 	public Gson getSerializer();
+	
+	public String getModelName(Class<?> clazz);
 
 }

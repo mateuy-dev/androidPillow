@@ -46,16 +46,31 @@ import android.util.Log;
 public class RestVolley {
 	IPathBuilder pathBuilder;
 	RequestQueue volleyQueue;
+	ISessionData sessionData = new NoneSessionData();
 
 	public RestVolley(Context context, IPathBuilder pathBuilder) {
+		this(context, pathBuilder, new NoneSessionData());
+	}
+	
+	public RestVolley(Context context, IPathBuilder pathBuilder, ISessionData sessionData) {
 		this.volleyQueue = Volley.newRequestQueue(context);
 		this.pathBuilder = pathBuilder;
+		this.sessionData = sessionData;
 	}
+	
+	
 	
 	
 	public <T extends IdentificableModel> void index(Class<T> clazz, Type collectionType, Listener<Collection<T>> listener, ErrorListener errorListener) {
 		Route route = pathBuilder.getIndexPath(clazz);
-		GsonCollectionRequest<T> gsonRequest = new GsonCollectionRequest<T>(pathBuilder.getSerializer(), route, collectionType, null, listener, errorListener);
+		
+		String requestBody=null;
+		Map<String, Object> map=sessionData.getData();
+		if(map.size()>0){
+			requestBody = pathBuilder.getSerializer().toJson(map);
+		}
+		
+		GsonCollectionRequest<T> gsonRequest = new GsonCollectionRequest<T>(pathBuilder.getSerializer(), route, collectionType, requestBody, listener, errorListener);
 		gsonRequest.setShouldCache(false);
 		volleyQueue.add(gsonRequest);
 	}
@@ -96,9 +111,11 @@ public class RestVolley {
 
 	private <T> void addRoute(Route route, Class<T> clazz, T model, Listener<T> listener, ErrorListener errorListener){
 		String requestBody=null;
+		Map<String, Object> map=sessionData.getData();
 		if(model!=null){
-			Map<String, T> map=new HashMap<String, T>();
-			map.put("post", model);
+			map.put(pathBuilder.getModelName(clazz), model);
+		}
+		if(map.size()>0){
 			requestBody = pathBuilder.getSerializer().toJson(map);
 		}
 		GsonRequest<T> gsonRequest = new GsonRequest<T>(pathBuilder.getSerializer(), route, clazz, requestBody, listener, errorListener);
@@ -120,6 +137,17 @@ public class RestVolley {
 		@Override
 		public void onResponse(T response) {
 			listener.onResponse(null);
+		}
+	}
+	
+	public static interface ISessionData{
+		public Map<String, Object> getData();
+	}
+	
+	private static class NoneSessionData implements ISessionData{
+		@Override
+		public Map<String, Object> getData() {
+			return new HashMap<String, Object>();
 		}
 	}
 }
