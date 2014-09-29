@@ -164,7 +164,8 @@ public class DBModelController<T extends IdentificableModel> {
 		String[] selectionArgs = { model.getId() };
 		
 		db.delete(getTableName(), selection, selectionArgs);
-		if(dirtyStatus!=DIRTY_STATUS_CREATED){
+		if(dirtyStatus!=DIRTY_STATUS_CREATED && deletedEntries!=null){
+			//deletedEntries != null so it can be used in no DB entries. This is ungly and may be changed!!!
 			//If the status is created it has not been sent to server yet, so we don't need to delete it.
 			deletedEntries.setToDelete(db, model);
 		}
