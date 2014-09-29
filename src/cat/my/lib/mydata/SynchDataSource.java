@@ -34,6 +34,7 @@ public class SynchDataSource implements IDataSource{
 		this.restVolley = restVolley;
 		this.deletedEntries = new DeletedEntries(restVolley, dbHelper);
 		this.dbModelControllerManager = new DBModelControllerManager(dbHelper, mapperController, deletedEntries);
+		dbSource = new DbDataSource(mapperController, dbHelper);
 	}
 	
 	@Override

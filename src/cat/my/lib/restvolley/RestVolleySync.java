@@ -28,7 +28,7 @@ import org.json.JSONObject;
 import cat.my.lib.restvolley.RestVolleyDataSource.ISessionData;
 import cat.my.lib.restvolley.models.IdentificableModel;
 import cat.my.lib.restvolley.pathbuilders.IPathBuilder;
-import cat.my.lib.restvolley.pathbuilders.RailsPathBuilder.Route;
+import cat.my.lib.restvolley.pathbuilders.Route;
 import cat.my.lib.restvolley.requests.GsonCollectionRequest;
 import cat.my.lib.restvolley.requests.GsonRequest;
 

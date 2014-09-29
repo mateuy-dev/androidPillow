@@ -27,7 +27,7 @@ import org.json.JSONObject;
 import cat.my.lib.mydata.IDataSource;
 import cat.my.lib.restvolley.models.IdentificableModel;
 import cat.my.lib.restvolley.pathbuilders.IPathBuilder;
-import cat.my.lib.restvolley.pathbuilders.RailsPathBuilder.Route;
+import cat.my.lib.restvolley.pathbuilders.Route;
 import cat.my.lib.restvolley.requests.GsonCollectionRequest;
 import cat.my.lib.restvolley.requests.GsonRequest;
 
@@ -59,14 +59,12 @@ public class RestVolleyDataSource implements IDataSource{
 		this.sessionData = sessionData;
 	}
 	
-	
-	
-	
-	public <T extends IdentificableModel> void index(Class<T> clazz, Type collectionType, Listener<Collection<T>> listener, ErrorListener errorListener) {
-		Route route = pathBuilder.getIndexPath(clazz);
-		
+	public <T extends IdentificableModel> void executeListOperation(Class<T> clazz, Type collectionType, Route route, Map<String, Object> params, Listener<Collection<T>> listener, ErrorListener errorListener) {
 		String requestBody=null;
-		Map<String, Object> map=sessionData.getData();
+		Map<String, Object> map=new HashMap<String, Object>(sessionData.getData());
+		if(params!=null){
+			map.putAll(params);
+		}
 		if(map.size()>0){
 			requestBody = pathBuilder.getSerializer().toJson(map);
 		}
@@ -75,44 +73,13 @@ public class RestVolleyDataSource implements IDataSource{
 		gsonRequest.setShouldCache(false);
 		volleyQueue.add(gsonRequest);
 	}
-
-	public <T extends IdentificableModel> void show(Class<T> clazz, T model, Listener<T> listener, ErrorListener errorListener) {
-		Route route = pathBuilder.getShowPath(model);
-		addRoute(route, clazz, listener, errorListener);
-	}
 	
-	public <T extends IdentificableModel> void create(Class<T> clazz, T model, Listener<T> listener, ErrorListener errorListener) {
-		Route route = pathBuilder.getCreatePath(model);
-		addRoute(route, clazz, model, listener, errorListener);
-	}
-	
-	/**
-	 * 
-	 * @param clazz
-	 * @param model
-	 * @param listener ATENTION: update operation may return emty result on server. This will result in null T in the listener. Return the T from the server if required
-	 * @param errorListener
-	 */
-	public <T extends IdentificableModel> void update(Class<T> clazz, T model, Listener<T> listener, ErrorListener errorListener) {
-		Route route = pathBuilder.getUpdatePath(model);
-		//Listener<T> proxyListener = new VoidListenerProxy<T>(listener);
-		addRoute(route, clazz, model, listener, errorListener);
-		
-	}
-	
-	public <T extends IdentificableModel> void destroy(Class<T> clazz, T model, Listener<Void> listener, ErrorListener errorListener) {
-		Route route = pathBuilder.getDestroyPath(model);
-		Listener<T> proxyListener = new VoidListenerProxy<T>(listener);
-		addRoute(route, clazz, proxyListener, errorListener);
-	}
-	
-	private <T> void addRoute(Route route, Class<T> clazz, Listener<T> listener, ErrorListener errorListener){
-		addRoute(route, clazz, null, listener, errorListener);
-	}
-
-	private <T> void addRoute(Route route, Class<T> clazz, T model, Listener<T> listener, ErrorListener errorListener){
+	public <T extends IdentificableModel> void executeOperation(Class<T> clazz, T model, Route route, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener) {
 		String requestBody=null;
-		Map<String, Object> map=sessionData.getData();
+		Map<String, Object> map=new HashMap<String, Object>(sessionData.getData());
+		if(params!=null){
+			map.putAll(params);
+		}
 		if(model!=null){
 			map.put(pathBuilder.getModelName(clazz), model);
 		}
@@ -123,11 +90,38 @@ public class RestVolleyDataSource implements IDataSource{
 		gsonRequest.setShouldCache(false);
 		volleyQueue.add(gsonRequest);
 	}
-
-	public interface OnUpdateListener<T> {
+	
+	@Override
+	public <T extends IdentificableModel> void index(Class<T> clazz, Type collectionType, Listener<Collection<T>> listener, ErrorListener errorListener) {
+		Route route = pathBuilder.getIndexPath(clazz);
+		executeListOperation(clazz, collectionType, route, null, listener, errorListener);
 	}
 
-	public interface OnGetListener<T> {
+	@Override
+	public <T extends IdentificableModel> void show(Class<T> clazz, T model, Listener<T> listener, ErrorListener errorListener) {
+		Route route = pathBuilder.getShowPath(model);
+		executeOperation(clazz, model, route, null, listener, errorListener);
+	}
+	
+	@Override
+	public <T extends IdentificableModel> void create(Class<T> clazz, T model, Listener<T> listener, ErrorListener errorListener) {
+		Route route = pathBuilder.getCreatePath(model);
+		executeOperation(clazz, model, route, null, listener, errorListener);
+	}
+	
+	@Override
+	public <T extends IdentificableModel> void update(Class<T> clazz, T model, Listener<T> listener, ErrorListener errorListener) {
+		//@param listener ATENTION: update operation may return empty result on server. This will result in null T in the listener. Return the T from the server if required
+		Route route = pathBuilder.getUpdatePath(model);
+		executeOperation(clazz, model, route, null, listener, errorListener);
+		
+	}
+	
+	@Override
+	public <T extends IdentificableModel> void destroy(Class<T> clazz, T model, Listener<Void> listener, ErrorListener errorListener) {
+		Route route = pathBuilder.getDestroyPath(model);
+		Listener<T> proxyListener = new VoidListenerProxy<T>(listener);
+		executeOperation(clazz, model, route, null, proxyListener, errorListener);
 	}
 	
 	public class VoidListenerProxy<T> implements Listener<T>{

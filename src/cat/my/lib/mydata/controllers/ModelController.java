@@ -1,4 +1,4 @@
-package cat.my.lib.mydata;
+package cat.my.lib.mydata.controllers;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -6,6 +6,7 @@ import java.util.Collection;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 
+import cat.my.lib.mydata.IDataSource;
 import cat.my.lib.restvolley.models.IdentificableModel;
 
 public abstract class ModelController<T extends IdentificableModel> {

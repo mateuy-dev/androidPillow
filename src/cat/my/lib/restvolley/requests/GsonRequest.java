@@ -18,7 +18,7 @@ package cat.my.lib.restvolley.requests;
 
  
 import android.util.Log;
-import cat.my.lib.restvolley.pathbuilders.RailsPathBuilder.Route;
+import cat.my.lib.restvolley.pathbuilders.Route;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;

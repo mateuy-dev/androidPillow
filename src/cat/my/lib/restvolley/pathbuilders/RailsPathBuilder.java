@@ -35,6 +35,16 @@ public class RailsPathBuilder implements IPathBuilder {
 	}
 	
 	@Override
+	public Route getCollectionRoute(Class<?> clazz, int method, String operation){
+		return new Route(method, getPath(clazz, operation));
+	}
+	
+	@Override
+	public Route getMemberRoute(IdentificableModel model, int method, String operation){
+		return new Route(method, getPath(model.getClass(), model.getId(), operation));
+	}
+
+	@Override
 	public Route getIndexPath(Class<?> clazz){
 		return new Route(Method.GET, getPath(clazz));
 	}
@@ -68,16 +78,23 @@ public class RailsPathBuilder implements IPathBuilder {
 		return getPath(model.getClass(), model.getId());
 	}
 	
+	protected String getPath(Class<?> clazz){
+		String modelName = getModelName(clazz);
+		String plural = English.plural(modelName);
+		return prefix + "/" + plural + ".json";
+	}
+	
 	protected String getPath(Class<?> clazz, String id){
 		String modelName = getModelName(clazz);
 		String plural = English.plural(modelName);
 		return prefix + "/" + plural +"/"+ id +".json";
 	}
 	
-	protected String getPath(Class<?> clazz){
+	private String getPath(Class<?> clazz, String id, String operation) {
 		String modelName = getModelName(clazz);
 		String plural = English.plural(modelName);
-		return prefix + "/" + plural + ".json";
+		String opPath = "/" + operation;
+		return prefix + "/" + plural +"/"+ id + opPath +".json";
 	}
 	
 	public String getModelName(Class<?> clazz){
@@ -88,25 +105,5 @@ public class RailsPathBuilder implements IPathBuilder {
 		return caseFormat.cammelCaseToSnakeCase(modelName);
 	}
 	
-	public class Route{
-		int method;
-		String url;
-		public Route(int method, String url) {
-			super();
-			this.method = method;
-			this.url = url;
-		}
-		public int getMethod() {
-			return method;
-		}
-		public void setMethod(int method) {
-			this.method = method;
-		}
-		public String getUrl() {
-			return url;
-		}
-		public void setUrl(String url) {
-			this.url = url;
-		}
-	}
+
 }
