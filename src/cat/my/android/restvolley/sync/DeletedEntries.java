@@ -1,13 +1,13 @@
-package cat.my.lib.mydata;
+package cat.my.android.restvolley.sync;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import cat.my.lib.android.CursorUtil;
-import cat.my.lib.orm.DBUtil;
-import cat.my.lib.restvolley.RestVolleyDataSource;
-import cat.my.lib.restvolley.models.IdentificableModel;
+import cat.my.android.restvolley.IdentificableModel;
+import cat.my.android.restvolley.db.DBUtil;
+import cat.my.android.restvolley.rest.RestDataSource;
+import cat.my.android.util.CursorUtil;
 
 import com.android.volley.Response.Listener;
 
@@ -28,11 +28,11 @@ public class DeletedEntries<T extends IdentificableModel> {
 			");";
 
 	SQLiteOpenHelper dbHelper;
-	RestVolleyDataSource<T> restVolley;
+	RestDataSource<T> restVolley;
 
 	public static final String WHERE_ID_SELECTION = ID_COLUMN + " == ?";
 
-	public DeletedEntries(RestVolleyDataSource<T> restVolley, SQLiteOpenHelper dbHelper) {
+	public DeletedEntries(RestDataSource<T> restVolley, SQLiteOpenHelper dbHelper) {
 		this.dbHelper = dbHelper;
 		this.restVolley = restVolley;
 	}
@@ -70,17 +70,13 @@ public class DeletedEntries<T extends IdentificableModel> {
 		Cursor cursor = getCursor();
 		while(cursor.moveToNext()){
 			String id = CursorUtil.getString(cursor, ID_COLUMN);
-			String className = CursorUtil.getString(cursor, CLASS_COLUMN);
+			//Not needed, the cursor only selects current classes.
+			//String className = CursorUtil.getString(cursor, CLASS_COLUMN);
 			try {
-				Class<IdentificableModel> clazz = (Class<IdentificableModel>) Class.forName(className);
-				IdentificableModel model = (IdentificableModel) clazz.newInstance();
+				Class<T> clazz = getModelClass();
+				T model = clazz.newInstance();
 				model.setId(id);
-				
-				//TODO we have problems here!!!!!!!!!!!!!!!!!!!!!!!!
-				setAllreadyDeleted(null/*model*/);
-			} catch (ClassNotFoundException e) {
-				//TODO log error
-				e.printStackTrace();
+				setAllreadyDeleted(model);
 			} catch (InstantiationException e) {
 				// TODO Auto-generated catch block
 				//TODO this means that the model does not have a default constructor!
@@ -111,8 +107,14 @@ public class DeletedEntries<T extends IdentificableModel> {
 		//TODO order may be important!!!
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		String[] projection = {ID_COLUMN, CLASS_COLUMN};
-		Cursor cursor = db.query(TABLE,	projection, null, null, null, null,  null);
+		String selection = CLASS_COLUMN +" == ?";
+		String[] values = {getModelClass().getName()};
+		Cursor cursor = db.query(TABLE,	projection, selection, values, null, null,  null);
 		return cursor;
+	}
+	
+	public Class<T> getModelClass(){
+		return restVolley.getRestMapping().getModelClass();
 	}
 
 	public boolean isDeleted(String id) {

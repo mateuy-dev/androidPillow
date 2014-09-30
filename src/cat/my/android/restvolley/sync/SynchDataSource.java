@@ -1,4 +1,4 @@
-package cat.my.lib.mydata;
+package cat.my.android.restvolley.sync;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,19 +6,20 @@ import java.util.List;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
-import cat.my.lib.orm.DBModelController;
-import cat.my.lib.orm.DbDataSource;
-import cat.my.lib.orm.IDBModelFunctions;
-import cat.my.lib.restvolley.RestVolleyDataSource;
-import cat.my.lib.restvolley.models.IdentificableModel;
-import cat.my.lib.restvolley.pathbuilders.IRestMap;
+import cat.my.android.restvolley.IDataSource;
+import cat.my.android.restvolley.IdentificableModel;
+import cat.my.android.restvolley.db.DBModelController;
+import cat.my.android.restvolley.db.DbDataSource;
+import cat.my.android.restvolley.db.IDbMapping;
+import cat.my.android.restvolley.rest.IRestMapping;
+import cat.my.android.restvolley.rest.RestDataSource;
 
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 
 public class SynchDataSource<T extends IdentificableModel> implements IDataSource<T>{
-	RestVolleyDataSource<T> restVolley;
+	RestDataSource<T> restVolley;
 	
 
 	DeletedEntries<T> deletedEntries;
@@ -26,20 +27,17 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 	DBModelController<T> dbModelController;
 	
 	
-	IDBModelFunctions<T> dbFuncs;
-	IRestMap<T> restMap;
+	IDbMapping<T> dbFuncs;
+	IRestMapping<T> restMap;
 		
-	public SynchDataSource(IDBModelFunctions<T> dbFuncs, IRestMap<T> restMap, Context context, SQLiteOpenHelper dbHelper) {
-//		this.dbMapper = dbMapper;
-		this.restVolley = new RestVolleyDataSource<T>(restMap, context);
-		this.deletedEntries = new DeletedEntries<T>(restVolley, dbHelper);
-		
-		//TODO check this: we need both?
-		dbModelController = new DBModelController<T>(dbHelper, dbFuncs, deletedEntries);
+	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context, SQLiteOpenHelper dbHelper) {
+		restVolley = new RestDataSource<T>(restMap, context);
+		deletedEntries = new DeletedEntries<T>(restVolley, dbHelper);
 		dbSource = new DbDataSource<T>(dbFuncs, dbHelper, deletedEntries);
+		dbModelController = dbSource.getDbModelController();
 	}
 	
-	public RestVolleyDataSource<T> getRestVolley() {
+	public RestDataSource<T> getRestVolley() {
 		return restVolley;
 	}
 	
@@ -68,7 +66,7 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 	
 	@Override
 	public void update(final T model, final Listener<T> listener, ErrorListener errorListener) {
-		//@param listener ATENTION: update operation may return emty result on server. This will result in null T in the listener. Return the T from the server if required
+		//@param listener ATENTION: update operation may return empty result on server. This will result in null T in the listener. Return the T from the server if required
 		Listener<T> updatedOnDbListener = new Listener<T>(){
 			@Override
 			public void onResponse(T response) {

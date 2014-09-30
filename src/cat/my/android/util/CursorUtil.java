@@ -1,4 +1,4 @@
-package cat.my.lib.android;
+package cat.my.android.util;
 
 import android.database.Cursor;
 

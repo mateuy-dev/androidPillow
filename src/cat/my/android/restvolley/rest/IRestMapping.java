@@ -1,4 +1,4 @@
-package cat.my.lib.restvolley.pathbuilders;
+package cat.my.android.restvolley.rest;
 
 
 
@@ -6,7 +6,7 @@ import java.lang.reflect.Type;
 
 import com.google.gson.Gson;
 
-public interface IRestMap<T> {
+public interface IRestMapping<T> {
 
 	public Route getCollectionRoute(int method, String operation);
 	

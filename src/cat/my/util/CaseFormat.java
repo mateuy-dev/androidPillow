@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package cat.my.lib.restvolley.util;
+package cat.my.util;
 
 public class CaseFormat {
 	

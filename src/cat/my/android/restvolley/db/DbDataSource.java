@@ -1,11 +1,11 @@
-package cat.my.lib.orm;
+package cat.my.android.restvolley.db;
 
 import java.util.Collection;
 
 import android.database.sqlite.SQLiteOpenHelper;
-import cat.my.lib.mydata.DeletedEntries;
-import cat.my.lib.mydata.IDataSource;
-import cat.my.lib.restvolley.models.IdentificableModel;
+import cat.my.android.restvolley.IDataSource;
+import cat.my.android.restvolley.IdentificableModel;
+import cat.my.android.restvolley.sync.DeletedEntries;
 
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
@@ -13,11 +13,10 @@ import com.android.volley.Response.Listener;
 public class DbDataSource<T extends IdentificableModel> implements IDataSource<T>{
 	
 	SQLiteOpenHelper dbHelper;
-	IDBModelControllerManager dbModelControllerManager;
-	IDBModelFunctions<T> funcs;
+	IDbMapping<T> funcs;
 	DBModelController<T> dbModelController;
 
-	public DbDataSource(IDBModelFunctions<T> funcs, SQLiteOpenHelper dbHelper, DeletedEntries<T> deletedEntries) {
+	public DbDataSource(IDbMapping<T> funcs, SQLiteOpenHelper dbHelper, DeletedEntries deletedEntries) {
 		super();
 		//TODO check dbModelControllerManager -null delete entitites
 		this.funcs=funcs;
@@ -64,7 +63,7 @@ public class DbDataSource<T extends IdentificableModel> implements IDataSource<T
 		listener.onResponse(null);
 	}
 	
-	private DBModelController<T> getDbModelController(){
+	public DBModelController<T> getDbModelController(){
 		return dbModelController;
 	}
 

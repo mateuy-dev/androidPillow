@@ -14,27 +14,27 @@
  * limitations under the License.
  *
  */
-package cat.my.lib.restvolley.pathbuilders;
+package cat.my.android.restvolley.rest;
 
 import java.lang.reflect.Type;
 
 import org.atteo.evo.inflector.English;
 
-import cat.my.lib.restvolley.models.IdentificableModel;
-import cat.my.lib.restvolley.util.CaseFormat;
+import cat.my.android.restvolley.IdentificableModel;
+import cat.my.util.CaseFormat;
 
 import com.android.volley.Request.Method;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class RailsPathBuilder<T extends IdentificableModel> implements IRestMap<T> {
+public class RailsRestMapping<T extends IdentificableModel> implements IRestMapping<T> {
 	String prefix;
 	Class<T> clazz;
 	Type collectionType;
 	CaseFormat caseFormat = new CaseFormat();
 	
-	public RailsPathBuilder(String prefix, Class<T> clazz, Type collectionType){
+	public RailsRestMapping(String prefix, Class<T> clazz, Type collectionType){
 		this.prefix = prefix;
 		this.clazz = clazz;
 		this.collectionType = collectionType;

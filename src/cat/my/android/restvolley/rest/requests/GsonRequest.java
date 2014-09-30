@@ -14,12 +14,12 @@
  * limitations under the License.
  *
  */
-package cat.my.lib.restvolley.requests;
+package cat.my.android.restvolley.rest.requests;
 
  
 import java.io.UnsupportedEncodingException;
 
-import cat.my.lib.restvolley.pathbuilders.Route;
+import cat.my.android.restvolley.rest.Route;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;

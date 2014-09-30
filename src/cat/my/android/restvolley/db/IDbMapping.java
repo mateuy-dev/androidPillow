@@ -1,9 +1,9 @@
-package cat.my.lib.orm;
+package cat.my.android.restvolley.db;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 
-public interface IDBModelFunctions<T>{
+public interface IDbMapping<T>{
 	/**
 	 * This method should be add the model relations (if any) to the given model. In most cases should do nothing
 	 * This method is called after a model is obtained from the database -after createModel(cursor)-
@@ -39,4 +39,6 @@ public interface IDBModelFunctions<T>{
 	 * @return the name of the sql table
 	 */
 	public String getTableName();
+	
+	public String[][] getAttributes();
 }

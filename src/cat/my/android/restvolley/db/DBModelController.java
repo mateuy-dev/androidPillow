@@ -1,4 +1,4 @@
-package cat.my.lib.orm;
+package cat.my.android.restvolley.db;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,9 +13,9 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import cat.my.lib.android.CursorUtil;
-import cat.my.lib.mydata.DeletedEntries;
-import cat.my.lib.restvolley.models.IdentificableModel;
+import cat.my.android.restvolley.IdentificableModel;
+import cat.my.android.restvolley.sync.DeletedEntries;
+import cat.my.android.util.CursorUtil;
 
 
 
@@ -39,12 +39,12 @@ public class DBModelController<T extends IdentificableModel> {
 
 	
 	SQLiteOpenHelper dbHelpert;
-	IDBModelFunctions<T> mapper;
-	DeletedEntries deletedEntries;
+	IDbMapping<T> mapper;
+	DeletedEntries<T> deletedEntries;
 	
 	
 	
-	public DBModelController(SQLiteOpenHelper dbHelpert, IDBModelFunctions<T> mapper, DeletedEntries deletedEntries) {
+	public DBModelController(SQLiteOpenHelper dbHelpert, IDbMapping<T> mapper, DeletedEntries<T> deletedEntries) {
 		this.dbHelpert= dbHelpert;
 		this.mapper = mapper;
 		this.deletedEntries = deletedEntries;
@@ -401,44 +401,5 @@ public class DBModelController<T extends IdentificableModel> {
 			builder.append(att[0]).append(att[1]);
 		}
 		return builder.toString();
-	}
-	
-	protected static boolean getBoolean(Cursor cursor, int columnIndex){
-		int value = cursor.getInt(columnIndex);
-		return value==DBUtil.BOOLEAN_TRUE ? true : false;
-	}
-	
-	protected static Date getDate(Cursor cursor, int columnIndex){
-		String value = cursor.getString(columnIndex);
-		return stringToDate(value);
-	}
-	
-	private static final String DATE_STRING_FORMAT = "yyyy-MM-dd";
-	
-	/**
-	 * Converts a date to string for json or database storage
-	 * @param date
-	 * @return
-	 */
-	protected static String dateToString(Date date){
-		if(date==null) return null;
-		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_STRING_FORMAT);
-		return dateFormat.format(date);
-	}
-	
-	/**
-	 * Converts a String obtained from json or DB to date for model usage
-	 * @param date
-	 * @return
-	 */
-	protected static Date stringToDate(String date){
-		if(date==null) return null;
-		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_STRING_FORMAT);
-		try {
-			return dateFormat.parse(date);
-		} catch (ParseException e) {
-			e.printStackTrace();
-			return null;
-		}
 	}
 }

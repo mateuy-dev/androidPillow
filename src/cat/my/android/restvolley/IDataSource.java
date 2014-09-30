@@ -1,8 +1,7 @@
-package cat.my.lib.mydata;
+package cat.my.android.restvolley;
 
 import java.util.Collection;
 
-import cat.my.lib.restvolley.models.IdentificableModel;
 
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;

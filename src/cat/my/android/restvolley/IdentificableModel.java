@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package cat.my.lib.restvolley.models;
+package cat.my.android.restvolley;
 
 public interface IdentificableModel {
 	public String getId();

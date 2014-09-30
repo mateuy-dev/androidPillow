@@ -1,4 +1,4 @@
-package cat.my.lib.restvolley.pathbuilders;
+package cat.my.android.restvolley.rest;
 public class Route{
 	int method;
 	String url;
