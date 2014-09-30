@@ -2,9 +2,8 @@ package cat.my.lib.orm;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import cat.my.lib.restvolley.models.IdentificableModel;
 
-public interface ModelMapper<T> {
+public interface IDBModelFunctions<T>{
 	/**
 	 * This method should be add the model relations (if any) to the given model. In most cases should do nothing
 	 * This method is called after a model is obtained from the database -after createModel(cursor)-

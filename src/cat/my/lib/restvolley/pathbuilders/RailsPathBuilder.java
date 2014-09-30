@@ -16,56 +16,62 @@
  */
 package cat.my.lib.restvolley.pathbuilders;
 
+import java.lang.reflect.Type;
+
 import org.atteo.evo.inflector.English;
+
+import cat.my.lib.restvolley.models.IdentificableModel;
+import cat.my.lib.restvolley.util.CaseFormat;
 
 import com.android.volley.Request.Method;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import cat.my.lib.restvolley.models.IdentificableModel;
-import cat.my.lib.restvolley.util.CaseFormat;
-
-public class RailsPathBuilder implements IPathBuilder {
+public class RailsPathBuilder<T extends IdentificableModel> implements IRestMap<T> {
 	String prefix;
+	Class<T> clazz;
+	Type collectionType;
 	CaseFormat caseFormat = new CaseFormat();
 	
-	public RailsPathBuilder(String prefix){
+	public RailsPathBuilder(String prefix, Class<T> clazz, Type collectionType){
 		this.prefix = prefix;
+		this.clazz = clazz;
+		this.collectionType = collectionType;
 	}
 	
 	@Override
-	public Route getCollectionRoute(Class<?> clazz, int method, String operation){
-		return new Route(method, getPath(clazz, operation));
+	public Route getCollectionRoute(int method, String operation){
+		return new Route(method, getPath(operation));
 	}
 	
 	@Override
-	public Route getMemberRoute(IdentificableModel model, int method, String operation){
-		return new Route(method, getPath(model.getClass(), model.getId(), operation));
+	public Route getMemberRoute(T model, int method, String operation){
+		return new Route(method, getPath(model.getId(), operation));
 	}
 
 	@Override
-	public Route getIndexPath(Class<?> clazz){
-		return new Route(Method.GET, getPath(clazz));
+	public Route getIndexPath(){
+		return new Route(Method.GET, getPath());
 	}
 	
 	@Override
-	public Route getCreatePath(IdentificableModel model){
-		return new Route(Method.POST, getPath(model.getClass()));
+	public Route getCreatePath(T model){
+		return new Route(Method.POST, getPath());
 	}
 	
 	@Override
-	public Route getShowPath(IdentificableModel model){
+	public Route getShowPath(T model){
 		return new Route(Method.GET, getPath(model));
 	}
 	
 	@Override
-	public Route getUpdatePath(IdentificableModel model){
+	public Route getUpdatePath(T model){
 		return new Route(Method.PUT, getPath(model));
 	}
 	
 	@Override
-	public Route getDestroyPath(IdentificableModel model){
+	public Route getDestroyPath(T model){
 		return new Route(Method.DELETE, getPath(model));
 	}
 	
@@ -74,35 +80,45 @@ public class RailsPathBuilder implements IPathBuilder {
 		return new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 	}
 	
-	private String getPath(IdentificableModel model){
-		return getPath(model.getClass(), model.getId());
+	private String getPath(T model){
+		return getPath(model.getId());
 	}
 	
-	protected String getPath(Class<?> clazz){
-		String modelName = getModelName(clazz);
+	protected String getPath(){
+		String modelName = getModelName();
 		String plural = English.plural(modelName);
 		return prefix + "/" + plural + ".json";
 	}
 	
-	protected String getPath(Class<?> clazz, String id){
-		String modelName = getModelName(clazz);
+	protected String getPath(String id){
+		String modelName = getModelName();
 		String plural = English.plural(modelName);
 		return prefix + "/" + plural +"/"+ id +".json";
 	}
 	
-	private String getPath(Class<?> clazz, String id, String operation) {
-		String modelName = getModelName(clazz);
+	private String getPath(String id, String operation) {
+		String modelName = getModelName();
 		String plural = English.plural(modelName);
 		String opPath = "/" + operation;
 		return prefix + "/" + plural +"/"+ id + opPath +".json";
 	}
 	
-	public String getModelName(Class<?> clazz){
+	public String getModelName(){
 		return getModelName(clazz.getSimpleName());
 	}
 	
 	protected String getModelName(String modelName){
 		return caseFormat.cammelCaseToSnakeCase(modelName);
+	}
+
+	@Override
+	public Class<T> getModelClass() {
+		return clazz;
+	}
+
+	@Override
+	public Type getCollectionType() {
+		return collectionType;
 	}
 	
 

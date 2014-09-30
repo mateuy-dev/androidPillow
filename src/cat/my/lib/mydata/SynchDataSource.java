@@ -1,137 +1,141 @@
 package cat.my.lib.mydata;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
+import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-import android.widget.Toast;
 import cat.my.lib.orm.DBModelController;
-import cat.my.lib.orm.DBModelControllerManager;
 import cat.my.lib.orm.DbDataSource;
-import cat.my.lib.orm.IDBModelControllerManager;
-import cat.my.lib.orm.IMapperController;
+import cat.my.lib.orm.IDBModelFunctions;
 import cat.my.lib.restvolley.RestVolleyDataSource;
 import cat.my.lib.restvolley.models.IdentificableModel;
+import cat.my.lib.restvolley.pathbuilders.IRestMap;
 
-
-import com.android.volley.NoConnectionError;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 
-public class SynchDataSource implements IDataSource{
-	RestVolleyDataSource restVolley;
-	IDBModelControllerManager dbModelControllerManager;
-	DeletedEntries deletedEntries;
-	DbDataSource dbSource;
+public class SynchDataSource<T extends IdentificableModel> implements IDataSource<T>{
+	RestVolleyDataSource<T> restVolley;
+	
+
+	DeletedEntries<T> deletedEntries;
+	DbDataSource<T> dbSource;
+	DBModelController<T> dbModelController;
+	
+	
+	IDBModelFunctions<T> dbFuncs;
+	IRestMap<T> restMap;
 		
-	public SynchDataSource(RestVolleyDataSource restVolley, IMapperController mapperController, SQLiteOpenHelper dbHelper) {
+	public SynchDataSource(IDBModelFunctions<T> dbFuncs, IRestMap<T> restMap, Context context, SQLiteOpenHelper dbHelper) {
 //		this.dbMapper = dbMapper;
-		this.restVolley = restVolley;
-		this.deletedEntries = new DeletedEntries(restVolley, dbHelper);
-		this.dbModelControllerManager = new DBModelControllerManager(dbHelper, mapperController, deletedEntries);
-		dbSource = new DbDataSource(mapperController, dbHelper);
+		this.restVolley = new RestVolleyDataSource<T>(restMap, context);
+		this.deletedEntries = new DeletedEntries<T>(restVolley, dbHelper);
+		
+		//TODO check this: we need both?
+		dbModelController = new DBModelController<T>(dbHelper, dbFuncs, deletedEntries);
+		dbSource = new DbDataSource<T>(dbFuncs, dbHelper, deletedEntries);
+	}
+	
+	public RestVolleyDataSource<T> getRestVolley() {
+		return restVolley;
 	}
 	
 	@Override
-	public <T extends IdentificableModel> void index(Class<T> clazz, Type collectionType, Listener<Collection<T>> listener, ErrorListener errorListener) {
-		dbSource.index(clazz, collectionType, listener, errorListener);
+	public void index(Listener<Collection<T>> listener, ErrorListener errorListener) {
+		dbSource.index(listener, errorListener);
 	}
 	
 	@Override
-	public <T extends IdentificableModel> void show(Class<T> clazz, T model, Listener<T> listener, ErrorListener errorListener) {
-		dbSource.show(clazz, model, listener, errorListener);
+	public void show(T model, Listener<T> listener, ErrorListener errorListener) {
+		dbSource.show(model, listener, errorListener);
 	}
 	
 	@Override
-	public <T extends IdentificableModel> void create(final Class<T> clazz, final T model, final Listener<T> listener, ErrorListener errorListener) {
+	public void create(final T model, final Listener<T> listener, ErrorListener errorListener) {
 		Listener<T> createdOnDbListener = new Listener<T>(){
 			@Override
 			public void onResponse(T response) {
-				Listener<T> myListener = new SetAsNotDirityListener<T>(clazz);
-				restVolley.create(clazz, model, myListener, dummyErrorListener);
+				Listener<T> myListener = new SetAsNotDirityListener();
+				restVolley.create(model, myListener, dummyErrorListener);
 				listener.onResponse(model);
 			}
 		};
-		dbSource.create(clazz, model, createdOnDbListener, errorListener);
+		dbSource.create(model, createdOnDbListener, errorListener);
 	}
 	
 	@Override
-	public <T extends IdentificableModel> void update(final Class<T> clazz, final T model, final Listener<T> listener, ErrorListener errorListener) {
+	public void update(final T model, final Listener<T> listener, ErrorListener errorListener) {
 		//@param listener ATENTION: update operation may return emty result on server. This will result in null T in the listener. Return the T from the server if required
 		Listener<T> updatedOnDbListener = new Listener<T>(){
 			@Override
 			public void onResponse(T response) {
-				Listener<T> myListener = new SetAsNotDirityListener<T>(clazz);
-				restVolley.update(clazz, model, myListener, dummyErrorListener);
+				Listener<T> myListener = new SetAsNotDirityListener();
+				restVolley.update(model, myListener, dummyErrorListener);
 				listener.onResponse(model);
 			}
 		};
-		dbSource.update(clazz, model, updatedOnDbListener, errorListener);
+		dbSource.update(model, updatedOnDbListener, errorListener);
 	}
 	
 	@Override
-	public <T extends IdentificableModel> void destroy(final Class<T> clazz, final T model, final Listener<Void> listener, ErrorListener errorListener) {
+	public void destroy(final T model, final Listener<Void> listener, ErrorListener errorListener) {
 		Listener<Void> deletedOnDbListener = new Listener<Void>(){
 			@Override
 			public void onResponse(Void response) {
-				deletedEntries.setAllreadyDeleted(clazz, model);
+				deletedEntries.setAllreadyDeleted(model);
 				listener.onResponse(response);
 			}
 		};
-		dbSource.destroy(clazz, model, deletedOnDbListener, errorListener);
+		dbSource.destroy(model, deletedOnDbListener, errorListener);
 	}
 	
-	public <T extends IdentificableModel> void sendDirty(Class<T> clazz){
-		DBModelController<T> db = getDbModelController(clazz);
+	public void sendDirty(){
+		DBModelController<T> db = getDbModelController();
 		List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
 		for(T model : createdModels){
-			restVolley.create(clazz, model, new SetAsNotDirityListener<T>(clazz), dummyErrorListener);
+			restVolley.create(model, new SetAsNotDirityListener(), dummyErrorListener);
 			
 		}
 		List<T> updatedModels=db.getDirty(DBModelController.DIRTY_STATUS_UPDATED);
 		for(T model : updatedModels){
-			restVolley.update(clazz, model, new SetAsNotDirityListener<T>(clazz), dummyErrorListener);
+			restVolley.update(model, new SetAsNotDirityListener(), dummyErrorListener);
 		}
 		deletedEntries.synchronize();
 	}
 	
-	public <T extends IdentificableModel> void download(final Class<T> clazz, Type collectionType, final Listener<Collection<T>> listener, ErrorListener errorListener) {
+	public void download(final Listener<Collection<T>> listener, ErrorListener errorListener) {
 		Listener<Collection<T>> fillDatabaseListener = new Listener<Collection<T>>(){
 			@Override
 			public void onResponse(Collection<T> response) {
-				DBModelController<T> db = getDbModelController(clazz);
+				DBModelController<T> db = getDbModelController();
 				db.cacheAll(new ArrayList<T>(response));
 				listener.onResponse(response);
 			}
 		};
-		restVolley.index(clazz, collectionType, fillDatabaseListener, errorListener);
+		restVolley.index(fillDatabaseListener, errorListener);
 	}
 
 
 	
-	public class SetAsNotDirityListener<T extends IdentificableModel> implements Listener<T>{
-		Class<T> clazz;
+	public class SetAsNotDirityListener implements Listener<T>{
 		
-		public SetAsNotDirityListener(Class<T> clazz) {
+		public SetAsNotDirityListener() {
 			super();
-			this.clazz = clazz;
 		}
 
 		@Override
 		public void onResponse(T response) {
-			DBModelController<T> db =getDbModelController(clazz);
+			DBModelController<T> db =getDbModelController();
 			db.markAsClean(response);
 			response = db.get(response.getId());
 		}
 	}
 	
-	private <T extends IdentificableModel> DBModelController<T> getDbModelController(Class<T> clazz){
-		return dbModelControllerManager.getDBModelController(clazz);
+	private DBModelController<T> getDbModelController(){
+		return dbModelController;
 	}
 	
 	public static ErrorListener dummyErrorListener = new ErrorListener() {

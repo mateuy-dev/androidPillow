@@ -7,28 +7,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.UUID;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
 import cat.my.lib.android.CursorUtil;
 import cat.my.lib.mydata.DeletedEntries;
 import cat.my.lib.restvolley.models.IdentificableModel;
-
-import com.android.volley.RequestQueue;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
-import com.android.volley.toolbox.Volley;
 
 
 
@@ -52,12 +39,12 @@ public class DBModelController<T extends IdentificableModel> {
 
 	
 	SQLiteOpenHelper dbHelpert;
-	ModelMapper<T> mapper;
+	IDBModelFunctions<T> mapper;
 	DeletedEntries deletedEntries;
 	
 	
 	
-	public DBModelController(SQLiteOpenHelper dbHelpert, ModelMapper<T> mapper, DeletedEntries deletedEntries) {
+	public DBModelController(SQLiteOpenHelper dbHelpert, IDBModelFunctions<T> mapper, DeletedEntries deletedEntries) {
 		this.dbHelpert= dbHelpert;
 		this.mapper = mapper;
 		this.deletedEntries = deletedEntries;

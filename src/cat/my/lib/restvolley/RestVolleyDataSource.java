@@ -16,115 +16,119 @@
  */
 package cat.my.lib.restvolley;
 
-import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.json.JSONObject;
-
+import android.content.Context;
 import cat.my.lib.mydata.IDataSource;
 import cat.my.lib.restvolley.models.IdentificableModel;
-import cat.my.lib.restvolley.pathbuilders.IPathBuilder;
+import cat.my.lib.restvolley.pathbuilders.IRestMap;
 import cat.my.lib.restvolley.pathbuilders.Route;
 import cat.my.lib.restvolley.requests.GsonCollectionRequest;
 import cat.my.lib.restvolley.requests.GsonRequest;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
 
-import android.content.Context;
-import android.util.Log;
-
-public class RestVolleyDataSource implements IDataSource{
-	IPathBuilder pathBuilder;
+public class RestVolleyDataSource<T extends IdentificableModel> implements IDataSource<T> {
+	
 	RequestQueue volleyQueue;
 	ISessionData sessionData = new NoneSessionData();
-
-	public RestVolleyDataSource(Context context, IPathBuilder pathBuilder) {
-		this(context, pathBuilder, new NoneSessionData());
+	
+	IRestMap<T> restMap;
+	
+	public RestVolleyDataSource(IRestMap<T> restMap, Context context) {
+		this(restMap, context, new NoneSessionData());
 	}
 	
-	public RestVolleyDataSource(Context context, IPathBuilder pathBuilder, ISessionData sessionData) {
+	public RestVolleyDataSource(IRestMap<T> restMap, Context context, ISessionData sessionData) {
+		this.restMap=restMap;
 		this.volleyQueue = Volley.newRequestQueue(context);
-		this.pathBuilder = pathBuilder;
+		
 		this.sessionData = sessionData;
 	}
 	
-	public <T extends IdentificableModel> void executeListOperation(Class<T> clazz, Type collectionType, Route route, Map<String, Object> params, Listener<Collection<T>> listener, ErrorListener errorListener) {
+	
+	
+	public void executeListOperation(int method, String operation, Map<String, Object> params, Listener<Collection<T>> listener, ErrorListener errorListener) {
+		Route route = restMap.getCollectionRoute(method, operation);
+		executeListOperation(route, params, listener, errorListener);
+	}
+	
+	private void executeListOperation(Route route, Map<String, Object> params, Listener<Collection<T>> listener, ErrorListener errorListener) {
 		String requestBody=null;
 		Map<String, Object> map=new HashMap<String, Object>(sessionData.getData());
 		if(params!=null){
 			map.putAll(params);
 		}
 		if(map.size()>0){
-			requestBody = pathBuilder.getSerializer().toJson(map);
+			requestBody = restMap.getSerializer().toJson(map);
 		}
 		
-		GsonCollectionRequest<T> gsonRequest = new GsonCollectionRequest<T>(pathBuilder.getSerializer(), route, collectionType, requestBody, listener, errorListener);
+		GsonCollectionRequest<T> gsonRequest = new GsonCollectionRequest<T>(restMap.getSerializer(), route, restMap.getCollectionType(), requestBody, listener, errorListener);
 		gsonRequest.setShouldCache(false);
 		volleyQueue.add(gsonRequest);
 	}
 	
-	public <T extends IdentificableModel> void executeOperation(Class<T> clazz, T model, Route route, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener) {
+	public void executeOperation(T model, int method, String operation, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener) {
+		Route route = restMap.getMemberRoute(model, method, operation);
+		executeOperation(model, route, params, listener, errorListener);
+	}
+	
+	private void executeOperation(T model, Route route, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener) {
 		String requestBody=null;
 		Map<String, Object> map=new HashMap<String, Object>(sessionData.getData());
 		if(params!=null){
 			map.putAll(params);
 		}
 		if(model!=null){
-			map.put(pathBuilder.getModelName(clazz), model);
+			map.put(restMap.getModelName(), model);
 		}
 		if(map.size()>0){
-			requestBody = pathBuilder.getSerializer().toJson(map);
+			requestBody = restMap.getSerializer().toJson(map);
 		}
-		GsonRequest<T> gsonRequest = new GsonRequest<T>(pathBuilder.getSerializer(), route, clazz, requestBody, listener, errorListener);
+		GsonRequest<T> gsonRequest = new GsonRequest<T>(restMap.getSerializer(), route, restMap.getModelClass(), requestBody, listener, errorListener);
 		gsonRequest.setShouldCache(false);
 		volleyQueue.add(gsonRequest);
 	}
 	
 	@Override
-	public <T extends IdentificableModel> void index(Class<T> clazz, Type collectionType, Listener<Collection<T>> listener, ErrorListener errorListener) {
-		Route route = pathBuilder.getIndexPath(clazz);
-		executeListOperation(clazz, collectionType, route, null, listener, errorListener);
+	public void index(Listener<Collection<T>> listener, ErrorListener errorListener) {
+		Route route = restMap.getIndexPath();
+		executeListOperation(route, null, listener, errorListener);
 	}
 
 	@Override
-	public <T extends IdentificableModel> void show(Class<T> clazz, T model, Listener<T> listener, ErrorListener errorListener) {
-		Route route = pathBuilder.getShowPath(model);
-		executeOperation(clazz, model, route, null, listener, errorListener);
+	public void show(T model, Listener<T> listener, ErrorListener errorListener) {
+		Route route = restMap.getShowPath(model);
+		executeOperation(model, route, null, listener, errorListener);
 	}
 	
 	@Override
-	public <T extends IdentificableModel> void create(Class<T> clazz, T model, Listener<T> listener, ErrorListener errorListener) {
-		Route route = pathBuilder.getCreatePath(model);
-		executeOperation(clazz, model, route, null, listener, errorListener);
+	public void create(T model, Listener<T> listener, ErrorListener errorListener) {
+		Route route = restMap.getCreatePath(model);
+		executeOperation(model, route, null, listener, errorListener);
 	}
 	
 	@Override
-	public <T extends IdentificableModel> void update(Class<T> clazz, T model, Listener<T> listener, ErrorListener errorListener) {
+	public void update(T model, Listener<T> listener, ErrorListener errorListener) {
 		//@param listener ATENTION: update operation may return empty result on server. This will result in null T in the listener. Return the T from the server if required
-		Route route = pathBuilder.getUpdatePath(model);
-		executeOperation(clazz, model, route, null, listener, errorListener);
+		Route route = restMap.getUpdatePath(model);
+		executeOperation(model, route, null, listener, errorListener);
 		
 	}
 	
 	@Override
-	public <T extends IdentificableModel> void destroy(Class<T> clazz, T model, Listener<Void> listener, ErrorListener errorListener) {
-		Route route = pathBuilder.getDestroyPath(model);
-		Listener<T> proxyListener = new VoidListenerProxy<T>(listener);
-		executeOperation(clazz, model, route, null, proxyListener, errorListener);
+	public void destroy(T model, Listener<Void> listener, ErrorListener errorListener) {
+		Route route = restMap.getDestroyPath(model);
+		Listener<T> proxyListener = new VoidListenerProxy(listener);
+		executeOperation(model, route, null, proxyListener, errorListener);
 	}
 	
-	public class VoidListenerProxy<T> implements Listener<T>{
+	public class VoidListenerProxy implements Listener<T>{
 		Listener<Void> listener;
 		public VoidListenerProxy(Listener<Void> listener){
 			this.listener = listener;

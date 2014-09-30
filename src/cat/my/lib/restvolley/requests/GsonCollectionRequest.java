@@ -19,13 +19,15 @@ package cat.my.lib.restvolley.requests;
  
 
 
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
+import java.util.Collection;
+
 import cat.my.lib.restvolley.pathbuilders.Route;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
@@ -33,12 +35,6 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-
- 
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Map;
  
 
 public class GsonCollectionRequest<T> extends JsonRequest<Collection<T>> {

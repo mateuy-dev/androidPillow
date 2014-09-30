@@ -1,58 +1,55 @@
 package cat.my.lib.orm;
 
-import java.lang.reflect.Type;
 import java.util.Collection;
 
 import android.database.sqlite.SQLiteOpenHelper;
+import cat.my.lib.mydata.DeletedEntries;
+import cat.my.lib.mydata.IDataSource;
+import cat.my.lib.restvolley.models.IdentificableModel;
 
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 
-import cat.my.lib.mydata.IDataSource;
-import cat.my.lib.restvolley.models.IdentificableModel;
-
-public class DbDataSource implements IDataSource{
-	IMapperController mapperController;
+public class DbDataSource<T extends IdentificableModel> implements IDataSource<T>{
+	
 	SQLiteOpenHelper dbHelper;
 	IDBModelControllerManager dbModelControllerManager;
+	IDBModelFunctions<T> funcs;
+	DBModelController<T> dbModelController;
 
-	public DbDataSource(IMapperController mapperController, SQLiteOpenHelper dbHelper) {
+	public DbDataSource(IDBModelFunctions<T> funcs, SQLiteOpenHelper dbHelper, DeletedEntries<T> deletedEntries) {
 		super();
 		//TODO check dbModelControllerManager -null delete entitites
-		
-		this.mapperController = mapperController;
+		this.funcs=funcs;
 		this.dbHelper = dbHelper;
-		this.dbModelControllerManager = new DBModelControllerManager(dbHelper, mapperController, null);
+		dbModelController = new DBModelController<T>(dbHelper, funcs, deletedEntries);
 	}
 
 	@Override
-	public <T extends IdentificableModel> void index(Class<T> clazz, Type collectionType,
-			Listener<Collection<T>> listener, ErrorListener errorListener) {
-		DBModelController<T> db = getDbModelController(clazz);
+	public void index(Listener<Collection<T>> listener, ErrorListener errorListener) {
+		DBModelController<T> db = getDbModelController();
 		listener.onResponse(db.getAll());
 	}
 
 	@Override
-	public <T extends IdentificableModel> void show(Class<T> clazz, T model, Listener<T> listener,
+	public void show(T model, Listener<T> listener,
 			ErrorListener errorListener) {
-		DBModelController<T> db =getDbModelController(clazz);
+		DBModelController<T> db =getDbModelController();
 		T result = db.get(model.getId());
 		listener.onResponse(result);
 	}
 
 	@Override
-	public <T extends IdentificableModel> void create(Class<T> clazz, T model, Listener<T> listener,
-			ErrorListener errorListener) {
-		DBModelController<T> db = getDbModelController(clazz);
+	public void create(T model, Listener<T> listener, ErrorListener errorListener) {
+		DBModelController<T> db = getDbModelController();
 		db.create(model);
 		model = db.get(model.getId());
 		listener.onResponse(model);
 	}
 
 	@Override
-	public <T extends IdentificableModel> void update(Class<T> clazz, T model, Listener<T> listener,
-			ErrorListener errorListener) {
-		DBModelController<T> db =getDbModelController(clazz);
+	public void update(T model, Listener<T> listener, ErrorListener errorListener) {
+		DBModelController<T> db =getDbModelController();
 		db.update(model);
 		//refresh model
 		model = db.get(model.getId());
@@ -60,15 +57,15 @@ public class DbDataSource implements IDataSource{
 	}
 
 	@Override
-	public <T extends IdentificableModel> void destroy(Class<T> clazz, T model, Listener<Void> listener,
+	public void destroy(T model, Listener<Void> listener,
 			ErrorListener errorListener) {
-		DBModelController<T> db =getDbModelController(clazz);
+		DBModelController<T> db =getDbModelController();
 		db.delete(model);
 		listener.onResponse(null);
 	}
 	
-	private <T extends IdentificableModel> DBModelController<T> getDbModelController(Class<T> clazz){
-		return dbModelControllerManager.getDBModelController(clazz);
+	private DBModelController<T> getDbModelController(){
+		return dbModelController;
 	}
 
 }
