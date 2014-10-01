@@ -23,8 +23,8 @@ public abstract class AbstractDBHelper extends SQLiteOpenHelper{
 	}
 	
 	public void resetTables(SQLiteDatabase db){
-		createTables(db);
 		dropTables(db);
+		createTables(db);
 	}
 	
 	public void createTables(SQLiteDatabase db){

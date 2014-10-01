@@ -16,7 +16,7 @@ public class DbDataSource<T extends IdentificableModel> implements IDataSource<T
 	IDbMapping<T> funcs;
 	DBModelController<T> dbModelController;
 
-	public DbDataSource(IDbMapping<T> funcs, SQLiteOpenHelper dbHelper, DeletedEntries deletedEntries) {
+	public DbDataSource(IDbMapping<T> funcs, SQLiteOpenHelper dbHelper, DeletedEntries<T> deletedEntries) {
 		super();
 		//TODO check dbModelControllerManager -null delete entitites
 		this.funcs=funcs;
