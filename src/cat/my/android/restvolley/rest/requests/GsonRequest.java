@@ -18,9 +18,11 @@ package cat.my.android.restvolley.rest.requests;
 
  
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 import cat.my.android.restvolley.rest.Route;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -33,18 +35,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
  
 
-public class GsonRequest<T> extends JsonRequest<T> {
-	private Gson gson;
+public class GsonRequest<T> extends AbstractGsonRequest<T> {
 	Class<T> clazz;
 	
-	public GsonRequest(Gson gson, Route route, Class<T> clazz, String requestBody, Listener<T> listener, ErrorListener errorListener) {
-		super(route.getMethod(), route.getUrl(), requestBody, listener, errorListener);
-		this.gson = gson;
+	public GsonRequest(Gson gson, Route route, Class<T> clazz, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener) {
+		super(gson, route, params, listener, errorListener);
+		
 		this.clazz = clazz;
-		setRetryPolicy(new DefaultRetryPolicy(
-                90000, 
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES, 
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 	}
     
     @Override
@@ -53,7 +50,7 @@ public class GsonRequest<T> extends JsonRequest<T> {
             String json = new String(
                     response.data, HttpHeaderParser.parseCharset(response.headers));
             return Response.success(
-                    gson.fromJson(json, clazz), HttpHeaderParser.parseCacheHeaders(response));
+            		getGson().fromJson(json, clazz), HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JsonSyntaxException e) {
@@ -61,6 +58,4 @@ public class GsonRequest<T> extends JsonRequest<T> {
             return Response.error(new ParseError(e));
         }
     }
-    
-    
 }

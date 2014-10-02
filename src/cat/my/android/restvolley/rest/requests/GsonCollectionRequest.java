@@ -22,9 +22,11 @@ package cat.my.android.restvolley.rest.requests;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Map;
 
 import cat.my.android.restvolley.rest.Route;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -37,19 +39,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
  
 
-public class GsonCollectionRequest<T> extends JsonRequest<Collection<T>> {
-	private Gson gson;
+public class GsonCollectionRequest<T> extends AbstractGsonRequest<Collection<T>> {
 	Type collectionType;
 	
-	public GsonCollectionRequest(Gson gson, Route route, Type collectionType, String requestBody, Listener<Collection<T>> listener, ErrorListener errorListener) {
-		super(route.getMethod(), route.getUrl(), requestBody, listener, errorListener);
-		this.gson=gson;
-		
+		public GsonCollectionRequest(Gson gson, Route route, Type collectionType, Map<String, Object> params, Listener<Collection<T>> listener, ErrorListener errorListener) {
+		super(gson, route, params, listener, errorListener);
 		this.collectionType = collectionType;
-		setRetryPolicy(new DefaultRetryPolicy(
-                90000, 
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES, 
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 	}
     
     @Override
@@ -57,7 +52,7 @@ public class GsonCollectionRequest<T> extends JsonRequest<Collection<T>> {
         try {
             String json = new String(
                     response.data, HttpHeaderParser.parseCharset(response.headers));
-            Collection<T> data = gson.fromJson(json, collectionType);
+            Collection<T> data = getGson().fromJson(json, collectionType);
             return Response.success(data, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
@@ -65,6 +60,5 @@ public class GsonCollectionRequest<T> extends JsonRequest<Collection<T>> {
             return Response.error(new ParseError(e));
         }
     }
-    
-    
+
 }

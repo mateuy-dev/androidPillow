@@ -34,19 +34,21 @@ import com.android.volley.toolbox.Volley;
 public class RestDataSource<T extends IdentificableModel> implements IDataSource<T> {
 	
 	RequestQueue volleyQueue;
-	ISessionData sessionData = new NoneSessionData();
+	Map<String, Object> sessionData;
 	
 	IRestMapping<T> restMapping;
 	
 	
 	public RestDataSource(IRestMapping<T> restMapping, Context context) {
-		this(restMapping, context, new NoneSessionData());
+		this(restMapping, context, new HashMap<String, Object>());
 	}
 	
-	public RestDataSource(IRestMapping<T> restMapping, Context context, ISessionData sessionData) {
+	public RestDataSource(IRestMapping<T> restMapping, Context context, Map<String, Object> sessionData) {
 		this.restMapping=restMapping;
 		this.volleyQueue = Volley.newRequestQueue(context);
 		
+		if(sessionData==null)
+			sessionData = new HashMap<String, Object>();
 		this.sessionData = sessionData;
 	}
 	
@@ -62,15 +64,13 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 	
 	private void executeListOperation(Route route, Map<String, Object> params, Listener<Collection<T>> listener, ErrorListener errorListener) {
 		String requestBody=null;
-		Map<String, Object> map=new HashMap<String, Object>(sessionData.getData());
+		Map<String, Object> map=new HashMap<String, Object>(sessionData);
 		if(params!=null){
 			map.putAll(params);
 		}
-		if(map.size()>0){
-			requestBody = restMapping.getSerializer().toJson(map);
-		}
 		
-		GsonCollectionRequest<T> gsonRequest = new GsonCollectionRequest<T>(restMapping.getSerializer(), route, restMapping.getCollectionType(), requestBody, listener, errorListener);
+		
+		GsonCollectionRequest<T> gsonRequest = new GsonCollectionRequest<T>(restMapping.getSerializer(), route, restMapping.getCollectionType(), map, listener, errorListener);
 		gsonRequest.setShouldCache(false);
 		volleyQueue.add(gsonRequest);
 	}
@@ -81,18 +81,16 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 	}
 	
 	private void executeOperation(T model, Route route, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener) {
-		String requestBody=null;
-		Map<String, Object> map=new HashMap<String, Object>(sessionData.getData());
+		
+		Map<String, Object> map=new HashMap<String, Object>(sessionData);
 		if(params!=null){
 			map.putAll(params);
 		}
 		if(model!=null){
 			map.put(restMapping.getModelName(), model);
 		}
-		if(map.size()>0){
-			requestBody = restMapping.getSerializer().toJson(map);
-		}
-		GsonRequest<T> gsonRequest = new GsonRequest<T>(restMapping.getSerializer(), route, restMapping.getModelClass(), requestBody, listener, errorListener);
+		
+		GsonRequest<T> gsonRequest = new GsonRequest<T>(restMapping.getSerializer(), route, restMapping.getModelClass(), map, listener, errorListener);
 		gsonRequest.setShouldCache(false);
 		volleyQueue.add(gsonRequest);
 	}
@@ -141,14 +139,5 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 		}
 	}
 	
-	public static interface ISessionData{
-		public Map<String, Object> getData();
-	}
 	
-	private static class NoneSessionData implements ISessionData{
-		@Override
-		public Map<String, Object> getData() {
-			return new HashMap<String, Object>();
-		}
-	}
 }

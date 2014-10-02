@@ -2,7 +2,9 @@ package cat.my.android.restvolley.sync;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -30,11 +32,14 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 	IDbMapping<T> dbFuncs;
 	IRestMapping<T> restMap;
 		
-	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context, SQLiteOpenHelper dbHelper) {
-		restVolley = new RestDataSource<T>(restMap, context);
+	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context, SQLiteOpenHelper dbHelper, Map<String, Object> session) {
+		restVolley = new RestDataSource<T>(restMap, context, session);
 		deletedEntries = new DeletedEntries<T>(restVolley, dbHelper);
 		dbSource = new DbDataSource<T>(dbFuncs, dbHelper, deletedEntries);
 		dbModelController = dbSource.getDbModelController();
+	}
+	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context, SQLiteOpenHelper dbHelper) {
+		this(dbFuncs, restMap, context, dbHelper, null);
 	}
 	
 	public RestDataSource<T> getRestVolley() {
