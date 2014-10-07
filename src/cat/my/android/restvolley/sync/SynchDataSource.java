@@ -65,7 +65,7 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 			@Override
 			public void onResponse(T response) {
 				Listener<T> myListener = new SetAsNotDirityListener();
-				restVolley.create(model, myListener, dummyErrorListener);
+				restVolley.create(model, myListener, DummyListeners.dummyErrorListener);
 				listener.onResponse(model);
 			}
 		};
@@ -79,7 +79,7 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 			@Override
 			public void onResponse(T response) {
 				Listener<T> myListener = new SetAsNotDirityListener();
-				restVolley.update(model, myListener, dummyErrorListener);
+				restVolley.update(model, myListener, DummyListeners.dummyErrorListener);
 				listener.onResponse(model);
 			}
 		};
@@ -102,12 +102,12 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 		DBModelController<T> db = getDbModelController();
 		List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
 		for(T model : createdModels){
-			restVolley.create(model, new SetAsNotDirityListener(), dummyErrorListener);
+			restVolley.create(model, new SetAsNotDirityListener(), DummyListeners.dummyErrorListener);
 			
 		}
 		List<T> updatedModels=db.getDirty(DBModelController.DIRTY_STATUS_UPDATED);
 		for(T model : updatedModels){
-			restVolley.update(model, new SetAsNotDirityListener(), dummyErrorListener);
+			restVolley.update(model, new SetAsNotDirityListener(), DummyListeners.dummyErrorListener);
 		}
 		deletedEntries.synchronize();
 	}
@@ -143,18 +143,6 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 	private DBModelController<T> getDbModelController(){
 		return dbModelController;
 	}
-	
-	public static ErrorListener dummyErrorListener = new ErrorListener() {
-		@Override
-		public void onErrorResponse(VolleyError error) {
-			error.printStackTrace();
-		}
-	};
-	Listener dummyListener = new Listener() {
-		@Override
-		public void onResponse(Object response) {
-		}
-	};
 	
 //	private ErrorListener adapt(ErrorListener errorListener) {
 //		return new MyDataErrorListener(errorListener);
