@@ -13,6 +13,7 @@ import cat.my.android.restvolley.IdentificableModel;
 import cat.my.android.restvolley.db.DBModelController;
 import cat.my.android.restvolley.db.DbDataSource;
 import cat.my.android.restvolley.db.IDbMapping;
+import cat.my.android.restvolley.rest.IAuthenticationData;
 import cat.my.android.restvolley.rest.IRestMapping;
 import cat.my.android.restvolley.rest.RestDataSource;
 
@@ -22,18 +23,16 @@ import com.android.volley.VolleyError;
 
 public class SynchDataSource<T extends IdentificableModel> implements IDataSource<T>{
 	RestDataSource<T> restVolley;
-	
-
+	IAuthenticationData authenticationData;
 	DeletedEntries<T> deletedEntries;
 	DbDataSource<T> dbSource;
 	DBModelController<T> dbModelController;
-	
-	
 	IDbMapping<T> dbFuncs;
 	IRestMapping<T> restMap;
 		
-	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context, SQLiteOpenHelper dbHelper, Map<String, Object> session) {
-		restVolley = new RestDataSource<T>(restMap, context, session);
+	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context, SQLiteOpenHelper dbHelper, IAuthenticationData authenticationData) {
+		this.authenticationData=authenticationData;
+		restVolley = new RestDataSource<T>(restMap, context, authenticationData);
 		deletedEntries = new DeletedEntries<T>(restVolley, dbHelper);
 		dbSource = new DbDataSource<T>(dbFuncs, dbHelper, deletedEntries);
 		dbModelController = dbSource.getDbModelController();
@@ -44,6 +43,10 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 	
 	public RestDataSource<T> getRestVolley() {
 		return restVolley;
+	}
+	
+	public void setServerRequiresAuthentication(boolean serverRequiresAuthentication) {
+		this.restVolley.setServerRequiresAuthentication(serverRequiresAuthentication);
 	}
 	
 	@Override
@@ -152,8 +155,6 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 		public void onResponse(Object response) {
 		}
 	};
-	
-	
 	
 //	private ErrorListener adapt(ErrorListener errorListener) {
 //		return new MyDataErrorListener(errorListener);

@@ -23,76 +23,93 @@ import java.util.Map;
 import android.content.Context;
 import cat.my.android.restvolley.IDataSource;
 import cat.my.android.restvolley.IdentificableModel;
+import cat.my.android.restvolley.rest.IAuthenticationData.NullAuthenticationData;
 import cat.my.android.restvolley.rest.requests.GsonCollectionRequest;
 import cat.my.android.restvolley.rest.requests.GsonRequest;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 
 public class RestDataSource<T extends IdentificableModel> implements IDataSource<T> {
 	
 	RequestQueue volleyQueue;
-	Map<String, Object> sessionData;
-	
+	IAuthenticationData authenticationData;
 	IRestMapping<T> restMapping;
+	boolean serverRequiresAuthentication=false;
 	
 	
 	public RestDataSource(IRestMapping<T> restMapping, Context context) {
-		this(restMapping, context, new HashMap<String, Object>());
+		this(restMapping, context, new NullAuthenticationData());
 	}
 	
-	public RestDataSource(IRestMapping<T> restMapping, Context context, Map<String, Object> sessionData) {
+	public RestDataSource(IRestMapping<T> restMapping, Context context, IAuthenticationData authenticationData) {
 		this.restMapping=restMapping;
 		this.volleyQueue = Volley.newRequestQueue(context);
-		
-		if(sessionData==null)
-			sessionData = new HashMap<String, Object>();
-		this.sessionData = sessionData;
+		this.authenticationData = authenticationData;
 	}
 	
 	public IRestMapping<T> getRestMapping() {
 		return restMapping;
 	}
 
+	/**
+	 * @return false if authentication is required but not provided
+	 */
+	public boolean checkAuthenticationRequired() {
+		return !serverRequiresAuthentication || authenticationData.isAuthenticated();
+	}
+	public void setServerRequiresAuthentication(boolean serverRequiresAuthentication) {
+		this.serverRequiresAuthentication = serverRequiresAuthentication;
+	}
 	
-	public void executeListOperation(int method, String operation, Map<String, Object> params, Listener<Collection<T>> listener, ErrorListener errorListener) {
+	public void executeCollectionListOperation(int method, String operation, Map<String, Object> params, Listener<Collection<T>> listener, ErrorListener errorListener) {
 		Route route = restMapping.getCollectionRoute(method, operation);
 		executeListOperation(route, params, listener, errorListener);
 	}
 	
-	private void executeListOperation(Route route, Map<String, Object> params, Listener<Collection<T>> listener, ErrorListener errorListener) {
-		String requestBody=null;
-		Map<String, Object> map=new HashMap<String, Object>(sessionData);
-		if(params!=null){
-			map.putAll(params);
-		}
-		
-		
-		GsonCollectionRequest<T> gsonRequest = new GsonCollectionRequest<T>(restMapping.getSerializer(), route, restMapping.getCollectionType(), map, listener, errorListener);
-		gsonRequest.setShouldCache(false);
-		volleyQueue.add(gsonRequest);
-	}
-	
-	public void executeOperation(T model, int method, String operation, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener) {
+	public void executeMemberOperation(T model, int method, String operation, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener) {
 		Route route = restMapping.getMemberRoute(model, method, operation);
 		executeOperation(model, route, params, listener, errorListener);
 	}
 	
+	public void executeCollectionOperation(T model, int method, String operation, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener) {
+		Route route = restMapping.getCollectionRoute(method, operation);
+		executeOperation(model, route, params, listener, errorListener);
+	}
+	
+	private void executeListOperation(Route route, Map<String, Object> params, Listener<Collection<T>> listener, ErrorListener errorListener) {
+		if(checkAuthenticationRequired()){
+			Map<String, Object> map=new HashMap<String, Object>(authenticationData.getSession());
+			if(params!=null){
+				map.putAll(params);
+			}
+			GsonCollectionRequest<T> gsonRequest = new GsonCollectionRequest<T>(restMapping.getSerializer(), route, restMapping.getCollectionType(), map, listener, errorListener);
+			gsonRequest.setShouldCache(false);
+			volleyQueue.add(gsonRequest);
+		} else {
+			errorListener.onErrorResponse(new AuthenticationRequiredException());
+		}
+	}
+	
 	private void executeOperation(T model, Route route, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener) {
-		
-		Map<String, Object> map=new HashMap<String, Object>(sessionData);
-		if(params!=null){
-			map.putAll(params);
+		if(checkAuthenticationRequired()){
+			Map<String, Object> map=new HashMap<String, Object>(authenticationData.getSession());
+			if(params!=null){
+				map.putAll(params);
+			}
+			if(model!=null){
+				map.put(restMapping.getModelName(), model);
+			}
+			
+			GsonRequest<T> gsonRequest = new GsonRequest<T>(restMapping.getSerializer(), route, restMapping.getModelClass(), map, listener, errorListener);
+			gsonRequest.setShouldCache(false);
+			volleyQueue.add(gsonRequest);
+		} else {
+			errorListener.onErrorResponse(new AuthenticationRequiredException());
 		}
-		if(model!=null){
-			map.put(restMapping.getModelName(), model);
-		}
-		
-		GsonRequest<T> gsonRequest = new GsonRequest<T>(restMapping.getSerializer(), route, restMapping.getModelClass(), map, listener, errorListener);
-		gsonRequest.setShouldCache(false);
-		volleyQueue.add(gsonRequest);
 	}
 	
 	@Override
@@ -139,5 +156,8 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 		}
 	}
 	
+	public static class AuthenticationRequiredException extends VolleyError{
+		
+	}
 	
 }
