@@ -302,7 +302,7 @@ public class DBModelController<T extends IdentificableModel> {
 	}
 	
 	private String createUUID() {
-		return UUID.randomUUID().toString().replace("-", "").toUpperCase();
+		return DBUtil.createUUID();
 	}
 
 	/**

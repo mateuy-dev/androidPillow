@@ -13,7 +13,7 @@ import cat.my.android.restvolley.IdentificableModel;
 import cat.my.android.restvolley.db.DBModelController;
 import cat.my.android.restvolley.db.DbDataSource;
 import cat.my.android.restvolley.db.IDbMapping;
-import cat.my.android.restvolley.rest.IAuthenticationData;
+import cat.my.android.restvolley.rest.ISessionController;
 import cat.my.android.restvolley.rest.IRestMapping;
 import cat.my.android.restvolley.rest.RestDataSource;
 
@@ -21,17 +21,18 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 
-public class SynchDataSource<T extends IdentificableModel> implements IDataSource<T>{
+public class SynchDataSource<T extends IdentificableModel> implements IDataSource<T>, ISynchDataSource<T>{
 	RestDataSource<T> restVolley;
-	IAuthenticationData authenticationData;
+	ISessionController authenticationData;
 	DeletedEntries<T> deletedEntries;
 	DbDataSource<T> dbSource;
 	DBModelController<T> dbModelController;
 	IDbMapping<T> dbFuncs;
 	IRestMapping<T> restMap;
-		
-	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context, SQLiteOpenHelper dbHelper, IAuthenticationData authenticationData) {
+	
+	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context, SQLiteOpenHelper dbHelper, ISessionController authenticationData) {
 		this.authenticationData=authenticationData;
+		this.dbFuncs=dbFuncs;
 		restVolley = new RestDataSource<T>(restMap, context, authenticationData);
 		deletedEntries = new DeletedEntries<T>(restVolley, dbHelper);
 		dbSource = new DbDataSource<T>(dbFuncs, dbHelper, deletedEntries);
@@ -43,10 +44,6 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 	
 	public RestDataSource<T> getRestVolley() {
 		return restVolley;
-	}
-	
-	public void setServerRequiresAuthentication(boolean serverRequiresAuthentication) {
-		this.restVolley.setServerRequiresAuthentication(serverRequiresAuthentication);
 	}
 	
 	@Override
@@ -99,6 +96,7 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 	}
 	
 	public void sendDirty(){
+		//TODO this should work with listeners!!!
 		DBModelController<T> db = getDbModelController();
 		List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
 		for(T model : createdModels){
@@ -144,6 +142,38 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 		return dbModelController;
 	}
 	
+	public ModelInfo getModelInfo(){
+		ModelInfo result = new ModelInfo();
+		DBModelController<T> db = getDbModelController();
+		
+		List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
+		result.setDirtyCreatedNum(createdModels.size());
+		
+		List<T> updatedModels=db.getDirty(DBModelController.DIRTY_STATUS_UPDATED);
+		result.setDirtyUpdatedNum(updatedModels.size());
+		return result;
+	}
+	
+	public static class ModelInfo{
+		int dirtyCreatedNum, dirtyUpdatedNum;
+
+		public int getDirtyCreatedNum() {
+			return dirtyCreatedNum;
+		}
+
+		public void setDirtyCreatedNum(int dirtyCreatedNum) {
+			this.dirtyCreatedNum = dirtyCreatedNum;
+		}
+
+		public int getDirtyUpdatedNum() {
+			return dirtyUpdatedNum;
+		}
+
+		public void setDirtyUpdatedNum(int dirtyUpdatedNum) {
+			this.dirtyUpdatedNum = dirtyUpdatedNum;
+		}
+		
+	}
 //	private ErrorListener adapt(ErrorListener errorListener) {
 //		return new MyDataErrorListener(errorListener);
 //	}
@@ -166,4 +196,8 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 //		}
 //		
 //	}
+
+	public IDbMapping<T> getDbFuncs() {
+		return dbFuncs;
+	}
 }

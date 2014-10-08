@@ -3,6 +3,7 @@ package cat.my.android.restvolley.db;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 import android.database.Cursor;
 
@@ -66,4 +67,9 @@ public class DBUtil {
 			return null;
 		}
 	}
+	
+	public static String createUUID() {
+		return UUID.randomUUID().toString();
+	}
+	
 }
