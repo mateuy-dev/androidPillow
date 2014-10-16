@@ -48,6 +48,8 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 	public RestDataSource(IRestMapping<T> restMapping, Context context, ISessionController authenticationData) {
 		this.restMapping=restMapping;
 		this.volleyQueue = Volley.newRequestQueue(context);
+		if(authenticationData==null)
+			authenticationData = new NullSessionController();
 		this.sessionController = authenticationData;
 	}
 	

@@ -6,6 +6,7 @@ import java.util.Map;
 import android.content.Context;
 import android.content.SharedPreferences;
 import cat.my.android.restvolley.IdentificableModel;
+import cat.my.android.restvolley.RestVolley;
 import cat.my.android.restvolley.rest.ISessionController;
 import cat.my.android.restvolley.rest.RailsRestMapping;
 import cat.my.android.restvolley.rest.RestDataSource;
@@ -34,8 +35,6 @@ public abstract class AbstractUserController<T extends IdentificableModel> {
 	 * @return
 	 */
 	public abstract T createGuestUser();
-	
-	public abstract SynchManager getSynchManager();
 	
 	/**
 	 * Should be called just after created.
@@ -106,7 +105,7 @@ public abstract class AbstractUserController<T extends IdentificableModel> {
 	 * Deletes all the user realated data and donwload the new user one. 
 	 */
 	public void reloadData(Listener<Void> listener){
-		getSynchManager().reloadData(listener);
+		RestVolley.getInstance().getSynchManager().reloadData(listener);
 	}
 	
 	

@@ -38,20 +38,20 @@ public class DBModelController<T extends IdentificableModel> {
 			COLUMN_CREATED_AT + DBUtil.TIMESTAMP_TYPE;
 
 	
-	SQLiteOpenHelper dbHelpert;
+	SQLiteOpenHelper dbHelper;
 	IDbMapping<T> mapper;
 	DeletedEntries<T> deletedEntries;
 	
 	
 	
 	public DBModelController(SQLiteOpenHelper dbHelpert, IDbMapping<T> mapper, DeletedEntries<T> deletedEntries) {
-		this.dbHelpert= dbHelpert;
+		this.dbHelper= dbHelpert;
 		this.mapper = mapper;
 		this.deletedEntries = deletedEntries;
 	}
 
 	public int getCount(){
-		SQLiteDatabase db = dbHelpert.getReadableDatabase();
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM "+ getTableName(), null);
 		cursor.moveToFirst();
 		int count= cursor.getInt(0);
@@ -73,7 +73,7 @@ public class DBModelController<T extends IdentificableModel> {
 		String selection = WHERE_ID_SELECTION;
 		String[] selectionArgs = { id };
 
-		SQLiteDatabase db = dbHelpert.getReadableDatabase();
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor cursor = getCursor(db, selection, selectionArgs, null);
 
 		if (!cursor.moveToFirst()) {
@@ -116,7 +116,7 @@ public class DBModelController<T extends IdentificableModel> {
 	 * @return All the models
 	 */
 	public List<T> getAll() {
-		SQLiteDatabase db = dbHelpert.getReadableDatabase();
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor cursor = getCursor(db, null, null, mapper.getDefaultModelOrder());
 		List<T> result = createModels(cursor);
 		db.close();
@@ -127,7 +127,7 @@ public class DBModelController<T extends IdentificableModel> {
 	public List<T> getDirty(int dirtyType) {
 		String selection = COLUMN_NAME_DIRTY + " == ?";
 		String[] selectionArgs = { dirtyType+"" };
-		SQLiteDatabase db = dbHelpert.getReadableDatabase();
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor cursor = getCursor(db, selection, selectionArgs, mapper.getDefaultModelOrder());
 		List<T> result = createModels(cursor);
 		db.close();
@@ -139,7 +139,7 @@ public class DBModelController<T extends IdentificableModel> {
 	 * @param model
 	 */
 	public void delete(T model){
-		SQLiteDatabase db = dbHelpert.getWritableDatabase();
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		
 		//get dirty status
 		Cursor cursor = getCursorForId(db, model.getId());
@@ -191,19 +191,19 @@ public class DBModelController<T extends IdentificableModel> {
 	}
 	
 	public void update(T model){
-		SQLiteDatabase db = dbHelpert.getWritableDatabase();
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		save(db, model, OP_UPDATE);
 		db.close();
 	}
 	
 	public void create(T model){
-		SQLiteDatabase db = dbHelpert.getWritableDatabase();
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		save(db, model, OP_CREATE);
 		db.close();
 	}
 	
 	public void cacheAll(List<T> models) {
-		SQLiteDatabase db = dbHelpert.getWritableDatabase();
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		for(T model: models)
 			save(db, model, OP_CACHE);
 		
@@ -294,7 +294,7 @@ public class DBModelController<T extends IdentificableModel> {
 	}
 	
 	public void markAsClean(T model){
-		SQLiteDatabase db = dbHelpert.getWritableDatabase();
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(COLUMN_NAME_DIRTY, DIRTY_STATUS_CLEAN);
 		db.update(getTableName(), values, WHERE_ID_SELECTION, new String[]{model.getId()});
@@ -357,7 +357,7 @@ public class DBModelController<T extends IdentificableModel> {
 	}
 	
 	protected void setColumnValue(String id, String columnName, Object value){
-		SQLiteDatabase db = dbHelpert.getWritableDatabase();
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		if(value instanceof String)
 			values.put(columnName, (String)value);
@@ -377,7 +377,7 @@ public class DBModelController<T extends IdentificableModel> {
 		String selection = WHERE_ID_SELECTION;
 		String[] selectionArgs = { id };
 
-		SQLiteDatabase db = dbHelpert.getReadableDatabase();
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor cursor = getCursor(db, selection, selectionArgs, null);
 
 		if (!cursor.moveToFirst()) {

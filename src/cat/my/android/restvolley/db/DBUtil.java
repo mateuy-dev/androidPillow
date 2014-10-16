@@ -40,6 +40,7 @@ public class DBUtil {
 	}
 	
 	private static final String DATE_STRING_FORMAT = "yyyy-MM-dd";
+	private static final String DATE_TIME_STRING_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	
 	/**
 	 * Converts a date to string for json or database storage
@@ -60,6 +61,23 @@ public class DBUtil {
 	public static Date dbToDate(String date){
 		if(date==null) return null;
 		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_STRING_FORMAT);
+		try {
+			return dateFormat.parse(date);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static String dateTimeToDb(Date date){
+		if(date==null) return null;
+		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
+		return dateFormat.format(date);
+	}
+	
+	public static Date dbToDateTime(String date){
+		if(date==null) return null;
+		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
 		try {
 			return dateFormat.parse(date);
 		} catch (ParseException e) {
