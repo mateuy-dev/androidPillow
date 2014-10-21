@@ -111,8 +111,8 @@ public class SynchManager {
 
 		@Override
 		public void onResponse(Object response) {
-			if(synchDataSources.size()<i){
-				i++;
+			i++;
+			if(synchDataSources.size()>i){
 				downloadCurrent();
 			} else {
 				if(!errorFound){

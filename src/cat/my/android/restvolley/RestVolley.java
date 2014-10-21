@@ -75,4 +75,8 @@ public class RestVolley {
     	Constructor<T> constructor = clazz.getConstructor(new Class[] { Context.class});
     	return constructor.newInstance(context);
 	}
+
+	public RestVolleyConfig getConfig() {
+		return config;
+	}
 }

@@ -15,6 +15,7 @@ public class RestVolleyConfig {
 	String dbHelper;
 	List<String> dataSources = new ArrayList<String>();
 	int downloadTimeInterval = 3600000;
+	int maxResponseWaitTime = 10000;
 
 	public RestVolleyConfig(Context context, int xmlFileResId){
 		try {
@@ -44,7 +45,10 @@ public class RestVolleyConfig {
                 	dbHelper = clazz;
                 } else if ("downloadTimeInterval".equals(tagName)){
                 	downloadTimeInterval = parser.getAttributeIntValue(0, 3600000);//("vale");
+                } else if ("maxResponseWaitTime".equals(tagName)){
+                	maxResponseWaitTime = parser.getAttributeIntValue(0, 10000);//("vale");
                 }
+                
             }
         }
 	}
@@ -59,5 +63,9 @@ public class RestVolleyConfig {
 
 	public int getDownloadTimeInterval() {
 		return downloadTimeInterval;
+	}
+
+	public int getMaxResponseWaitTime() {
+		return maxResponseWaitTime;
 	}
 }

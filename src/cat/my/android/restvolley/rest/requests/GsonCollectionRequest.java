@@ -44,8 +44,8 @@ import com.google.gson.JsonSyntaxException;
 public class GsonCollectionRequest<T> extends AbstractGsonRequest<Collection<T>> {
 	Type collectionType;
 	
-		public GsonCollectionRequest(Gson gson, Route route, Type collectionType, Map<String, Object> params, CollectionListener<T> listener, ErrorListener errorListener) {
-		super(gson, route, params, listener, errorListener);
+		public GsonCollectionRequest(Gson gson, Route route, Type collectionType, Map<String, Object> params, CollectionListener<T> listener, ErrorListener errorListener, int initialTimeOutMs) {
+		super(gson, route, params, listener, errorListener, initialTimeOutMs);
 		this.collectionType = collectionType;
 	}
     

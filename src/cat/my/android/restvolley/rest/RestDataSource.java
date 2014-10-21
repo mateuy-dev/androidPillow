@@ -23,6 +23,8 @@ import java.util.Map;
 import android.content.Context;
 import cat.my.android.restvolley.IDataSource;
 import cat.my.android.restvolley.IdentificableModel;
+import cat.my.android.restvolley.RestVolley;
+import cat.my.android.restvolley.RestVolleyConfig;
 import cat.my.android.restvolley.Listeners.CollectionListener;
 import cat.my.android.restvolley.rest.ISessionController.NullSessionController;
 import cat.my.android.restvolley.rest.requests.GsonCollectionRequest;
@@ -35,7 +37,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 
 public class RestDataSource<T extends IdentificableModel> implements IDataSource<T> {
-	
+	Context context;
 	RequestQueue volleyQueue;
 	ISessionController sessionController;
 	IRestMapping<T> restMapping;
@@ -52,10 +54,15 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 		if(authenticationData==null)
 			authenticationData = new NullSessionController();
 		this.sessionController = authenticationData;
+		this.context = context;
 	}
 	
 	public IRestMapping<T> getRestMapping() {
 		return restMapping;
+	}
+	
+	private RestVolleyConfig getConfig(){
+		return RestVolley.getInstance(context).getConfig();
 	}
 
 //	/**
@@ -91,7 +98,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 				if(params!=null){
 					map.putAll(params);
 				}
-				GsonCollectionRequest<T> gsonRequest = new GsonCollectionRequest<T>(restMapping.getSerializer(), route, restMapping.getCollectionType(), map, listener, errorListener);
+				GsonCollectionRequest<T> gsonRequest = new GsonCollectionRequest<T>(restMapping.getSerializer(), route, restMapping.getCollectionType(), map, listener, errorListener, getConfig().getDownloadTimeInterval());
 				gsonRequest.setShouldCache(false);
 				volleyQueue.add(gsonRequest);
 			}
@@ -112,7 +119,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 				map.put(restMapping.getModelName(), model);
 			}
 			
-			GsonRequest<T> gsonRequest = new GsonRequest<T>(restMapping.getSerializer(), route, restMapping.getModelClass(), map, listener, errorListener);
+			GsonRequest<T> gsonRequest = new GsonRequest<T>(restMapping.getSerializer(), route, restMapping.getModelClass(), map, listener, errorListener, getConfig().getDownloadTimeInterval());
 			gsonRequest.setShouldCache(false);
 			volleyQueue.add(gsonRequest);
 			}

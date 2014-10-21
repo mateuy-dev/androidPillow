@@ -33,12 +33,12 @@ public abstract class AbstractGsonRequest <T> extends JsonRequest<T>{
 		return result;
 	}
 	
-	public AbstractGsonRequest(Gson gson, Route route, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener) {
+	public AbstractGsonRequest(Gson gson, Route route, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener, int initialTimeOutMs) {
 		super(route.getMethod(), route.getUrl(), getResourceBody(gson, params), listener, new VolleyErrorListener(errorListener));
 		this.gson=gson;
 		this.params = params;
 		setRetryPolicy(new DefaultRetryPolicy(
-                90000, 
+				initialTimeOutMs, 
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES, 
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 	}

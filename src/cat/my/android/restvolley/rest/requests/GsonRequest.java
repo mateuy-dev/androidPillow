@@ -38,8 +38,8 @@ import com.google.gson.JsonSyntaxException;
 public class GsonRequest<T> extends AbstractGsonRequest<T> {
 	Class<T> clazz;
 	
-	public GsonRequest(Gson gson, Route route, Class<T> clazz, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener) {
-		super(gson, route, params, listener, errorListener);
+	public GsonRequest(Gson gson, Route route, Class<T> clazz, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener, int initialTimeOutMs) {
+		super(gson, route, params, listener, errorListener, initialTimeOutMs);
 		
 		this.clazz = clazz;
 	}

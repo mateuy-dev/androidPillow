@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
+
 import android.database.Cursor;
 
 public class DBUtil {
@@ -19,6 +20,7 @@ public class DBUtil {
 	public static final String DECIMAL_TYPE = " INTEGER";
 	public static final String DOUBLE_TYPE = " DOUBLE";
 	public static final String DATE_TYPE = "  TEXT";
+	public static final String ENUM_TYPE = "  INTEGER";
 
 	public static String createTable(IDbMapping<?> mapping){
 		return "CREATE TABLE " + mapping.getTableName() 
@@ -108,6 +110,17 @@ public class DBUtil {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public static Integer enumToDb(Enum<?> value){
+		if(value==null)
+			return null;
+		return value.ordinal();
+	}
+	
+	public static <T> T dbToEnum(Cursor cursor, int columnIndex, T[] values){
+		int id = cursor.getInt(columnIndex);
+		return values[id];
 	}
 	
 	public static String createUUID() {
