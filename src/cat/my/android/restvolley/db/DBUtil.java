@@ -45,7 +45,7 @@ public class DBUtil {
 		return dbToCalendar(value);
 	}
 	
-	private static final String DATE_STRING_FORMAT = "yyyy-MM-dd";
+	public static final String DATE_STRING_FORMAT = "yyyy-MM-dd";
 	private static final String DATE_TIME_STRING_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	
 	public static String calendarToDb(Calendar date){

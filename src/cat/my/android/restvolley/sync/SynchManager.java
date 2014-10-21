@@ -13,7 +13,9 @@ import android.content.res.XmlResourceParser;
 import android.database.sqlite.SQLiteDatabase;
 import cat.my.android.restvolley.AbstractDBHelper;
 import cat.my.android.restvolley.Listeners.CollectionListener;
+import cat.my.android.restvolley.Listeners.ErrorListener;
 import cat.my.android.restvolley.RestVolley;
+import cat.my.android.restvolley.RestVolleyError;
 import cat.my.android.restvolley.db.DBUtil;
 import cat.my.android.restvolley.users.AbstractUserController;
 
@@ -55,9 +57,7 @@ public class SynchManager {
 		if(!force && getLastDownload()!=null && isValidDonwload()){
 			listener.onResponse(null);
 		} else {
-			//TODO if download does not work lastDownload should not change!
-			setLastDownload(new Date());
-			new DownloadTask(listener).downloadCurrent();
+			new DownloadTask(listener).start();
 		}
 	}
 	
@@ -101,9 +101,10 @@ public class SynchManager {
 		return getLastDownload().getTime() + downloadTimeInterval > new Date().getTime();
 	}
 
-	private class DownloadTask implements CollectionListener{
+	private class DownloadTask implements CollectionListener, ErrorListener{
 		int i=0;
 		Listener<Void> listener;
+		boolean errorFound = false;
 		public DownloadTask(Listener<Void> listener) {
 			this.listener = listener;
 		}
@@ -114,12 +115,25 @@ public class SynchManager {
 				i++;
 				downloadCurrent();
 			} else {
-				listener.onResponse(null);
+				if(!errorFound){
+					setLastDownload(new Date());
+					listener.onResponse(null);
+				}
 			}
 		}
 		
 		private void downloadCurrent(){
-			synchDataSources.get(i).download(this, DummyListeners.dummyErrorListener);
+			synchDataSources.get(i).download(this, this);
+		}
+		
+		public void start(){
+			downloadCurrent();
+		}
+
+		@Override
+		public void onErrorResponse(RestVolleyError error) {
+			errorFound = true;
+			error.printStackTrace();
 		}
 	}
 }

@@ -19,6 +19,7 @@ public class RestVolley {
 	public static final String PREFERENCES_FILE_KEY = "cat_my_android_restvolley";
 	public static int xmlFileResId;
 	List<ISynchDataSource<?>> dataSources;
+	RestVolleyConfig config;
 	
 	AbstractDBHelper dbHelper;
 	SynchManager synchManager;
@@ -58,28 +59,18 @@ public class RestVolley {
 	}
 	
 	private void init(Context context, int xmlFileResId) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, XmlPullParserException, IOException{
+		config = new RestVolleyConfig(context, xmlFileResId);
+		dbHelper = getClassFor(context, config.getDbHelper());
 		dataSources = new ArrayList<ISynchDataSource<?>>();
-        XmlResourceParser parser = context.getResources().getXml(xmlFileResId);
-        //Check http://stackoverflow.com/questions/8378748/create-a-custom-xml-data-type
-        int token;
-        while ((token = parser.next()) != XmlPullParser.END_DOCUMENT) {
-            if (token == XmlPullParser.START_TAG) {
-            	String tagName = parser.getName();
-                if ("datasource".equals(tagName)) {
-                	ISynchDataSource<?> currentModel = getClassFor(context, parser);
-                    dataSources.add(currentModel);
-                }
-                else if("dbhelper".equals(tagName)){
-                	//TODO this should not be an AbstractDBHelper
-                	dbHelper = getClassFor(context, parser);
-                }
-            }
-        }
+		for(String dataSourceName: config.getDataSources()){
+			ISynchDataSource<?> currentModel = getClassFor(context, dataSourceName);
+            dataSources.add(currentModel);
+		}
         synchManager = new SynchManager(context, dataSources, dbHelper);
+        synchManager.setDownloadTimeInterval(config.getDownloadTimeInterval());
 	}
 	
-	private <T> T  getClassFor(Context context, XmlResourceParser parser) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
-		String className = parser.getAttributeValue(0);//("class");
+	private <T> T  getClassFor(Context context, String className) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
     	Class<T> clazz = (Class<T>) Class.forName(className);
     	Constructor<T> constructor = clazz.getConstructor(new Class[] { Context.class});
     	return constructor.newInstance(context);

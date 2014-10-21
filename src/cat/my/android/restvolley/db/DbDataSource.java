@@ -28,7 +28,12 @@ public class DbDataSource<T extends IdentificableModel> implements IDataSource<T
 	@Override
 	public void index(CollectionListener<T> listener, ErrorListener errorListener) {
 		DBModelController<T> db = getDbModelController();
-		listener.onResponse(db.getAll());
+		listener.onResponse(db.index());
+	}
+	
+	public void index(String selection, String[] selectionArgs, String order, CollectionListener<T> listener, ErrorListener errorListener) {
+		DBModelController<T> db = getDbModelController();
+		listener.onResponse(db.index(selection, selectionArgs, order));
 	}
 
 	@Override

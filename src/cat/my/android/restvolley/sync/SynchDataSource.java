@@ -56,6 +56,10 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 		dbSource.index(listener, errorListener);
 	}
 	
+	public void index(String selection, String[] selectionArgs, String order, CollectionListener<T> listener, ErrorListener errorListener) {
+		dbSource.index(selection, selectionArgs, order, listener, errorListener);
+	}
+	
 	@Override
 	public void show(T model, Listener<T> listener, ErrorListener errorListener) {
 		dbSource.show(model, listener, errorListener);

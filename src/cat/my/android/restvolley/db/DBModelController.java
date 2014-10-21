@@ -115,9 +115,21 @@ public class DBModelController<T extends IdentificableModel> {
 	/**
 	 * @return All the models
 	 */
-	public List<T> getAll() {
+	public List<T> index() {
+		return index(null, null, null);
+	}
+	
+	/**
+	 * Returns the models that with the given selection and order. All params may be null
+	 * @param selection as defined in db.query
+	 * @param selectionArgs as defined in db.query
+	 * @param order as defined in db.query. If null it will use default order
+	 * @return list of models
+	 */
+	public List<T> index(String selection, String[] selectionArgs, String order){
+		order = order!=null ? order : mapper.getDefaultModelOrder();
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		Cursor cursor = getCursor(db, null, null, mapper.getDefaultModelOrder());
+		Cursor cursor = getCursor(db, selection, selectionArgs, order);
 		List<T> result = createModels(cursor);
 		db.close();
 		return result;
@@ -127,11 +139,8 @@ public class DBModelController<T extends IdentificableModel> {
 	public List<T> getDirty(int dirtyType) {
 		String selection = COLUMN_NAME_DIRTY + " == ?";
 		String[] selectionArgs = { dirtyType+"" };
-		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		Cursor cursor = getCursor(db, selection, selectionArgs, mapper.getDefaultModelOrder());
-		List<T> result = createModels(cursor);
-		db.close();
-		return result;
+		
+		return index(selection, selectionArgs, null);
 	}
 	
 	/**
