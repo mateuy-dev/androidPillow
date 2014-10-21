@@ -15,8 +15,8 @@ import cat.my.android.restvolley.sync.DummyListeners.ProxyListener;
 import cat.my.android.restvolley.sync.SynchManager;
 
 import com.android.volley.Request.Method;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
+import cat.my.android.restvolley.Listeners.ErrorListener;
+import cat.my.android.restvolley.Listeners.Listener;
 
 public abstract class AbstractUserController<T extends IdentificableModel> {
 	SharedPreferences sharedPref;

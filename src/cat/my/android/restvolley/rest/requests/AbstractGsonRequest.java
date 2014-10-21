@@ -14,8 +14,10 @@ import org.apache.http.message.BasicNameValuePair;
 import cat.my.android.restvolley.rest.Route;
 
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
+import cat.my.android.restvolley.Listeners.ErrorListener;
+import cat.my.android.restvolley.Listeners.Listener;
+import cat.my.android.restvolley.Listeners.VolleyErrorListener;
+
 import com.android.volley.toolbox.JsonRequest;
 import com.google.gson.Gson;
 
@@ -32,7 +34,7 @@ public abstract class AbstractGsonRequest <T> extends JsonRequest<T>{
 	}
 	
 	public AbstractGsonRequest(Gson gson, Route route, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener) {
-		super(route.getMethod(), route.getUrl(), getResourceBody(gson, params), listener, errorListener);
+		super(route.getMethod(), route.getUrl(), getResourceBody(gson, params), listener, new VolleyErrorListener(errorListener));
 		this.gson=gson;
 		this.params = params;
 		setRetryPolicy(new DefaultRetryPolicy(

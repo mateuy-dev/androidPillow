@@ -5,11 +5,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import cat.my.android.restvolley.IdentificableModel;
+import cat.my.android.restvolley.Listeners.Listener;
 import cat.my.android.restvolley.db.DBUtil;
 import cat.my.android.restvolley.rest.RestDataSource;
 import cat.my.android.util.CursorUtil;
 
-import com.android.volley.Response.Listener;
+
 
 /**
  * Keeps track of entries deleted on the database but no yet in the server.

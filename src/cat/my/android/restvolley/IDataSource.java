@@ -2,12 +2,19 @@ package cat.my.android.restvolley;
 
 import java.util.Collection;
 
+import cat.my.android.restvolley.Listeners.CollectionListener;
+import cat.my.android.restvolley.Listeners.ErrorListener;
+import cat.my.android.restvolley.Listeners.Listener;
 
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
+
 
 public interface IDataSource <T extends IdentificableModel>{
-	public void index(Listener<Collection<T>> listener, ErrorListener errorListener);
+	/**
+	 * Returns all the instances
+	 * @param listener to be executed when the instances have been retrieved
+	 * @param errorListener to be executed in case of error
+	 */
+	public void index(CollectionListener<T> listener, ErrorListener errorListener);
 
 	public void show(T model, Listener<T> listener, ErrorListener errorListener);
 	

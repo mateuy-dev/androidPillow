@@ -10,6 +10,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
 import cat.my.android.restvolley.IDataSource;
 import cat.my.android.restvolley.IdentificableModel;
+import cat.my.android.restvolley.Listeners.CollectionListener;
+import cat.my.android.restvolley.Listeners.ErrorListener;
+import cat.my.android.restvolley.RestVolley;
 import cat.my.android.restvolley.db.DBModelController;
 import cat.my.android.restvolley.db.DbDataSource;
 import cat.my.android.restvolley.db.IDbMapping;
@@ -17,8 +20,8 @@ import cat.my.android.restvolley.rest.ISessionController;
 import cat.my.android.restvolley.rest.IRestMapping;
 import cat.my.android.restvolley.rest.RestDataSource;
 
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
+
+import cat.my.android.restvolley.Listeners.Listener;
 import com.android.volley.VolleyError;
 
 public class SynchDataSource<T extends IdentificableModel> implements IDataSource<T>, ISynchDataSource<T>{
@@ -30,16 +33,18 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 	IDbMapping<T> dbFuncs;
 	IRestMapping<T> restMap;
 	
-	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context, SQLiteOpenHelper dbHelper, ISessionController authenticationData) {
+	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context
+, ISessionController authenticationData) {
 		this.authenticationData=authenticationData;
 		this.dbFuncs=dbFuncs;
 		restVolley = new RestDataSource<T>(restMap, context, authenticationData);
+		SQLiteOpenHelper dbHelper = RestVolley.getInstance(context).getDbHelper();
 		deletedEntries = new DeletedEntries<T>(restVolley, dbHelper);
 		dbSource = new DbDataSource<T>(dbFuncs, dbHelper, deletedEntries);
 		dbModelController = dbSource.getDbModelController();
 	}
-	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context, SQLiteOpenHelper dbHelper) {
-		this(dbFuncs, restMap, context, dbHelper, null);
+	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context) {
+		this(dbFuncs, restMap, context, null);
 	}
 	
 	public RestDataSource<T> getRestVolley() {
@@ -47,7 +52,7 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 	}
 	
 	@Override
-	public void index(Listener<Collection<T>> listener, ErrorListener errorListener) {
+	public void index(CollectionListener<T> listener, ErrorListener errorListener) {
 		dbSource.index(listener, errorListener);
 	}
 	
@@ -110,8 +115,8 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 		deletedEntries.synchronize();
 	}
 	
-	public void download(final Listener<Collection<T>> listener, ErrorListener errorListener) {
-		Listener<Collection<T>> fillDatabaseListener = new Listener<Collection<T>>(){
+	public void download(final CollectionListener<T> listener, ErrorListener errorListener) {
+		CollectionListener<T> fillDatabaseListener = new CollectionListener<T>(){
 			@Override
 			public void onResponse(Collection<T> response) {
 				DBModelController<T> db = getDbModelController();

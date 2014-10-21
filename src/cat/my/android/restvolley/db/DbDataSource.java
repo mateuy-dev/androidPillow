@@ -5,10 +5,11 @@ import java.util.Collection;
 import android.database.sqlite.SQLiteOpenHelper;
 import cat.my.android.restvolley.IDataSource;
 import cat.my.android.restvolley.IdentificableModel;
+import cat.my.android.restvolley.Listeners.CollectionListener;
+import cat.my.android.restvolley.Listeners.ErrorListener;
+import cat.my.android.restvolley.Listeners.Listener;
 import cat.my.android.restvolley.sync.DeletedEntries;
 
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
 
 public class DbDataSource<T extends IdentificableModel> implements IDataSource<T>{
 	
@@ -25,7 +26,7 @@ public class DbDataSource<T extends IdentificableModel> implements IDataSource<T
 	}
 
 	@Override
-	public void index(Listener<Collection<T>> listener, ErrorListener errorListener) {
+	public void index(CollectionListener<T> listener, ErrorListener errorListener) {
 		DBModelController<T> db = getDbModelController();
 		listener.onResponse(db.getAll());
 	}

@@ -12,11 +12,12 @@ import android.content.SharedPreferences;
 import android.content.res.XmlResourceParser;
 import android.database.sqlite.SQLiteDatabase;
 import cat.my.android.restvolley.AbstractDBHelper;
+import cat.my.android.restvolley.Listeners.CollectionListener;
 import cat.my.android.restvolley.RestVolley;
 import cat.my.android.restvolley.db.DBUtil;
 import cat.my.android.restvolley.users.AbstractUserController;
 
-import com.android.volley.Response.Listener;
+import cat.my.android.restvolley.Listeners.Listener;
 
 public class SynchManager {
 	
@@ -100,7 +101,7 @@ public class SynchManager {
 		return getLastDownload().getTime() + downloadTimeInterval > new Date().getTime();
 	}
 
-	private class DownloadTask implements Listener{
+	private class DownloadTask implements CollectionListener{
 		int i=0;
 		Listener<Void> listener;
 		public DownloadTask(Listener<Void> listener) {

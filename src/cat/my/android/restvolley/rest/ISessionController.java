@@ -3,8 +3,8 @@ package cat.my.android.restvolley.rest;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
+import cat.my.android.restvolley.Listeners.ErrorListener;
+import cat.my.android.restvolley.Listeners.Listener;
 
 public interface ISessionController {
 	public Map<String, Object> getSession();

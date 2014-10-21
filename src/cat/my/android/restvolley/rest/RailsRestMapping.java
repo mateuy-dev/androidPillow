@@ -16,6 +16,7 @@
  */
 package cat.my.android.restvolley.rest;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 
 import org.atteo.evo.inflector.English;
@@ -27,6 +28,11 @@ import com.android.volley.Request.Method;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
 public class RailsRestMapping<T extends IdentificableModel> implements IRestMapping<T> {
 	String prefix;
@@ -77,7 +83,10 @@ public class RailsRestMapping<T extends IdentificableModel> implements IRestMapp
 	
 	@Override
 	public Gson getSerializer(){
-		return new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+		GsonBuilder builder = new GsonBuilder();
+		builder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
+		builder.registerTypeAdapterFactory(new RailsEnumAdapterFactory());
+		return builder.create();
 	}
 	
 	private String getPath(T model){
@@ -121,5 +130,46 @@ public class RailsRestMapping<T extends IdentificableModel> implements IRestMapp
 		return collectionType;
 	}
 	
+	/**
+	 * Enums values are expresed in minus in Rails and capital leters in Java
+	 */
+	private class RailsEnumAdapterFactory implements TypeAdapterFactory {
+
+	    @Override
+	    public <TE> TypeAdapter<TE> create(final Gson gson, final TypeToken<TE> type) {
+	            Class<? super TE> rawType = type.getRawType();
+	            if (Enum.class.isAssignableFrom(rawType)) {
+	                return new RailsEnumTypeAdapter(type);
+	            }
+	            return null;
+	    }
+
+	    private class RailsEnumTypeAdapter<TE> extends TypeAdapter<TE> {
+	    	TypeToken<TE> type;
+	        public RailsEnumTypeAdapter(TypeToken<TE> type) {
+				this.type = type;
+			}
+
+			public void write(JsonWriter out, TE value) throws IOException {
+	              if (value == null) {
+	                   out.nullValue();
+	                   return;
+	              }
+	              Enum<?> enumValue = (Enum<?>) value;
+	              String javaValue = enumValue.toString();
+	              String railsValue = javaValue.toLowerCase();
+	              out.value(railsValue);
+	              
+	         }
+
+	         public TE read(JsonReader in) throws IOException {
+	              String railsValue = in.nextString();
+	              String javaValue = railsValue.toUpperCase();
+	              Class enumClass =type.getRawType(); 
+	              return (TE) Enum.valueOf(enumClass, javaValue);
+	         }
+	    }
+
+	}
 
 }

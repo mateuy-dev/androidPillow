@@ -2,6 +2,7 @@ package cat.my.android.restvolley.db;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
@@ -39,15 +40,26 @@ public class DBUtil {
 		return dbToDate(value);
 	}
 	
+	public static Calendar getCalendar(Cursor cursor, int columnIndex){
+		String value = cursor.getString(columnIndex);
+		return dbToCalendar(value);
+	}
+	
 	private static final String DATE_STRING_FORMAT = "yyyy-MM-dd";
 	private static final String DATE_TIME_STRING_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	
+	public static String calendarToDb(Calendar date){
+		if(date==null) return null;
+		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_STRING_FORMAT);
+		return dateFormat.format(date.getTime());
+	}
 	
 	/**
 	 * Converts a date to string for json or database storage
 	 * @param date
 	 * @return
 	 */
-	public static String dateToDb(Date date){
+	public static String dateToDb(Object date){
 		if(date==null) return null;
 		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_STRING_FORMAT);
 		return dateFormat.format(date);
@@ -67,6 +79,18 @@ public class DBUtil {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	/**
+	 * Converts a String obtained from json or DB to date for model usage
+	 * @param date
+	 * @return
+	 */
+	public static Calendar dbToCalendar(String date){
+		if(date==null) return null;
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dbToDate(date));
+		return cal;
 	}
 	
 	public static String dateTimeToDb(Date date){

@@ -17,14 +17,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class RestVolley {
 	public static final String PREFERENCES_FILE_KEY = "cat_my_android_restvolley";
-	
+	public static int xmlFileResId;
 	List<ISynchDataSource<?>> dataSources;
 	
 	AbstractDBHelper dbHelper;
 	SynchManager synchManager;
 	
 	private static RestVolley restVolley;
-	public static synchronized RestVolley getInstance(Context context, int xmlFileResId){
+	public static synchronized RestVolley getInstance(Context context){
 		if(restVolley==null){
 			restVolley = new RestVolley();
 			try {
@@ -34,6 +34,10 @@ public class RestVolley {
 			}
 		}
 		return restVolley;
+	}
+	
+	public static synchronized void setConfigurationFile(int xmlFileResId){
+		RestVolley.xmlFileResId = xmlFileResId;
 	}
 	
 	public static  RestVolley getInstance(){
@@ -62,22 +66,22 @@ public class RestVolley {
             if (token == XmlPullParser.START_TAG) {
             	String tagName = parser.getName();
                 if ("datasource".equals(tagName)) {
-                	ISynchDataSource<?> currentModel = (ISynchDataSource<?>) getClassFor(context, parser);
+                	ISynchDataSource<?> currentModel = getClassFor(context, parser);
                     dataSources.add(currentModel);
                 }
                 else if("dbhelper".equals(tagName)){
                 	//TODO this should not be an AbstractDBHelper
-                	dbHelper = (AbstractDBHelper) getClassFor(context, parser);
+                	dbHelper = getClassFor(context, parser);
                 }
             }
         }
         synchManager = new SynchManager(context, dataSources, dbHelper);
 	}
 	
-	private Object getClassFor(Context context, XmlResourceParser parser) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+	private <T> T  getClassFor(Context context, XmlResourceParser parser) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
 		String className = parser.getAttributeValue(0);//("class");
-    	Class<?> clazz = Class.forName(className);
-    	Constructor<?> constructor = clazz.getConstructor(new Class[] { Context.class});
+    	Class<T> clazz = (Class<T>) Class.forName(className);
+    	Constructor<T> constructor = clazz.getConstructor(new Class[] { Context.class});
     	return constructor.newInstance(context);
 	}
 }
