@@ -2,6 +2,7 @@ package cat.my.android.restvolley.sync;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -31,9 +32,9 @@ public class SynchManager {
 	long downloadTimeInterval = 3600000; //1 hour
 	private static final String LAST_DOWNLOAD_DATE = "LAST_DOWNLOAD_DATE";
 	
-	public SynchManager(Context context, List<ISynchDataSource<?>> synchDataSources, AbstractDBHelper dbHelper) {
+	public SynchManager(Context context, Collection<ISynchDataSource<?>> synchDataSources, AbstractDBHelper dbHelper) {
 		super();
-		this.synchDataSources = synchDataSources;
+		this.synchDataSources = new ArrayList<ISynchDataSource<?>>(synchDataSources);
 		this.dbHelper = dbHelper;
 		sharedPref = context.getSharedPreferences(RestVolley.PREFERENCES_FILE_KEY, Context.MODE_PRIVATE);
 	}

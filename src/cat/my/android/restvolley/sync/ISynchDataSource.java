@@ -13,5 +13,5 @@ import cat.my.android.restvolley.Listeners.Listener;
 public interface ISynchDataSource<T> {
 	public void sendDirty();
 	public void download(final CollectionListener<T> listener, ErrorListener errorListener);
-
+	public Class<T> getModelClass();
 }

@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -18,7 +21,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class RestVolley {
 	public static final String PREFERENCES_FILE_KEY = "cat_my_android_restvolley";
 	public static int xmlFileResId;
-	List<ISynchDataSource<?>> dataSources;
+	Map<Class<?>, ISynchDataSource<?>> dataSources;
 	RestVolleyConfig config;
 	
 	AbstractDBHelper dbHelper;
@@ -46,8 +49,8 @@ public class RestVolley {
 		return restVolley;
 	}
 	
-	public List<ISynchDataSource<?>> getDataSources() {
-		return dataSources;
+	public Collection<ISynchDataSource<?>> getDataSources() {
+		return dataSources.values();
 	}
 
 	public AbstractDBHelper getDbHelper() {
@@ -61,12 +64,12 @@ public class RestVolley {
 	private void init(Context context, int xmlFileResId) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, XmlPullParserException, IOException{
 		config = new RestVolleyConfig(context, xmlFileResId);
 		dbHelper = getClassFor(context, config.getDbHelper());
-		dataSources = new ArrayList<ISynchDataSource<?>>();
+		dataSources = new HashMap<Class<?>, ISynchDataSource<?>>();
 		for(String dataSourceName: config.getDataSources()){
 			ISynchDataSource<?> currentModel = getClassFor(context, dataSourceName);
-            dataSources.add(currentModel);
+            dataSources.put(currentModel.getModelClass(), currentModel);
 		}
-        synchManager = new SynchManager(context, dataSources, dbHelper);
+        synchManager = new SynchManager(context, dataSources.values(), dbHelper);
         synchManager.setDownloadTimeInterval(config.getDownloadTimeInterval());
 	}
 	
@@ -78,5 +81,9 @@ public class RestVolley {
 
 	public RestVolleyConfig getConfig() {
 		return config;
+	}
+	
+	public <T> ISynchDataSource<T> getDataSource(Class<T> clazz){
+		return (ISynchDataSource<T>) dataSources.get(clazz);
 	}
 }

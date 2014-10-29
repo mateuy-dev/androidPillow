@@ -16,6 +16,7 @@ import cat.my.android.restvolley.RestVolley;
 import cat.my.android.restvolley.db.DBModelController;
 import cat.my.android.restvolley.db.DbDataSource;
 import cat.my.android.restvolley.db.IDbMapping;
+import cat.my.android.restvolley.listeners.EventDispatcher;
 import cat.my.android.restvolley.rest.ISessionController;
 import cat.my.android.restvolley.rest.IRestMapping;
 import cat.my.android.restvolley.rest.RestDataSource;
@@ -42,6 +43,7 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 		deletedEntries = new DeletedEntries<T>(restVolley, dbHelper);
 		dbSource = new DbDataSource<T>(dbFuncs, dbHelper, deletedEntries);
 		dbModelController = dbSource.getDbModelController();
+		this.restMap=restMap;
 	}
 	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context) {
 		this(dbFuncs, restMap, context, null);
@@ -131,7 +133,9 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 		restVolley.index(fillDatabaseListener, errorListener);
 	}
 
-
+	public EventDispatcher<T> getEventDispatcher(){
+		return dbSource.getEventDispatcher();
+	}
 	
 	public class SetAsNotDirityListener implements Listener<T>{
 		
@@ -208,5 +212,9 @@ public class SynchDataSource<T extends IdentificableModel> implements IDataSourc
 
 	public IDbMapping<T> getDbFuncs() {
 		return dbFuncs;
+	}
+	@Override
+	public Class<T> getModelClass() {
+		return restMap.getModelClass();
 	}
 }

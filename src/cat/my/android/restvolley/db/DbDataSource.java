@@ -1,6 +1,10 @@
 package cat.my.android.restvolley.db;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import android.database.sqlite.SQLiteOpenHelper;
 import cat.my.android.restvolley.IDataSource;
@@ -8,11 +12,13 @@ import cat.my.android.restvolley.IdentificableModel;
 import cat.my.android.restvolley.Listeners.CollectionListener;
 import cat.my.android.restvolley.Listeners.ErrorListener;
 import cat.my.android.restvolley.Listeners.Listener;
+import cat.my.android.restvolley.listeners.EventDispatcher;
+import cat.my.android.restvolley.listeners.IModelUpdatedListener;
 import cat.my.android.restvolley.sync.DeletedEntries;
 
 
 public class DbDataSource<T extends IdentificableModel> implements IDataSource<T>{
-	
+	EventDispatcher<T> eventDispatcher = new EventDispatcher<T>();
 	SQLiteOpenHelper dbHelper;
 	IDbMapping<T> funcs;
 	DBModelController<T> dbModelController;
@@ -59,6 +65,7 @@ public class DbDataSource<T extends IdentificableModel> implements IDataSource<T
 		//refresh model
 		model = db.get(model.getId());
 		listener.onResponse(model);
+		eventDispatcher.notifyModelUpdate(model);
 	}
 
 	@Override
@@ -71,6 +78,10 @@ public class DbDataSource<T extends IdentificableModel> implements IDataSource<T
 	
 	public DBModelController<T> getDbModelController(){
 		return dbModelController;
+	}
+
+	public EventDispatcher<T> getEventDispatcher() {
+		return eventDispatcher;
 	}
 
 }
