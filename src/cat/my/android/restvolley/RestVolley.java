@@ -83,7 +83,7 @@ public class RestVolley {
 		return config;
 	}
 	
-	public <T> ISynchDataSource<T> getDataSource(Class<T> clazz){
+	public <T extends IdentificableModel> ISynchDataSource<T> getDataSource(Class<T> clazz){
 		return (ISynchDataSource<T>) dataSources.get(clazz);
 	}
 }

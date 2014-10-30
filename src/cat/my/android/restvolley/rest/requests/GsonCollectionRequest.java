@@ -32,7 +32,7 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Response;
 
-import cat.my.android.restvolley.Listeners.CollectionListener;
+import cat.my.android.restvolley.Listeners.Listener;
 import cat.my.android.restvolley.Listeners.ErrorListener;
 import cat.my.android.restvolley.Listeners.Listener;
 import com.android.volley.toolbox.HttpHeaderParser;
@@ -44,7 +44,7 @@ import com.google.gson.JsonSyntaxException;
 public class GsonCollectionRequest<T> extends AbstractGsonRequest<Collection<T>> {
 	Type collectionType;
 	
-		public GsonCollectionRequest(Gson gson, Route route, Type collectionType, Map<String, Object> params, CollectionListener<T> listener, ErrorListener errorListener, int initialTimeOutMs) {
+		public GsonCollectionRequest(Gson gson, Route route, Type collectionType, Map<String, Object> params, Listener<Collection<T>> listener, ErrorListener errorListener, int initialTimeOutMs) {
 		super(gson, route, params, listener, errorListener, initialTimeOutMs);
 		this.collectionType = collectionType;
 	}

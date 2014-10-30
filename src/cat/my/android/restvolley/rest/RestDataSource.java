@@ -25,7 +25,7 @@ import cat.my.android.restvolley.IDataSource;
 import cat.my.android.restvolley.IdentificableModel;
 import cat.my.android.restvolley.RestVolley;
 import cat.my.android.restvolley.RestVolleyConfig;
-import cat.my.android.restvolley.Listeners.CollectionListener;
+import cat.my.android.restvolley.Listeners.Listener;
 import cat.my.android.restvolley.rest.ISessionController.NullSessionController;
 import cat.my.android.restvolley.rest.requests.GsonCollectionRequest;
 import cat.my.android.restvolley.rest.requests.GsonRequest;
@@ -75,7 +75,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 //		this.serverRequiresAuthentication = serverRequiresAuthentication;
 //	}
 	
-	public void executeCollectionListOperation(int method, String operation, Map<String, Object> params, CollectionListener<T> listener, ErrorListener errorListener) {
+	public void executeCollectionListOperation(int method, String operation, Map<String, Object> params, Listener<Collection<T>> listener, ErrorListener errorListener) {
 		Route route = restMapping.getCollectionRoute(method, operation);
 		executeListOperation(route, params, listener, errorListener);
 	}
@@ -90,7 +90,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 		executeOperation(model, route, params, listener, errorListener);
 	}
 	
-	private void executeListOperation(final Route route, final Map<String, Object> params, final CollectionListener<T> listener, final ErrorListener errorListener) {
+	private void executeListOperation(final Route route, final Map<String, Object> params, final Listener<Collection<T>> listener, final ErrorListener errorListener) {
 		Listener<Void> onSessionStarted = new Listener<Void>() {
 			@Override
 			public void onResponse(Void response) {
@@ -129,7 +129,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 	}
 	
 	@Override
-	public void index(CollectionListener<T> listener, ErrorListener errorListener) {
+	public void index(Listener<Collection<T>> listener, ErrorListener errorListener) {
 		Route route = restMapping.getIndexPath();
 		executeListOperation(route, null, listener, errorListener);
 	}

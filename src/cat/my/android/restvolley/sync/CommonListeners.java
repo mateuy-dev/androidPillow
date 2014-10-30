@@ -1,0 +1,114 @@
+package cat.my.android.restvolley.sync;
+
+import java.util.Collection;
+
+import android.content.Context;
+import android.os.Handler;
+import android.util.Log;
+import android.widget.Toast;
+
+import cat.my.android.restvolley.Listeners.Listener;
+import cat.my.android.restvolley.Listeners.ErrorListener;
+import cat.my.android.restvolley.Listeners.Listener;
+import cat.my.android.restvolley.RestVolleyError;
+
+import com.android.volley.VolleyError;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+public class CommonListeners {
+	public static ErrorListener dummyErrorListener = new ErrorListener() {
+		@Override
+		public void onErrorResponse(RestVolleyError error) {
+			error.printStackTrace();
+		}
+	};
+	public static ErrorListener silentErrorListener = new ErrorListener() {
+		@Override
+		public void onErrorResponse(RestVolleyError error) {
+			Log.i("RestVolley", error.getMessage());
+		}
+	};
+	public static Listener dummyListener = new Listener() {
+		@Override
+		public void onResponse(Object response) {
+		}
+	};
+	
+	public static class DummyToastListener<T> implements Listener<T>{
+		String text;
+		Context context;
+		public DummyToastListener(Context context, String text) {
+			this.context = context;
+			this.text= text;
+		}
+		@Override
+		public void onResponse(T response) {
+			Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+		}
+	}
+		
+	public static Listener dummyLogListener = new Listener(){
+		@Override
+		public void onResponse(Object response) {
+			System.out.println(new Gson().toJson(response).toString());
+		}
+	};
+	
+	
+	public static class ProxyListener<T, D> implements Listener<D>{
+		Listener<T> listener;
+		T response;
+		public ProxyListener(Listener<T> listener, T response){
+			this.listener = listener;
+			this.response = response;
+		}
+
+		@Override
+		public void onResponse(D dummyResponse) {
+			listener.onResponse(response);
+		}
+	}
+	
+	public static abstract class ExecuteOnMainThreadListener<T> implements Listener<T>{
+		Context context;
+		public ExecuteOnMainThreadListener(Context context){
+			this.context = context;
+		}
+		public void onResponse(T response) {
+			Handler mainHandler = new Handler(context.getMainLooper());
+			Runnable myRunnable = new MainThreadExecutor(response);
+			mainHandler.post(myRunnable);
+		}
+		public abstract void onResponseInMainThread(T response);
+		
+		private class MainThreadExecutor implements Runnable{
+			T response;
+			public MainThreadExecutor(T response) {
+				this.response = response;
+			}
+			@Override
+			public void run() {
+				onResponseInMainThread(response);
+			}
+		}
+	}
+	
+	public static class ExecuteOnMainThreadProxyListener<T> extends ExecuteOnMainThreadListener<T>{
+		Listener<T> listener;
+		Context context;
+		
+		public ExecuteOnMainThreadProxyListener(Context context, Listener<T> listener) {
+			super(context);
+			this.listener = listener;
+		}
+		
+		@Override
+		public void onResponseInMainThread(T response) {
+			listener.onResponse(response);
+		}
+		
+	}
+
+}

@@ -48,4 +48,8 @@ public class RestVolleyError {
 	public Throwable getCause() {
 		return volleyError.getCause();
 	}
+
+	public VolleyError getVolleyError() {
+		return volleyError;
+	}
 }

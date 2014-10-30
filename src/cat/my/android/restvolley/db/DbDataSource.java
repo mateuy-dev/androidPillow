@@ -6,10 +6,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
 import cat.my.android.restvolley.IDataSource;
 import cat.my.android.restvolley.IdentificableModel;
-import cat.my.android.restvolley.Listeners.CollectionListener;
+import cat.my.android.restvolley.Listeners.Listener;
 import cat.my.android.restvolley.Listeners.ErrorListener;
 import cat.my.android.restvolley.Listeners.Listener;
 import cat.my.android.restvolley.listeners.EventDispatcher;
@@ -17,27 +18,31 @@ import cat.my.android.restvolley.listeners.IModelUpdatedListener;
 import cat.my.android.restvolley.sync.DeletedEntries;
 
 
-public class DbDataSource<T extends IdentificableModel> implements IDataSource<T>{
+public class DbDataSource<T extends IdentificableModel> implements IDBDataSource<T>{
 	EventDispatcher<T> eventDispatcher = new EventDispatcher<T>();
 	SQLiteOpenHelper dbHelper;
 	IDbMapping<T> funcs;
 	DBModelController<T> dbModelController;
+	Context context;
 
-	public DbDataSource(IDbMapping<T> funcs, SQLiteOpenHelper dbHelper, DeletedEntries<T> deletedEntries) {
+	public DbDataSource(Context context, IDbMapping<T> funcs, SQLiteOpenHelper dbHelper, DeletedEntries<T> deletedEntries) {
 		super();
 		//TODO check dbModelControllerManager -null delete entitites
 		this.funcs=funcs;
 		this.dbHelper = dbHelper;
+		this.context = context;
 		dbModelController = new DBModelController<T>(dbHelper, funcs, deletedEntries);
+		
 	}
 
 	@Override
-	public void index(CollectionListener<T> listener, ErrorListener errorListener) {
+	public void index(Listener<Collection<T>> listener, ErrorListener errorListener) {
 		DBModelController<T> db = getDbModelController();
 		listener.onResponse(db.index());
 	}
 	
-	public void index(String selection, String[] selectionArgs, String order, CollectionListener<T> listener, ErrorListener errorListener) {
+	@Override
+	public void index(String selection, String[] selectionArgs, String order, Listener<Collection<T>> listener, ErrorListener errorListener) {
 		DBModelController<T> db = getDbModelController();
 		listener.onResponse(db.index(selection, selectionArgs, order));
 	}
@@ -82,6 +87,10 @@ public class DbDataSource<T extends IdentificableModel> implements IDataSource<T
 
 	public EventDispatcher<T> getEventDispatcher() {
 		return eventDispatcher;
+	}
+
+	public Context getContext() {
+		return context;
 	}
 
 }

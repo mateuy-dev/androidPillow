@@ -17,10 +17,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import cat.my.android.restvolley.IDataSource;
 import cat.my.android.restvolley.IdentificableModel;
-import cat.my.android.restvolley.Listeners.CollectionListener;
+import cat.my.android.restvolley.Listeners.Listener;
 import cat.my.android.restvolley.RestVolley;
 
-import cat.my.android.restvolley.sync.DummyListeners;
+import cat.my.android.restvolley.sync.CommonListeners;
 import cat.my.android.restvolley.sync.SynchDataSource;
 
 import cat.my.android.restvolley.Listeners.ErrorListener;
@@ -31,8 +31,8 @@ public abstract class RestVolleyListAdapter<T extends IdentificableModel> extend
 	Context context;
 	List<T> models = new ArrayList<T>();
 	IDataSource<T> dataSource;
-	ErrorListener donwloadErrorListener = DummyListeners.dummyErrorListener;
-	ErrorListener refreshListErrorListener = DummyListeners.dummyErrorListener;
+	ErrorListener donwloadErrorListener = CommonListeners.dummyErrorListener;
+	ErrorListener refreshListErrorListener = CommonListeners.dummyErrorListener;
 
 	public RestVolleyListAdapter(Context context, Class<T> clazz) {
 		super();
@@ -41,7 +41,7 @@ public abstract class RestVolleyListAdapter<T extends IdentificableModel> extend
 	}
 
 	public void refreshList(){
-		CollectionListener<T> listener = new CollectionListener<T>(){
+		Listener<Collection<T>> listener = new Listener<Collection<T>>(){
 			@Override
 			public void onResponse(Collection<T> postsResponse) {
 				models.clear();
@@ -53,7 +53,7 @@ public abstract class RestVolleyListAdapter<T extends IdentificableModel> extend
 	}
 	
 	public void downloadData(){
-		CollectionListener<T> listener = new CollectionListener<T>(){
+		Listener<Collection<T>> listener = new Listener<Collection<T>>(){
 			@Override
 			public void onResponse(Collection<T> postsResponse) {
 				refreshList();

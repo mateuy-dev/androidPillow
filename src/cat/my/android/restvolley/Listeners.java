@@ -5,7 +5,6 @@ import java.util.Collection;
 import com.android.volley.VolleyError;
 
 public class Listeners{
-	public interface CollectionListener<T> extends Listener<Collection<T>>{}
 	public interface Listener<T> extends com.android.volley.Response.Listener<T>{}
 	public interface ErrorListener {
 		public void onErrorResponse(RestVolleyError error);

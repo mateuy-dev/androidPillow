@@ -10,8 +10,8 @@ import cat.my.android.restvolley.RestVolley;
 import cat.my.android.restvolley.rest.ISessionController;
 import cat.my.android.restvolley.rest.RailsRestMapping;
 import cat.my.android.restvolley.rest.RestDataSource;
-import cat.my.android.restvolley.sync.DummyListeners;
-import cat.my.android.restvolley.sync.DummyListeners.ProxyListener;
+import cat.my.android.restvolley.sync.CommonListeners;
+import cat.my.android.restvolley.sync.CommonListeners.ProxyListener;
 import cat.my.android.restvolley.sync.SynchManager;
 
 import com.android.volley.Request.Method;

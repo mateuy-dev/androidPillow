@@ -13,7 +13,7 @@ import android.content.SharedPreferences;
 import android.content.res.XmlResourceParser;
 import android.database.sqlite.SQLiteDatabase;
 import cat.my.android.restvolley.AbstractDBHelper;
-import cat.my.android.restvolley.Listeners.CollectionListener;
+import cat.my.android.restvolley.Listeners.Listener;
 import cat.my.android.restvolley.Listeners.ErrorListener;
 import cat.my.android.restvolley.RestVolley;
 import cat.my.android.restvolley.RestVolleyError;
@@ -102,7 +102,7 @@ public class SynchManager {
 		return getLastDownload().getTime() + downloadTimeInterval > new Date().getTime();
 	}
 
-	private class DownloadTask implements CollectionListener, ErrorListener{
+	private class DownloadTask implements Listener, ErrorListener{
 		int i=0;
 		Listener<Void> listener;
 		boolean errorFound = false;

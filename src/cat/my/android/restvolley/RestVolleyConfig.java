@@ -16,6 +16,7 @@ public class RestVolleyConfig {
 	List<String> dataSources = new ArrayList<String>();
 	int downloadTimeInterval = 3600000;
 	int maxResponseWaitTime = 10000;
+	boolean dbMultiThread = false;
 
 	public RestVolleyConfig(Context context, int xmlFileResId){
 		try {
@@ -47,8 +48,9 @@ public class RestVolleyConfig {
                 	downloadTimeInterval = parser.getAttributeIntValue(0, 3600000);//("vale");
                 } else if ("maxResponseWaitTime".equals(tagName)){
                 	maxResponseWaitTime = parser.getAttributeIntValue(0, 10000);//("vale");
+                } else if ("dbMultiThread".equals(tagName)){
+                	dbMultiThread = parser.getAttributeBooleanValue(0, false);
                 }
-                
             }
         }
 	}
@@ -67,5 +69,9 @@ public class RestVolleyConfig {
 
 	public int getMaxResponseWaitTime() {
 		return maxResponseWaitTime;
+	}
+
+	public boolean isDbMultiThread() {
+		return dbMultiThread;
 	}
 }
