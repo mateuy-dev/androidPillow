@@ -60,8 +60,8 @@ public class SynchDataSourceMainThreadProxy<T extends IdentificableModel> implem
 		dataSource.destroy(model, new ExecuteOnMainThreadProxyListener<Void>(getContext(),listener), errorListener);
 	}
 
-	public void sendDirty() {
-		dataSource.sendDirty();
+	public void sendDirty(Listener<Void> listener, ErrorListener errorListener) {
+		dataSource.sendDirty(listener, errorListener);
 	}
 
 	public void download(Listener<Collection<T>> listener, ErrorListener errorListener) {

@@ -86,15 +86,55 @@ public class SynchManager {
 		this.downloadTimeInterval = downloadTimeInterval;
 	}
 
-	public void synchronize(Listener<Void> listener, boolean force){
-		upload();
-		download(listener, force);
+	public void synchronize(Listener<Void> listener, ErrorListener errorListener, boolean force){
+		new SynchronizeOperation(listener, errorListener, force).start();
 	}
 	
-	public void upload(){
-		//This should work with listeners!!!!!!!!!!!!!!!!!!!!!
-		for(ISynchDataSource<?> dataSource:synchDataSources){
-			dataSource.sendDirty();
+	public void sendDirty(Listener<Void> listener, ErrorListener errorListener){
+		new SendDirtyOperation(listener, errorListener).start();
+	}
+	
+	private class SynchronizeOperation implements Listener<Void>{
+		Listener<Void> listener;
+		ErrorListener errorListener;
+		boolean force;
+		public SynchronizeOperation(Listener<Void> listener, ErrorListener errorListener, boolean force) {
+			this.listener = listener;
+			this.errorListener = errorListener;
+			this.force = force;
+		}
+		public void start(){
+			sendDirty(this, errorListener);
+		}
+		@Override
+		public void onResponse(Void response) {
+			download(listener, force);
+		}
+	}
+	
+	private class SendDirtyOperation implements Listener<Void>{
+		Listener<Void> listener;
+		ErrorListener errorListener;
+		int i=0;
+		public SendDirtyOperation(Listener<Void> listener, ErrorListener errorListener) {
+			this.listener = listener;
+			this.errorListener = errorListener;
+		}
+		public void sendNext(){
+			if(i<synchDataSources.size()){
+				ISynchDataSource<?> dataSource = synchDataSources.get(i);
+				++i;
+				dataSource.sendDirty(this, errorListener);
+			} else {
+				listener.onResponse(null);
+			}
+		}
+		@Override
+		public void onResponse(Void response) {
+			sendNext();
+		}
+		public void start(){
+			sendNext();
 		}
 	}
 	

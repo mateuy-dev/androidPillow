@@ -23,7 +23,7 @@ public class SynchOnConnectionChangeReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		if(connectivityManager.getActiveNetworkInfo()!=null && connectivityManager.getActiveNetworkInfo().isConnected()){
-			syncManager.synchronize(CommonListeners.dummyListener, false);
+			syncManager.synchronize(CommonListeners.dummyListener, CommonListeners.dummyErrorListener, false);
 		}
 //		NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
 //		NetworkInfo mobNetInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);

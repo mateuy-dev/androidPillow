@@ -49,7 +49,7 @@ public abstract class RestVolleyListAdapter<T extends IdentificableModel> extend
 				notifyDataSetChanged();
 			}
 		};
-		dataSource.index(listener, refreshListErrorListener);
+		dataSourceIndex(listener, refreshListErrorListener);
 	}
 	
 	public void downloadData(){
@@ -61,6 +61,10 @@ public abstract class RestVolleyListAdapter<T extends IdentificableModel> extend
 		};
 		
 		((SynchDataSource<T>)dataSource).download(listener, donwloadErrorListener);
+	}
+	
+	public void dataSourceIndex(Listener<Collection<T>> listener, ErrorListener errorListener){
+		dataSource.index(listener, errorListener);
 	}
 
 	@Override

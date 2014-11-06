@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -20,6 +21,8 @@ import cat.my.android.restvolley.db.DbDataSource;
 import cat.my.android.restvolley.db.IDBDataSource;
 import cat.my.android.restvolley.db.IDbMapping;
 import cat.my.android.restvolley.db.MTDbDataSource;
+import cat.my.android.restvolley.db.MTDbDataSource.OperationRunnable;
+import cat.my.android.restvolley.db.MTDbDataSource.SimpleIndexRunnable;
 import cat.my.android.restvolley.listeners.EventDispatcher;
 import cat.my.android.restvolley.rest.ISessionController;
 import cat.my.android.restvolley.rest.IRestMapping;
@@ -35,7 +38,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 	RestDataSource<T> restVolley;
 	ISessionController authenticationData;
 	DeletedEntries<T> deletedEntries;
-	IDBDataSource<T> dbSource;
+	MTDbDataSource<T> dbSource;
 	DBModelController<T> dbModelController;
 	IDbMapping<T> dbFuncs;
 	IRestMapping<T> restMap;
@@ -49,9 +52,9 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		restVolley = new RestDataSource<T>(restMap, context, authenticationData);
 		SQLiteOpenHelper dbHelper = RestVolley.getInstance(context).getDbHelper();
 		deletedEntries = new DeletedEntries<T>(restVolley, dbHelper);
-		dbSource = new DbDataSource<T>(context, dbFuncs, dbHelper, deletedEntries);
-		if(RestVolley.getInstance(context).getConfig().isDbMultiThread())
-			dbSource = new MTDbDataSource<T>(dbSource);
+//		dbSource = new DbDataSource<T>(context, dbFuncs, dbHelper, deletedEntries);
+//		if(RestVolley.getInstance(context).getConfig().isDbMultiThread()){
+		dbSource = new MTDbDataSource<T>(new DbDataSource<T>(context, dbFuncs, dbHelper, deletedEntries));
 		
 		dbModelController = dbSource.getDbModelController();
 		this.restMap=restMap;
@@ -119,33 +122,59 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		dbSource.destroy(model, deletedOnDbListener, errorListener);
 	}
 	
-	@Override
-	public void sendDirty(){
-		//TODO this should work with listeners!!!
-		DBModelController<T> db = getDbModelController();
-		List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
-		for(T model : createdModels){
-			restVolley.create(model, new SetAsNotDirityListener(), volleyErrorListener);
+	private class SendDirtyRunnable extends OperationRunnable<Listener<Void>>{
+		public SendDirtyRunnable(Listener<Void> listener, ErrorListener errorListener) {
+			super(listener, errorListener);
+		}
+
+		@Override
+		public void run() {
+			DBModelController<T> db = getDbModelController();
+			List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
+			for(T model : createdModels){
+				restVolley.create(model, new SetAsNotDirityListener(), volleyErrorListener);
+			}
+			List<T> updatedModels=db.getDirty(DBModelController.DIRTY_STATUS_UPDATED);
+			for(T model : updatedModels){
+				restVolley.update(model, new SetAsNotDirityListener(), volleyErrorListener);
+			}
+			deletedEntries.synchronize();
 			
+			getListener().onResponse(null);
 		}
-		List<T> updatedModels=db.getDirty(DBModelController.DIRTY_STATUS_UPDATED);
-		for(T model : updatedModels){
-			restVolley.update(model, new SetAsNotDirityListener(), volleyErrorListener);
+	}
+	
+	@Override
+	public void sendDirty(Listener<Void> listener, ErrorListener errorListener){
+		getThreadPoolExecutor().execute(new SendDirtyRunnable(listener, errorListener));
+	}
+	
+	private ThreadPoolExecutor getThreadPoolExecutor() {
+		return dbSource.getThreadPoolExecutor();
+	}
+	
+	private class DownloadRunnable extends OperationRunnable<Listener<Collection<T>>>{
+		public DownloadRunnable(Listener<Collection<T>> listener, ErrorListener errorListener) {
+			super(listener, errorListener);
 		}
-		deletedEntries.synchronize();
+
+		@Override
+		public void run() {
+			Listener<Collection<T>> fillDatabaseListener = new Listener<Collection<T>>(){
+				@Override
+				public void onResponse(Collection<T> response) {
+					DBModelController<T> db = getDbModelController();
+					db.cacheAll(new ArrayList<T>(response));
+					getListener().onResponse(response);
+				}
+			};
+			restVolley.index(fillDatabaseListener, getErrorListener());
+		}
 	}
 	
 	@Override
 	public void download(final Listener<Collection<T>> listener, ErrorListener errorListener) {
-		Listener<Collection<T>> fillDatabaseListener = new Listener<Collection<T>>(){
-			@Override
-			public void onResponse(Collection<T> response) {
-				DBModelController<T> db = getDbModelController();
-				db.cacheAll(new ArrayList<T>(response));
-				listener.onResponse(response);
-			}
-		};
-		restVolley.index(fillDatabaseListener, errorListener);
+		getThreadPoolExecutor().execute(new DownloadRunnable(listener, errorListener));
 	}
 
 	@Override

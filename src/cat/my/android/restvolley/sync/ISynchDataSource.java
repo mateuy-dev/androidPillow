@@ -13,7 +13,7 @@ import cat.my.android.restvolley.Listeners.ErrorListener;
 import cat.my.android.restvolley.Listeners.Listener;
 
 public interface ISynchDataSource<T extends IdentificableModel> extends IDBDataSource<T> {
-	public void sendDirty();
+	public void sendDirty(Listener<Void> listener, ErrorListener errorListener);
 	public void download(final Listener<Collection<T>> listener, ErrorListener errorListener);
 	public Class<T> getModelClass();
 }

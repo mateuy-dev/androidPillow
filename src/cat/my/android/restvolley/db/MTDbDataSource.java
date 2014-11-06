@@ -21,7 +21,8 @@ import cat.my.android.restvolley.sync.DeletedEntries;
 
 
 public class MTDbDataSource<T extends IdentificableModel> implements IDBDataSource<T>{
-	ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+	static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+
 	IDBDataSource<T> dataSource;
 
 	public MTDbDataSource(IDBDataSource<T> dataSource) {
@@ -29,13 +30,19 @@ public class MTDbDataSource<T extends IdentificableModel> implements IDBDataSour
 		this.dataSource=dataSource;
 	}
 
-	private abstract class OperationRunnable<L> implements Runnable{
+	public abstract static class OperationRunnable<L> implements Runnable{
 		L listener;
 		ErrorListener errorListener;
 		public OperationRunnable(L listener, ErrorListener errorListener) {
 			super();
 			this.listener = listener;
 			this.errorListener = errorListener;
+		}
+		public L getListener() {
+			return listener;
+		}
+		public ErrorListener getErrorListener() {
+			return errorListener;
 		}
 	}
 	
@@ -146,6 +153,10 @@ public class MTDbDataSource<T extends IdentificableModel> implements IDBDataSour
 
 	public EventDispatcher<T> getEventDispatcher() {
 		return dataSource.getEventDispatcher();
+	}
+	
+	public ThreadPoolExecutor getThreadPoolExecutor() {
+		return threadPoolExecutor;
 	}
 
 }
