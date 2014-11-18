@@ -1,0 +1,15 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:enabled="false"
+    android:orientation="horizontal"
+    android:paddingEnd="8dip" >
+
+    <Button
+        android:id="@+id/action_bar_save"
+        style="@style/ActionBarButtonOffWhite" 
+        android:text="@string/save"
+         android:icon="@drawable/ic_action_accept"
+        />
+
+</LinearLayout>

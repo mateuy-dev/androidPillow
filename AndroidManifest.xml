@@ -6,7 +6,11 @@
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="20" />
-
+<!-- 		<application android:theme="@style/AppTheme" > -->
+	<application>
+        <activity android:name="cat.my.android.restvolley.forms.views.FormActivity">
+        </activity>
+    </application>
 
 
 </manifest>
