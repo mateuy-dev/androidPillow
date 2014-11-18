@@ -19,7 +19,7 @@ public class FormInputs {
 	InputDataManager inputManager = new InputDataManager();
 	
 	//Data
-	Map<Field, View> inputViewMap = null;
+	Map<Field, FormInput> inputViewMap = null;
 	Object model;
 	Context context;
 	
@@ -36,15 +36,12 @@ public class FormInputs {
 		if(inputViewMap!=null)
 			return;
 		
-		inputViewMap = new HashMap<Field, View>();
+		inputViewMap = new HashMap<Field, FormInput>();
 		for(Field field: model.getClass().getDeclaredFields()){
 			try {
 				if(!field.isSynthetic() && acceptInput(field)){
 					field.setAccessible(true);
-					InputData inputData = inputManager.getInputData(field);
-					View input = (View) inputData.createView(context);
-					inputData.setValue(input, field.get(model));
-					inputViewMap.put(field, input);
+					inputViewMap.put(field, new FormInput(context, field, model));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -58,12 +55,15 @@ public class FormInputs {
 	
 	public Collection<View> getInputs(){
 		initInputs();
-		if(inputNames==null)
-			return inputViewMap.values();
-		
 		Collection<View> result = new ArrayList<View>();
-		for(String inputName: inputNames){
-			result.add(getInput(inputName));
+		if(inputNames==null){
+			for(FormInput row : inputViewMap.values()){
+				result.add(row.getRootView());
+			}
+		} else {
+			for(String inputName: inputNames){
+				result.add(getInput(inputName));
+			}
 		}
 		return result;
 	}
@@ -72,18 +72,16 @@ public class FormInputs {
 		initInputs();
 		try {
 			Field field = model.getClass().getDeclaredField(fieldName);
-			return inputViewMap.get(field);
+			return inputViewMap.get(field).getRootView();
 		} catch (NoSuchFieldException e) {
 			return null;
 		}
 	}
 
 	public void updateModelFromForm() {
-		for(Entry<Field, View> entries : inputViewMap.entrySet()){
+		for(Entry<Field, FormInput> entries : inputViewMap.entrySet()){
 			Field field= entries.getKey();
-			View view = entries.getValue();
-			InputData inputData = inputManager.getInputData(field);
-			Object value = inputData.getValue(view);
+			Object value = entries.getValue().getValue();
 			try {
 				field.set(model, value);
 			} catch (Exception e) {
@@ -107,28 +105,6 @@ public class FormInputs {
 		return false;
 	}
 	
-	public class FormInputRow{
-		Field field;
-		View input;
-		View rootView;
-		InputData inputData;
-		public FormInputRow(Field field){
-			this.field = field;
-			init();
-		}
-		public void init(){
-			field.setAccessible(true);
-			
-			inputData = inputManager.getInputData(field);
-			input = (View) inputData.createView(context);
-			try {
-				inputData.setValue(input, field.get(model));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			rootView = input;
-		}
-		
-	}
+	
 
 }
