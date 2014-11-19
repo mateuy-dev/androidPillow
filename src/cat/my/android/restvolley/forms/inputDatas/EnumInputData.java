@@ -12,7 +12,7 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import cat.my.android.restvolley.forms.InputData;
 
-public class EnumInputData implements InputData {
+public class EnumInputData extends AbstractSpinnerInputData<Enum<?>> {
 	Class<?> valueClass;
 
 	public EnumInputData(Class<?> valueClass) {
@@ -20,20 +20,8 @@ public class EnumInputData implements InputData {
 	}
 
 	@Override
-	public Object getValue(View view) {
-		return ((Spinner) view).getSelectedItem();
-	}
-
-	@Override
-	public void setValue(View view, Object value) {
-		((Spinner) view).setSelection(((Enum<?>) value).ordinal());
-	}
-
-	@Override
-	public View createView(Context context) {
-		Spinner spinner = new Spinner(context);
-		spinner.setAdapter(new EnumSpinnerAdapter(context));
-		return spinner;
+	public ArrayAdapter<Enum<?>> createAdapter(Context context) {
+		return new EnumSpinnerAdapter(context);
 	}
 
 	private class EnumSpinnerAdapter extends ArrayAdapter<Enum<?>> {
@@ -73,12 +61,21 @@ public class EnumInputData implements InputData {
 
 			Enum<?> item = getItem(position);
 			
-			int id = getContext().getResources().getIdentifier(valueClass.getSimpleName()+"_"+item.name(), "string", getContext().getPackageName());
-
-			text.setText(getContext().getResources().getString(id));
+			String stringId = valueClass.getSimpleName()+"_"+item.name();
+			int id = getContext().getResources().getIdentifier(stringId, "string", getContext().getPackageName());
+			String label; 
+			if(id!=0)
+				label = getContext().getResources().getString(id);
+			else{
+				label = item.name();
+				Log.e("RestVolley", "The following String needs to be added to string.xml: "+stringId);
+			}
+			text.setText(label);
 
 			return view;
 		}
 
 	}
+
+	
 }

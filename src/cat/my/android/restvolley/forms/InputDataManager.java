@@ -2,9 +2,12 @@ package cat.my.android.restvolley.forms;
 
 import java.lang.reflect.Field;
 
+import cat.my.android.restvolley.IdentificableModel;
 import cat.my.android.restvolley.forms.InputData.InputDataInfo;
+import cat.my.android.restvolley.forms.InputData.InputDataInfo.DEFAULT_INPUT;
 import cat.my.android.restvolley.forms.inputDatas.EditTextData;
 import cat.my.android.restvolley.forms.inputDatas.EnumInputData;
+import cat.my.android.restvolley.forms.inputDatas.IdentificableModelInputData;
 import cat.my.android.restvolley.forms.inputDatas.IntEditTextData;
 
 public class InputDataManager{
@@ -13,10 +16,15 @@ public class InputDataManager{
 		field.getAnnotations();
 		InputDataInfo inputTypeAnnotation = (InputDataInfo) field.getAnnotation(InputDataInfo.class);
 		if(inputTypeAnnotation!=null){
-			try {
-				return (InputData)inputTypeAnnotation.inputClass().newInstance();
-			} catch (Exception e) {
-				e.printStackTrace();
+			if(inputTypeAnnotation.inputClass() != DEFAULT_INPUT.class){
+				try {
+					return (InputData)inputTypeAnnotation.inputClass().newInstance();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if(inputTypeAnnotation.belongsTo() !=null){
+				Class<? extends IdentificableModel> parentClass = inputTypeAnnotation.belongsTo();
+				return new IdentificableModelInputData(parentClass);
 			}
 		}
 		
