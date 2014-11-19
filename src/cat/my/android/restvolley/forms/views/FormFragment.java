@@ -28,10 +28,14 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 		LinearLayout rootView = new LinearLayout(getActivity());
 		rootView.setOrientation(LinearLayout.VERTICAL);
 		
-		String id = BundleUtils.getId(getArguments());
-		Class<T> clazz = BundleUtils.getModelClass(getArguments());
+		
+		Bundle bundle = getArguments();
+		final String[] atts = BundleUtils.getShownAtts(bundle);
+		String id = BundleUtils.getId(bundle);
+		Class<T> clazz = BundleUtils.getModelClass(bundle);
 		formView = new TFormView<T>(getActivity());
 		rootView.addView(formView);
+		
 		
 		ISynchDataSource<T> dataSource = RestVolley.getInstance(getActivity()).getDataSource(clazz);
 		
@@ -44,12 +48,16 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 				dataSource.show(idModel, new Listener<T>() {
 					@Override
 					public void onResponse(T model) {
-						formView.setModel(model);
+						formView.setModel(model, atts);
 					}
 				}, CommonListeners.dummyErrorListener);
 			} else {
-				//new, we just set the empty model
-				formView.setModel(idModel);
+				//we check if there is a model in the bundle, other wise we use the empty model
+				T bundleModel = BundleUtils.getModel(bundle);
+				if(bundleModel!=null){
+					idModel = bundleModel;
+				}
+				formView.setModel(idModel, atts);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

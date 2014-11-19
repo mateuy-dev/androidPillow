@@ -20,7 +20,7 @@ public class EnumInputData extends AbstractSpinnerInputData<Enum<?>> {
 	}
 
 	@Override
-	public ArrayAdapter<Enum<?>> createAdapter(Context context) {
+	public ArrayAdapter<Enum<?>> createAdapter(Context context, Spinner spinner) {
 		return new EnumSpinnerAdapter(context);
 	}
 

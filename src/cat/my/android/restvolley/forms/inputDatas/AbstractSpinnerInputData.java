@@ -17,12 +17,12 @@ public abstract class AbstractSpinnerInputData<T> implements InputData {
 	@Override
 	public View createView(Context context) {
 		Spinner spinner = new Spinner(context);
-		ArrayAdapter<T> adapter = createAdapter(context);
+		ArrayAdapter<T> adapter = createAdapter(context, spinner);
 		spinner.setAdapter(adapter);
 		return spinner;
 	}
 	
-	public abstract ArrayAdapter<T> createAdapter(Context context);
+	public abstract ArrayAdapter<T> createAdapter(Context context, Spinner spinner);
 
 
 

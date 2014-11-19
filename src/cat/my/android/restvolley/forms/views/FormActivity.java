@@ -28,7 +28,7 @@ public class FormActivity<T extends IdentificableModel>  extends ActionBarActivi
 	    setContentView(R.layout.form_activity);
 		if (savedInstanceState == null) {
 			formFragment = new FormFragment<T>();
-			formFragment.setArguments(BundleUtils.createIdBundle(getIntent().getExtras()));
+			formFragment.setArguments(BundleUtils.copyBundle(getIntent().getExtras()));
 			getSupportFragmentManager().beginTransaction().add(R.id.container, formFragment).commit();
 		}
 	}

@@ -1,10 +1,12 @@
 package cat.my.android.restvolley.forms;
 
 import java.lang.reflect.Field;
+import java.util.Date;
 
 import cat.my.android.restvolley.IdentificableModel;
 import cat.my.android.restvolley.forms.InputData.InputDataInfo;
 import cat.my.android.restvolley.forms.InputData.InputDataInfo.DEFAULT_INPUT;
+import cat.my.android.restvolley.forms.inputDatas.DateEditTextData;
 import cat.my.android.restvolley.forms.inputDatas.EditTextData;
 import cat.my.android.restvolley.forms.inputDatas.EnumInputData;
 import cat.my.android.restvolley.forms.inputDatas.IdentificableModelInputData;
@@ -35,6 +37,8 @@ public class InputDataManager{
 			return new IntEditTextData();
 		} else if(Enum.class.isAssignableFrom(valueClass)){
 			return new EnumInputData(valueClass);
+		} else if (Date.class.isAssignableFrom(valueClass)){
+			return new DateEditTextData();
 		}
 		return null;
 	}

@@ -1,6 +1,7 @@
 package cat.my.android.restvolley.forms.inputDatas;
 
 import java.util.Collection;
+import java.util.List;
 
 import android.content.Context;
 import android.view.View;
@@ -25,10 +26,30 @@ public class IdentificableModelInputData<T extends IdentificableModel> extends A
 	}
 
 	@Override
-	public ArrayAdapter<T> createAdapter(Context context) {
-		adapter = new ArrayAdapter<T>(context, android.R.layout.simple_spinner_item);
+	public ArrayAdapter<T> createAdapter(Context context, Spinner spinner) {
+		adapter = new CustomArrayAdapter<T>(spinner, context, android.R.layout.simple_spinner_item);
 		loadData(context, onLoadListener, CommonListeners.dummyErrorListener);
 		return adapter;
+	}
+	
+	@Override
+	public void setValue(View view, Object value) {
+		String id = (String) value;
+		T model;
+		try {
+			model = parentClass.newInstance();
+			model.setId(id);
+			Spinner spinner = ((Spinner)view);
+			((CustomArrayAdapter<T>)spinner.getAdapter()).setSelection(model);
+		} catch (Exception e) {
+			//TODO
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public Object getValue(View view) {
+		return ((T)super.getValue(view)).getId();
 	}
 	
 	/**
@@ -52,6 +73,33 @@ public class IdentificableModelInputData<T extends IdentificableModel> extends A
 		}
 		
 	};
+	
+	private class CustomArrayAdapter<T> extends ArrayAdapter<T>{
+		T selection;
+		Spinner spinner;
+		public CustomArrayAdapter(Spinner spinner, Context context, int resource) {
+			super(context, resource);
+			this.spinner = spinner;
+		}
+		
+		public void setSelection(T model){
+			selection = model;
+			updateSelected();
+		}
+
+		private void updateSelected() {
+			int position = getPosition(selection);
+			if(position!=-1){
+				spinner.setSelection(position);
+			}
+		}
+		
+		@Override
+		public void notifyDataSetChanged() {
+			super.notifyDataSetChanged();
+			updateSelected();
+		}
+	}
 
 
 }
