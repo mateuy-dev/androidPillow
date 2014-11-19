@@ -35,7 +35,8 @@ public class FormInput{
 		private void createRootView() {
 			rootView = new LinearLayout(context);
 			TextView label = new TextView(context);
-			label.setText(field.getName());
+			String labelText = StringResourceUtils.getLabel(context, field);
+			label.setText(labelText);
 			rootView.addView(label);
 			rootView.addView(input);
 		}

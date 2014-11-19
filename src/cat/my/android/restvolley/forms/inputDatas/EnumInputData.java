@@ -11,6 +11,7 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import cat.my.android.restvolley.forms.InputData;
+import cat.my.android.restvolley.forms.StringResourceUtils;
 
 public class EnumInputData extends AbstractSpinnerInputData<Enum<?>> {
 	Class<?> valueClass;
@@ -61,15 +62,7 @@ public class EnumInputData extends AbstractSpinnerInputData<Enum<?>> {
 
 			Enum<?> item = getItem(position);
 			
-			String stringId = valueClass.getSimpleName()+"_"+item.name();
-			int id = getContext().getResources().getIdentifier(stringId, "string", getContext().getPackageName());
-			String label; 
-			if(id!=0)
-				label = getContext().getResources().getString(id);
-			else{
-				label = item.name();
-				Log.e("RestVolley", "The following String needs to be added to string.xml: "+stringId);
-			}
+			String label = StringResourceUtils.getLabel(getContext(), item);
 			text.setText(label);
 
 			return view;
