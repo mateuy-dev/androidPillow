@@ -9,9 +9,9 @@ import android.widget.Toast;
 
 import cat.my.android.restvolley.Listeners.Listener;
 import cat.my.android.restvolley.Listeners.ErrorListener;
-import cat.my.android.restvolley.Listeners.Listener;
 import cat.my.android.restvolley.RestVolleyError;
 
+import com.android.volley.NoConnectionError;
 import com.android.volley.VolleyError;
 
 import com.google.gson.Gson;
@@ -27,9 +27,21 @@ public class CommonListeners {
 	public static ErrorListener silentErrorListener = new ErrorListener() {
 		@Override
 		public void onErrorResponse(RestVolleyError error) {
-			Log.i("RestVolley", error.getMessage());
+			Log.w("RestVolley", error.getMessage());
 		}
 	};
+	
+	public static final ErrorListener volleyErrorListener= new ErrorListener(){
+		@Override
+		public void onErrorResponse(RestVolleyError error) {
+			if(error.getVolleyError() instanceof NoConnectionError){
+				Log.i("RestVolley", error.getMessage());
+			} else {
+				error.printStackTrace();
+			}
+		}
+	};
+	
 	public static Listener dummyListener = new Listener() {
 		@Override
 		public void onResponse(Object response) {

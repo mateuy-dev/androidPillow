@@ -31,7 +31,7 @@ public abstract class RestVolleyListAdapter<T extends IdentificableModel> extend
 	Context context;
 	List<T> models = new ArrayList<T>();
 	IDataSource<T> dataSource;
-	ErrorListener donwloadErrorListener = CommonListeners.dummyErrorListener;
+	ErrorListener donwloadErrorListener = CommonListeners.volleyErrorListener;
 	ErrorListener refreshListErrorListener = CommonListeners.dummyErrorListener;
 
 	public RestVolleyListAdapter(Context context, Class<T> clazz) {

@@ -81,6 +81,14 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 		listener.onResponse(null);
 	}
 	
+	@Override
+	public void count(String selection, String[] selectionArgs, Listener<Integer> listener,
+			ErrorListener errorListener) {
+		DBModelController<T> db =getDbModelController();
+		int result = db.getCount(selection, selectionArgs);
+		listener.onResponse(result);
+	}
+	
 	public DBModelController<T> getDbModelController(){
 		return dbModelController;
 	}
@@ -92,5 +100,7 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 	public Context getContext() {
 		return context;
 	}
+
+	
 
 }

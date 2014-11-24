@@ -59,7 +59,7 @@ public class DeletedEntries<T extends IdentificableModel> {
 	}
 	
 	public void setAllreadyDeleted(T model){
-		restVolley.destroy(model, new OnServerDeletedListener(model.getId()), CommonListeners.dummyErrorListener);
+		restVolley.destroy(model, new OnServerDeletedListener(model.getId()), CommonListeners.volleyErrorListener);
 	}
 	
 	public void setAsDeleted(SQLiteDatabase db, String id) {

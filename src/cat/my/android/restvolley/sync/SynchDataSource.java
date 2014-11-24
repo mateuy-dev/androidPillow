@@ -89,7 +89,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 			@Override
 			public void onResponse(T response) {
 				Listener<T> myListener = new SetAsNotDirityListener();
-				restVolley.create(model, myListener, volleyErrorListener);
+				restVolley.create(model, myListener, CommonListeners.volleyErrorListener);
 				listener.onResponse(model);
 			}
 		};
@@ -103,7 +103,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 			@Override
 			public void onResponse(T response) {
 				Listener<T> myListener = new SetAsNotDirityListener();
-				restVolley.update(model, myListener, volleyErrorListener);
+				restVolley.update(model, myListener, CommonListeners.volleyErrorListener);
 				listener.onResponse(model);
 			}
 		};
@@ -122,6 +122,12 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		dbSource.destroy(model, deletedOnDbListener, errorListener);
 	}
 	
+	@Override
+	public void count(String selection, String[] selectionArgs, Listener<Integer> listener,
+			ErrorListener errorListener) {
+		dbSource.count(selection, selectionArgs, listener, errorListener);
+	}
+	
 	private class SendDirtyRunnable extends OperationRunnable<Listener<Void>>{
 		public SendDirtyRunnable(Listener<Void> listener, ErrorListener errorListener) {
 			super(listener, errorListener);
@@ -132,11 +138,11 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 			DBModelController<T> db = getDbModelController();
 			List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
 			for(T model : createdModels){
-				restVolley.create(model, new SetAsNotDirityListener(), volleyErrorListener);
+				restVolley.create(model, new SetAsNotDirityListener(), CommonListeners.volleyErrorListener);
 			}
 			List<T> updatedModels=db.getDirty(DBModelController.DIRTY_STATUS_UPDATED);
 			for(T model : updatedModels){
-				restVolley.update(model, new SetAsNotDirityListener(), volleyErrorListener);
+				restVolley.update(model, new SetAsNotDirityListener(), CommonListeners.volleyErrorListener);
 			}
 			deletedEntries.synchronize();
 			
@@ -234,18 +240,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		
 	}
 
-	private static final VolleyErrorListener volleyErrorListener= new VolleyErrorListener();
-	private static class VolleyErrorListener implements ErrorListener{
-		@Override
-		public void onErrorResponse(RestVolleyError error) {
-			if(error.getVolleyError() instanceof NoConnectionError){
-				Log.i("RestVolley", error.getMessage());
-			} else {
-				error.printStackTrace();
-			}
-		}
-		
-	}
+	
 
 	public IDbMapping<T> getDbFuncs() {
 		return dbFuncs;
@@ -257,4 +252,5 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 	public Context getContext() {
 		return context;
 	}
+
 }

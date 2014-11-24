@@ -147,6 +147,27 @@ public class MTDbDataSource<T extends IdentificableModel> implements IDBDataSour
 		threadPoolExecutor.execute(new DestroyRunnable(model, listener, errorListener));
 	}
 	
+	public class CountRunnable extends OperationRunnable<Listener<Integer>>{
+		String selection;
+		String[] selectionArgs;
+		public CountRunnable(String selection, String[] selectionArgs,Listener<Integer> listener, ErrorListener errorListener) {
+			super(listener, errorListener);
+			this.selection = selection;
+			this.selectionArgs = selectionArgs;
+		}
+		@Override
+		public void run() {
+			dataSource.count(selection, selectionArgs, listener, errorListener);
+		}
+	}
+	
+	@Override
+	public void count(String selection, String[] selectionArgs, Listener<Integer> listener,
+			ErrorListener errorListener) {
+		threadPoolExecutor.execute(new CountRunnable(selection, selectionArgs, listener, errorListener));
+	}
+
+	
 	public DBModelController<T> getDbModelController(){
 		return dataSource.getDbModelController();
 	}

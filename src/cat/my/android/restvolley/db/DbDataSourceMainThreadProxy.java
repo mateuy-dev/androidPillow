@@ -51,6 +51,12 @@ public class DbDataSourceMainThreadProxy <T extends IdentificableModel> implemen
 	public void destroy(T model, Listener<Void> listener, ErrorListener errorListener) {
 		dataSource.destroy(model, new ExecuteOnMainThreadProxyListener<Void>(getContext(),listener), errorListener);
 	}
+	
+	@Override
+	public void count(String selection, String[] selectionArgs, Listener<Integer> listener,
+			ErrorListener errorListener) {
+		dataSource.count(selection, selectionArgs, new ExecuteOnMainThreadProxyListener<Integer>(getContext(), listener), errorListener);
+	}
 
 	public DBModelController<T> getDbModelController() {
 		return dataSource.getDbModelController();
@@ -63,5 +69,7 @@ public class DbDataSourceMainThreadProxy <T extends IdentificableModel> implemen
 	public Context getContext() {
 		return dataSource.getContext();
 	}
+
+	
 
 }

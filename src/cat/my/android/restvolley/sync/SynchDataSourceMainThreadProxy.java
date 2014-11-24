@@ -59,6 +59,12 @@ public class SynchDataSourceMainThreadProxy<T extends IdentificableModel> implem
 	public void destroy(T model, Listener<Void> listener, ErrorListener errorListener) {
 		dataSource.destroy(model, new ExecuteOnMainThreadProxyListener<Void>(getContext(),listener), errorListener);
 	}
+	
+	@Override
+	public void count(String selection, String[] selectionArgs, Listener<Integer> listener,
+			ErrorListener errorListener) {
+		dataSource.count(selection, selectionArgs, new ExecuteOnMainThreadProxyListener<Integer>(getContext(),listener), errorListener);
+	}
 
 	public void sendDirty(Listener<Void> listener, ErrorListener errorListener) {
 		dataSource.sendDirty(listener, errorListener);

@@ -174,7 +174,7 @@ public class SynchManager {
 		@Override
 		public void onErrorResponse(RestVolleyError error) {
 			errorFound = true;
-			error.printStackTrace();
+			CommonListeners.volleyErrorListener.onErrorResponse(error);
 		}
 	}
 }

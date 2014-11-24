@@ -16,6 +16,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import cat.my.android.restvolley.IdentificableModel;
 import cat.my.android.restvolley.sync.DeletedEntries;
 import cat.my.android.util.CursorUtil;
+import cat.my.util.StringUtil;
 
 
 
@@ -51,8 +52,16 @@ public class DBModelController<T extends IdentificableModel> {
 	}
 
 	public int getCount(){
+		return getColumnIntegerValue(null, null);
+	}
+	
+	public int getCount(String selection, String[] selectionArgs){
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM "+ getTableName(), null);
+		String query = "SELECT COUNT(*) FROM "+ getTableName();
+		if(!StringUtil.isBlanck(selection)){
+			query += " WHERE "+selection;
+		}
+		Cursor cursor = db.rawQuery(query, selectionArgs);
 		cursor.moveToFirst();
 		int count= cursor.getInt(0);
 		cursor.close();

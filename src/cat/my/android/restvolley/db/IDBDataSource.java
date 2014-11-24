@@ -14,6 +14,8 @@ public interface IDBDataSource<T extends IdentificableModel> extends IDataSource
 			ErrorListener errorListener);
 	public DBModelController<T> getDbModelController();
 	public EventDispatcher<T> getEventDispatcher();
+	void count(String selection, String[] selectionArgs, Listener<Integer> listener,
+			ErrorListener errorListener);
 	
 
 }
