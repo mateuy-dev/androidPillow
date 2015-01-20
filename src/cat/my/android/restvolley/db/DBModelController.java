@@ -90,7 +90,7 @@ public class DBModelController<T extends IdentificableModel> {
 			return null;
 		}
 
-		T model = createModel(cursor);
+		T model = createModel(cursor, true);
 		cursor.close();
 		db.close();
 		
@@ -185,7 +185,7 @@ public class DBModelController<T extends IdentificableModel> {
 	protected List<T> createModels(Cursor cursor){
 		List<T> models = new ArrayList<T>();
 		while (cursor.moveToNext()) {
-			T model = createModel(cursor);
+			T model = createModel(cursor, true);
 			models.add(model);
 		}
 		cursor.close();
@@ -197,10 +197,11 @@ public class DBModelController<T extends IdentificableModel> {
 	 * @param cursor
 	 * @return new model
 	 */
-	protected T createModel(Cursor cursor) {
+	protected T createModel(Cursor cursor, boolean addRelations) {
 		String id = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_ID));
 		T model =  mapper.createModel(cursor, id);
-		mapper.addRelations(model);
+		if(addRelations)
+			mapper.addRelations(model);
 		return model;
 		
 //		String projectId = cursor.getString(cursor
@@ -275,7 +276,7 @@ public class DBModelController<T extends IdentificableModel> {
 			Cursor cursor = getCursorForId(db, model.getId());
 			if(cursor.moveToNext()){
 				//Existing, we need to update
-				T existing = createModel(cursor);
+				T existing = createModel(cursor, false);
 				int dirtyStatus = CursorUtil.getInt(cursor, COLUMN_NAME_DIRTY);
 				if(dirtyStatus == DIRTY_STATUS_CLEAN){
 					model = merge(model, existing);
