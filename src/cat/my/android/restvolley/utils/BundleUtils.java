@@ -72,6 +72,10 @@ public class BundleUtils {
 		return bundle.getString(ID_ATTRIBUTE);
 	}
 	
+	public static boolean containsId(Bundle bundle){
+		return bundle.containsKey(ID_ATTRIBUTE);
+	}
+	
 	public static <T> Class<T> getModelClass(Bundle bundle){
 		return (Class<T> ) bundle.getSerializable(BundleUtils.CLASS_ATTRTRIBUTE);
 	}

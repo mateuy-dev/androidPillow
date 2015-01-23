@@ -8,6 +8,7 @@ import cat.my.android.restvolley.exceptions.NotProgrammedException;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMapping<T>{
 	Class<T> modelClass;
@@ -33,13 +34,14 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 
 	@Override
 	public void addModelContentValues(T model, ContentValues values) {
-		for(Field field: modelClass.getFields()){
+		for(Field field: modelClass.getDeclaredFields()){
 			put(values, field.getName(), dbValue(field, model));
 		}
 	}
 
 	private Object dbValue(Field field, T model) {
 		try {
+			field.setAccessible(true);
 			Object value = field.get(model);
 			if(value instanceof Date){
 				value = DBUtil.dateToDb((Date)value);
@@ -61,7 +63,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		
 			model.setId(id);
 			
-			for(Field field: modelClass.getFields()){
+			for(Field field: modelClass.getDeclaredFields()){
 				String fieldName = field.getName();
 				Class<?> fieldClass = field.getType();
 				Object value = null;
@@ -81,6 +83,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 				} else {
 					throw new NotProgrammedException();
 				}
+				field.setAccessible(true);
 				field.set(model, value);
 			}
 			return model;
@@ -126,8 +129,13 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 			return projectionAttributes;
 		Field[] fields = modelClass.getDeclaredFields();
 		String[] result = new String[fields.length-1];
-		for(int i=0; i<fields.length; ++i){
-			result[i]=fields[i].getName();
+		
+		for(int i=0, j=0; i<fields.length; ++i){
+			String fieldName = fields[i].getName();
+			if(!fieldName.equals("id")){
+				result[j]= fieldName;
+				j++;
+			}
 		}
 		projectionAttributes = result;
 		return projectionAttributes;
@@ -139,10 +147,14 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		if(atts!=null)
 			return atts;
 		Field[] fields = modelClass.getDeclaredFields();
-		String[][] result = new String[fields.length][2];
-		for(int i=0; i<fields.length; ++i){
-			result[i][0]=fields[i].getName();
-			result[i][1]=getDbType(fields[i]);
+		String[][] result = new String[fields.length-1][2];
+		for(int i=0, j=0; i<fields.length; ++i){
+			String fieldName = fields[i].getName();
+			if(!fieldName.equals("id")){
+				result[j][0]=fieldName;
+				result[j][1]=getDbType(fields[i]);
+				j++;
+			}
 		}
 		atts = result;
 		return result;

@@ -2,11 +2,13 @@ package cat.my.android.restvolley.db;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 public interface IDbMapping<T>{
 	/**
 	 * This method should be add the model relations (if any) to the given model. In most cases should do nothing
 	 * This method is called after a model is obtained from the database -after createModel(cursor)-
+	 * @param db 
 	 * @param model
 	 */
 	public void addRelations(T model);

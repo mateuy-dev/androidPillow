@@ -120,6 +120,32 @@ public class CommonListeners {
 		public void onResponseInMainThread(T response) {
 			listener.onResponse(response);
 		}
+	}
+	
+	/**
+	 * Used when you want to wait for more than one task to finish.
+	 */
+	public static class MultipleTasksListener<T> implements Listener<T>{
+		int tasks, finished;
+		Listener<T> listener;
+		/**
+		 * 
+		 * @param tasks number of tasks to finish
+		 * @param listener listener to execute once all the tasks have finished
+		 */
+		public MultipleTasksListener(int tasks, Listener<T> listener) {
+			super();
+			this.tasks = tasks;
+			this.listener=listener;
+		}
+		@Override
+		public synchronized void onResponse(T response) {
+			finished ++;
+			if(finished == tasks){
+				listener.onResponse(response);
+			}
+		}
+		
 		
 	}
 

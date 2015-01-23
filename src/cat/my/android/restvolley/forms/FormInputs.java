@@ -1,6 +1,7 @@
 package cat.my.android.restvolley.forms;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,7 +40,7 @@ public class FormInputs {
 		inputViewMap = new HashMap<Field, FormInput>();
 		for(Field field: model.getClass().getDeclaredFields()){
 			try {
-				if(!field.isSynthetic() && acceptInput(field)){
+				if(!field.isSynthetic() && acceptInput(field) && !isTransient(field)){
 					field.setAccessible(true);
 					inputViewMap.put(field, new FormInput(context, field, model));
 				}
@@ -105,6 +106,8 @@ public class FormInputs {
 		return false;
 	}
 	
-	
+	private static boolean isTransient(Field field){
+		return Modifier.isTransient(field.getModifiers());
+	}
 
 }

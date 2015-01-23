@@ -17,11 +17,11 @@ import cat.my.android.restvolley.forms.InputData;
 import cat.my.android.restvolley.sync.CommonListeners;
 import cat.my.android.restvolley.sync.ISynchDataSource;
 
-public class IdentificableModelInputData<T extends IdentificableModel> extends AbstractSpinnerInputData<T>{
+public class IdentificableModelSpinnerInputData<T extends IdentificableModel> extends AbstractSpinnerInputData<T>{
 	Class<T> parentClass;
 	ArrayAdapter<T> adapter;
 	
-	public IdentificableModelInputData(Class<T> parentClass) {
+	public IdentificableModelSpinnerInputData(Class<T> parentClass) {
 		this.parentClass = parentClass;
 	}
 

@@ -90,7 +90,7 @@ public class DBModelController<T extends IdentificableModel> {
 			return null;
 		}
 
-		T model = createModel(cursor, true);
+		T model = createModel(db, cursor, true);
 		cursor.close();
 		db.close();
 		
@@ -139,7 +139,7 @@ public class DBModelController<T extends IdentificableModel> {
 		order = order!=null ? order : mapper.getDefaultModelOrder();
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor cursor = getCursor(db, selection, selectionArgs, order);
-		List<T> result = createModels(cursor);
+		List<T> result = createModels(db, cursor);
 		db.close();
 		return result;
 	}
@@ -182,10 +182,10 @@ public class DBModelController<T extends IdentificableModel> {
 	 * @param cursor cursor to look into
 	 * @return created list of T
 	 */
-	protected List<T> createModels(Cursor cursor){
+	protected List<T> createModels(SQLiteDatabase db, Cursor cursor){
 		List<T> models = new ArrayList<T>();
 		while (cursor.moveToNext()) {
-			T model = createModel(cursor, true);
+			T model = createModel(db, cursor, true);
 			models.add(model);
 		}
 		cursor.close();
@@ -197,7 +197,7 @@ public class DBModelController<T extends IdentificableModel> {
 	 * @param cursor
 	 * @return new model
 	 */
-	protected T createModel(Cursor cursor, boolean addRelations) {
+	protected T createModel(SQLiteDatabase db, Cursor cursor, boolean addRelations) {
 		String id = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_ID));
 		T model =  mapper.createModel(cursor, id);
 		if(addRelations)
@@ -276,7 +276,7 @@ public class DBModelController<T extends IdentificableModel> {
 			Cursor cursor = getCursorForId(db, model.getId());
 			if(cursor.moveToNext()){
 				//Existing, we need to update
-				T existing = createModel(cursor, false);
+				T existing = createModel(db, cursor, false);
 				int dirtyStatus = CursorUtil.getInt(cursor, COLUMN_NAME_DIRTY);
 				if(dirtyStatus == DIRTY_STATUS_CLEAN){
 					model = merge(model, existing);

@@ -9,7 +9,7 @@ import cat.my.android.restvolley.forms.InputData.InputDataInfo.DEFAULT_INPUT;
 import cat.my.android.restvolley.forms.inputDatas.DateEditTextData;
 import cat.my.android.restvolley.forms.inputDatas.EditTextData;
 import cat.my.android.restvolley.forms.inputDatas.EnumInputData;
-import cat.my.android.restvolley.forms.inputDatas.IdentificableModelInputData;
+import cat.my.android.restvolley.forms.inputDatas.IdentificableModelSpinnerInputData;
 import cat.my.android.restvolley.forms.inputDatas.IntEditTextData;
 
 public class InputDataManager{
@@ -26,7 +26,7 @@ public class InputDataManager{
 				}
 			} else if(inputTypeAnnotation.belongsTo() !=null){
 				Class<? extends IdentificableModel> parentClass = inputTypeAnnotation.belongsTo();
-				return new IdentificableModelInputData(parentClass);
+				return new IdentificableModelSpinnerInputData(parentClass);
 			}
 		}
 		
