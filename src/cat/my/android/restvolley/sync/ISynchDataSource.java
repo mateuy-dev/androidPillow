@@ -6,6 +6,7 @@ import java.util.List;
 
 import cat.my.android.restvolley.IdentificableModel;
 import cat.my.android.restvolley.db.IDBDataSource;
+import cat.my.android.restvolley.db.IDbMapping;
 import cat.my.android.restvolley.rest.RestDataSource;
 import cat.my.android.restvolley.sync.SynchDataSource.SetAsNotDirityListener;
 
@@ -18,4 +19,5 @@ public interface ISynchDataSource<T extends IdentificableModel> extends IDBDataS
 	public void download(final Listener<Collection<T>> listener, ErrorListener errorListener);
 	public Class<T> getModelClass();
 	public RestDataSource<T> getRestVolley();
+	public IDbMapping<T> getDbFuncs();
 }

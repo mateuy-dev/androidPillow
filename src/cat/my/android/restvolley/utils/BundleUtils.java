@@ -3,6 +3,8 @@ package cat.my.android.restvolley.utils;
 import com.google.gson.Gson;
 
 import cat.my.android.restvolley.IdentificableModel;
+import cat.my.android.restvolley.db.DBUtil;
+import android.database.Cursor;
 import android.os.Bundle;
 
 /**
@@ -107,5 +109,16 @@ public class BundleUtils {
 		String modelJson = getStringModel(bundle);
 		T result = (T) new Gson().fromJson(modelJson, getModelClass(bundle));
 		return result;
+	}
+	
+	
+
+	public static void setEnum(Bundle bundle, String key, Enum<?> value){
+		//TODO New type of bundle utils. Need to sort Bundle utils. 
+		bundle.putSerializable(key, value);
+	}
+	
+	public static <T> T getEnum(Bundle bundle, String key){
+		return (T) bundle.getSerializable(key);
 	}
 }

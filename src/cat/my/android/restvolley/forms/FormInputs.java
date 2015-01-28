@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import cat.my.android.restvolley.IdentificableModel;
+import cat.my.android.restvolley.reflection.ReflectionUtil;
 
 import android.content.Context;
 import android.view.View;
@@ -38,9 +39,9 @@ public class FormInputs {
 			return;
 		
 		inputViewMap = new HashMap<Field, FormInput>();
-		for(Field field: model.getClass().getDeclaredFields()){
+		for(Field field: ReflectionUtil.getStoredFields(model.getClass())){
 			try {
-				if(!field.isSynthetic() && acceptInput(field) && !isTransient(field)){
+				if(acceptInput(field)){
 					field.setAccessible(true);
 					inputViewMap.put(field, new FormInput(context, field, model));
 				}
@@ -106,8 +107,6 @@ public class FormInputs {
 		return false;
 	}
 	
-	private static boolean isTransient(Field field){
-		return Modifier.isTransient(field.getModifiers());
-	}
+	
 
 }

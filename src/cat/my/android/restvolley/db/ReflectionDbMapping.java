@@ -5,6 +5,8 @@ import java.util.Date;
 
 import cat.my.android.restvolley.IdentificableModel;
 import cat.my.android.restvolley.exceptions.NotProgrammedException;
+import cat.my.android.restvolley.reflection.ReflectionUtil;
+import cat.my.util.BreakFastException;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -34,7 +36,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 
 	@Override
 	public void addModelContentValues(T model, ContentValues values) {
-		for(Field field: modelClass.getDeclaredFields()){
+		for(Field field: ReflectionUtil.getStoredFields(modelClass)){
 			put(values, field.getName(), dbValue(field, model));
 		}
 	}
@@ -63,7 +65,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		
 			model.setId(id);
 			
-			for(Field field: modelClass.getDeclaredFields()){
+			for(Field field: ReflectionUtil.getStoredFields(modelClass)){
 				String fieldName = field.getName();
 				Class<?> fieldClass = field.getType();
 				Object value = null;
@@ -78,7 +80,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 				} else if(Date.class.isAssignableFrom(fieldClass)){
 					value = DBUtil.getDate(cursor, cursor.getColumnIndex(fieldName));
 				} else if(Enum.class.isAssignableFrom(fieldClass)){
-					T[] enumValues = (T[]) fieldClass.getEnumConstants();//EventType.values()
+					Object[] enumValues = (Object[]) fieldClass.getEnumConstants();//EventType.values()
 					value = DBUtil.dbToEnum(cursor, cursor.getColumnIndex(fieldName), enumValues);
 				} else {
 					throw new NotProgrammedException();
@@ -88,7 +90,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 			}
 			return model;
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new BreakFastException(e);
 		}
 	}
 
@@ -100,6 +102,8 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 	 * @param value
 	 */
 	private static void put(ContentValues values, String key, Object value) {
+		if(value==null) return;
+		
 		if(value instanceof String)
 			values.put(key, (String) value);
 		else if(value instanceof Byte)
@@ -117,7 +121,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		else if(value instanceof byte[])
 			values.put(key, (byte[]) value);
 		else{
-			throw new NotProgrammedException();
+			throw new NotProgrammedException("can't save value of type" + value.getClass());
 		}
 	}
 	
@@ -127,7 +131,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		//TODO refactor and take id out.
 		if(projectionAttributes!=null)
 			return projectionAttributes;
-		Field[] fields = modelClass.getDeclaredFields();
+		Field[] fields = ReflectionUtil.getStoredFields(modelClass);
 		String[] result = new String[fields.length-1];
 		
 		for(int i=0, j=0; i<fields.length; ++i){
@@ -146,7 +150,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 	public synchronized String[][] getAttributes() {
 		if(atts!=null)
 			return atts;
-		Field[] fields = modelClass.getDeclaredFields();
+		Field[] fields = ReflectionUtil.getStoredFields(modelClass);
 		String[][] result = new String[fields.length-1][2];
 		for(int i=0, j=0; i<fields.length; ++i){
 			String fieldName = fields[i].getName();
@@ -177,7 +181,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		} else if(Enum.class.isAssignableFrom(fieldClass)){
 			type = DBUtil.ENUM_TYPE;
 		} else {
-			throw new NotProgrammedException();
+			throw new NotProgrammedException(fieldClass.toString());
 		}
 		return type;
 	}

@@ -53,14 +53,18 @@ public class FormActivity<T extends IdentificableModel>  extends ActionBarActivi
 				T model = formFragment.getModel();
 				ISynchDataSource<T> dataSource = (ISynchDataSource<T>) RestVolley.getInstance(FormActivity.this).getDataSource(model.getClass());
 				if(StringUtil.isBlanck(model.getId())){
-					dataSource.create(model, closeOnSaveListener, CommonListeners.dummyErrorListener);
+					dataSource.create(model, getOnSaveListener(), CommonListeners.dummyErrorListener);
 				} else {
-					dataSource.update(model, closeOnSaveListener, CommonListeners.dummyErrorListener);
+					dataSource.update(model, getOnSaveListener(), CommonListeners.dummyErrorListener);
 				}
 			}
 			
 		};
 		saveButton.setOnClickListener(okClickListener);
+	}
+	
+	public Listener<T> getOnSaveListener(){
+		return closeOnSaveListener;
 	}
 	
 	private Listener<T> closeOnSaveListener = new Listener<T>() {
@@ -69,5 +73,7 @@ public class FormActivity<T extends IdentificableModel>  extends ActionBarActivi
 			finish();
 		}
 	};
+	
 
+	
 }

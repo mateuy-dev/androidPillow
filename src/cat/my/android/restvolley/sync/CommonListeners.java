@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import android.content.Context;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -145,8 +146,12 @@ public class CommonListeners {
 				listener.onResponse(response);
 			}
 		}
-		
-		
 	}
-
+	
+	public static class MultipleTasksProxyListener<T, D> extends MultipleTasksListener<D>{
+		T response;
+		public MultipleTasksProxyListener(int tasks, Listener<T> listener, T response) {
+			super(tasks, new ProxyListener<T, D>(listener, response));
+		}
+	}
 }
