@@ -15,7 +15,6 @@ public class QueryHelper<T extends IdentificableModel> {
 		dbMapping = RestVolley.getInstance(context).getDataSource(clazz).getDbFuncs();
 	}
 	
-	
 	public Query getHasManyToManyThrough(IdentificableModel referencedModel, Class<? extends IdentificableModel> through){
 		String tableName = RestVolley.getInstance(context).getDataSource(through).getDbFuncs().getTableName();
 		String referenceModelTableName = RestVolley.getInstance(context).getDataSource(referencedModel.getClass()).getDbFuncs().getTableName();

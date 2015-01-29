@@ -33,6 +33,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
 public class RailsRestMapping<T extends IdentificableModel> implements IRestMapping<T> {
@@ -164,13 +165,18 @@ public class RailsRestMapping<T extends IdentificableModel> implements IRestMapp
 	              
 	         }
 
-	         public TE read(JsonReader in) throws IOException {
-	              String railsValue = in.nextString();
-	              String javaValue = railsValue.toUpperCase();
-	              Class enumClass =type.getRawType(); 
-	              return (TE) Enum.valueOf(enumClass, javaValue);
-	         }
-	    }
+			public TE read(JsonReader in) throws IOException {
+				if (in.peek() == JsonToken.NULL) {
+					in.nextNull();
+					return null;
+				} else {
+					String railsValue = in.nextString();
+					String javaValue = railsValue.toUpperCase();
+					Class enumClass = type.getRawType();
+					return (TE) Enum.valueOf(enumClass, javaValue);
+				}
+			}
+		}
 
 	}
 
