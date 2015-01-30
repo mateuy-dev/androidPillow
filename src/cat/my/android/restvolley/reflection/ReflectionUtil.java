@@ -1,12 +1,20 @@
 package cat.my.android.restvolley.reflection;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import cat.my.android.restvolley.IdentificableModel;
+import cat.my.android.restvolley.forms.InputData;
+
 public class ReflectionUtil {
+	
 	/**
 	 * Returns the declared fields including fields form parent classes that are not transient neither synthetic
 	 * @param type

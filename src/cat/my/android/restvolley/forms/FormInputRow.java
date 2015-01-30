@@ -7,25 +7,28 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class FormInput{
-	InputDataManager inputManager = new InputDataManager();
+public class FormInputRow{
+		InputDataManager inputManager = new InputDataManager();
 		Field field;
 		View input;
 		LinearLayout rootView;
 		InputData inputData;
 		Context context;
 		Object model;
-		public FormInput(Context context, Field field, Object model){
+		boolean editable;
+		
+		public FormInputRow(Context context, Field field, Object model, boolean editable){
 			this.field = field;
 			this.context = context;
 			this.model = model;
+			this.editable=editable;
 			init();
 		}
 		public void init(){
-			inputData = inputManager.getInputData(field);
-			input = (View) inputData.createView(context);
+			inputData = inputManager.getInputData(field, editable);
+			input = (View) inputData.getView(context);
 			try {
-				inputData.setValue(input, field.get(model));
+				inputData.setValue(field.get(model));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -45,6 +48,6 @@ public class FormInput{
 		}
 		
 		public Object getValue(){
-			return inputData.getValue(input);
+			return inputData.getValue();
 		}
 	}

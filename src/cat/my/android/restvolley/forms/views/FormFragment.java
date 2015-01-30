@@ -7,6 +7,7 @@ import cat.my.android.restvolley.forms.TFormView;
 import cat.my.android.restvolley.sync.CommonListeners;
 import cat.my.android.restvolley.sync.ISynchDataSource;
 import cat.my.android.restvolley.utils.BundleUtils;
+import cat.my.util.BreakFastException;
 
 
 
@@ -19,6 +20,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class FormFragment<T extends IdentificableModel>  extends Fragment{
+	public static final String EDIT_MODE_PARAM = "editMode";
+
+	
+	String modelId;
 	TFormView<T> formView;
 	
 	@Override
@@ -31,9 +36,11 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 		
 		Bundle bundle = getArguments();
 		final String[] atts = BundleUtils.getShownAtts(bundle);
-		String id = BundleUtils.getId(bundle);
+		modelId = BundleUtils.getId(bundle);
 		Class<T> clazz = BundleUtils.getModelClass(bundle);
-		formView = new TFormView<T>(getActivity());
+		boolean editMode = bundle.getBoolean(EDIT_MODE_PARAM, true);
+		
+		formView = new TFormView<T>(getActivity(), editMode);
 		rootView.addView(formView);
 		
 		
@@ -42,9 +49,9 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 		try {
 			T idModel = null;
 			idModel = clazz.newInstance();
-			if (id != null) {
+			if (modelId != null) {
 				//update, we should look for current values
-				idModel.setId(id);
+				idModel.setId(modelId);
 				dataSource.show(idModel, new Listener<T>() {
 					@Override
 					public void onResponse(T model) {
@@ -60,7 +67,7 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 				formView.setModel(idModel, atts);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new BreakFastException(e);
 		}
 		
 		return rootView;
@@ -69,4 +76,9 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 	public T getModel(){
 		return formView.getModel();
 	}
+	
+	public String getModelId() {
+		return modelId;
+	}
+
 }

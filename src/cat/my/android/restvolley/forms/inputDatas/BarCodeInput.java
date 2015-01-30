@@ -6,15 +6,15 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
-public class BarCodeInput implements InputData{
+public class BarCodeInput extends AbstractInputData{
 
 	@Override
-	public Object getValue(View view) {
+	public Object getValue() {
 		return ((BarCodeInputView)view).getValue();
 	}
 
 	@Override
-	public void setValue(View view, Object value) {
+	public void setValue(Object value) {
 		((BarCodeInputView)view).setValue((String)value);
 	}
 

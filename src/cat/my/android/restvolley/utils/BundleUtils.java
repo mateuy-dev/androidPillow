@@ -71,7 +71,7 @@ public class BundleUtils {
 	}
 	
 	public static String getId(Bundle bundle){
-		return bundle.getString(ID_ATTRIBUTE);
+		return bundle.getString(ID_ATTRIBUTE, null);
 	}
 	
 	public static boolean containsId(Bundle bundle){

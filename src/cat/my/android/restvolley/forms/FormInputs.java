@@ -21,29 +21,31 @@ public class FormInputs {
 	InputDataManager inputManager = new InputDataManager();
 	
 	//Data
-	Map<Field, FormInput> inputViewMap = null;
+	Map<Field, FormInputRow> inputViewMap = null;
 	Object model;
 	Context context;
+	boolean editable;
 	
 	//Filters
 	String[] inputNames;
 	
-	public FormInputs(Object model, Context context) {
+	public FormInputs(Object model, Context context, boolean editable) {
 		super();
 		this.model = model;
 		this.context = context;
+		this.editable = editable;
 	}
 	
 	private void initInputs() {
 		if(inputViewMap!=null)
 			return;
 		
-		inputViewMap = new HashMap<Field, FormInput>();
+		inputViewMap = new HashMap<Field, FormInputRow>();
 		for(Field field: ReflectionUtil.getStoredFields(model.getClass())){
 			try {
 				if(acceptInput(field)){
 					field.setAccessible(true);
-					inputViewMap.put(field, new FormInput(context, field, model));
+					inputViewMap.put(field, new FormInputRow(context, field, model, editable));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -59,7 +61,7 @@ public class FormInputs {
 		initInputs();
 		Collection<View> result = new ArrayList<View>();
 		if(inputNames==null){
-			for(FormInput row : inputViewMap.values()){
+			for(FormInputRow row : inputViewMap.values()){
 				result.add(row.getRootView());
 			}
 		} else {
@@ -81,7 +83,7 @@ public class FormInputs {
 	}
 
 	public void updateModelFromForm() {
-		for(Entry<Field, FormInput> entries : inputViewMap.entrySet()){
+		for(Entry<Field, FormInputRow> entries : inputViewMap.entrySet()){
 			Field field= entries.getKey();
 			Object value = entries.getValue().getValue();
 			try {

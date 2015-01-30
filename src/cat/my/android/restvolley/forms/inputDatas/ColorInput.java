@@ -5,14 +5,14 @@ import android.view.View;
 import cat.my.android.restvolley.forms.InputData;
 import cat.my.android.restvolley.forms.inputs.ColorPicker;
 
-public class ColorInput  implements InputData{
+public class ColorInput extends AbstractInputData{
 	@Override
-	public Object getValue(View view) {
+	public Object getValue() {
 		return ((ColorPicker)view).getColor();
 	}
 
 	@Override
-	public void setValue(View view, Object value) {
+	public void setValue(Object value) {
 		((ColorPicker)view).setColor((Integer)value);
 	}
 

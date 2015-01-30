@@ -19,10 +19,12 @@ public class FromDialog<T> {
 	T model;
 	OnClickListener okClickListener, cancelClickListener;
 	TFormView<T> form ;
+	boolean editable;
 	
-	public FromDialog(Context context, T model){
+	public FromDialog(Context context, T model, boolean editable){
 		this.context = context;
 		this.model = model;
+		this.editable = editable;
 		initListeners();
 	}
 	
@@ -43,7 +45,7 @@ public class FromDialog<T> {
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setTitle("Change herd location");
 		
-		form = new TFormView<T>(context);
+		form = new TFormView<T>(context, editable);
 		form.setModel(model, attributes);
 		
 		// Set up the input
@@ -51,7 +53,8 @@ public class FromDialog<T> {
 
 		// Set up the buttons
 		builder.setPositiveButton("Ok", okClickListener);
-		builder.setNegativeButton("Cancel", cancelClickListener);
+		if(editable)
+			builder.setNegativeButton("Cancel", cancelClickListener);
 
 		builder.show();
 	}

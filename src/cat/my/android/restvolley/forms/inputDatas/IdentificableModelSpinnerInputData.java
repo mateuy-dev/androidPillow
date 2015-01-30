@@ -33,13 +33,13 @@ public class IdentificableModelSpinnerInputData<T extends IdentificableModel> ex
 	}
 	
 	@Override
-	public void setValue(View view, Object value) {
+	public void setValue(Object value) {
 		String id = (String) value;
 		T model;
 		try {
 			model = parentClass.newInstance();
 			model.setId(id);
-			Spinner spinner = ((Spinner)view);
+			Spinner spinner = (getView());
 			((CustomArrayAdapter<T>)spinner.getAdapter()).setSelection(model);
 		} catch (Exception e) {
 			//TODO
@@ -48,8 +48,8 @@ public class IdentificableModelSpinnerInputData<T extends IdentificableModel> ex
 	}
 	
 	@Override
-	public Object getValue(View view) {
-		return ((T)super.getValue(view)).getId();
+	public Object getValue() {
+		return ((T)super.getValue()).getId();
 	}
 	
 	/**

@@ -11,20 +11,19 @@ import android.view.View;
 
 public interface InputData {
 	
-	@Target({ElementType.FIELD})
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface InputDataInfo {
-		public interface DEFAULT_INPUT extends InputData{};
-		public interface NONE extends IdentificableModel{};
-		
-		Class<? extends InputData> inputClass() default DEFAULT_INPUT.class;
-		Class<? extends IdentificableModel> belongsTo() default NONE.class;
-		
-	}
+//	@Target({ElementType.FIELD})
+//	@Retention(RetentionPolicy.RUNTIME)
+//	public @interface InputDataInfo {
+//		public interface DEFAULT_INPUT extends InputData{};
+//		public interface NONE extends IdentificableModel{};
+//		
+//		Class<? extends InputData> inputClass() default DEFAULT_INPUT.class;
+//		Class<? extends IdentificableModel> belongsTo() default NONE.class;
+//	}
 	
-	public Object getValue(View view);
+	public Object getValue();
 
-	public void setValue(View view, Object value);
+	public void setValue(Object value);
 
-	public View createView(Context context);
+	public View getView(Context context);
 }

@@ -4,27 +4,34 @@ import java.lang.reflect.Field;
 import java.util.Date;
 
 import cat.my.android.restvolley.IdentificableModel;
-import cat.my.android.restvolley.forms.InputData.InputDataInfo;
-import cat.my.android.restvolley.forms.InputData.InputDataInfo.DEFAULT_INPUT;
+import cat.my.android.restvolley.forms.inputDatas.ColorInput;
 import cat.my.android.restvolley.forms.inputDatas.DateEditTextData;
 import cat.my.android.restvolley.forms.inputDatas.EditTextData;
 import cat.my.android.restvolley.forms.inputDatas.EnumInputData;
 import cat.my.android.restvolley.forms.inputDatas.IdentificableModelSpinnerInputData;
 import cat.my.android.restvolley.forms.inputDatas.IntEditTextData;
+import cat.my.android.restvolley.forms.inputDatas.display.TextDisplay;
+import cat.my.android.restvolley.reflection.ValuesTypes.ValueType;
+import cat.my.android.restvolley.reflection.ValuesTypes.ValueTypeClass;
 
 public class InputDataManager{
 	@SuppressWarnings("unchecked")
-	public InputData getInputData(Field field){
+	public InputData getInputData(Field field, boolean editable){
+		if(!editable){
+			return new TextDisplay();
+		}
+		
 		field.getAnnotations();
-		InputDataInfo inputTypeAnnotation = (InputDataInfo) field.getAnnotation(InputDataInfo.class);
+		ValueType inputTypeAnnotation = (ValueType) field.getAnnotation(ValueType.class);
 		if(inputTypeAnnotation!=null){
-			if(inputTypeAnnotation.inputClass() != DEFAULT_INPUT.class){
-				try {
-					return (InputData)inputTypeAnnotation.inputClass().newInstance();
-				} catch (Exception e) {
-					e.printStackTrace();
+			ValueTypeClass valueType = inputTypeAnnotation.type();
+			if(valueType != ValueTypeClass.DEFAULT){
+				//if the input has an especific type defined we check it
+				if(valueType == ValueTypeClass.COLOR){
+					return new ColorInput();
 				}
 			} else if(inputTypeAnnotation.belongsTo() !=null){
+				//The field is a belogsTo attribute (foreign key)
 				Class<? extends IdentificableModel> parentClass = inputTypeAnnotation.belongsTo();
 				return new IdentificableModelSpinnerInputData(parentClass);
 			}

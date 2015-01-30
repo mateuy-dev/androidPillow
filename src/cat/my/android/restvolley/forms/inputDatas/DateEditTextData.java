@@ -9,11 +9,11 @@ import android.content.Context;
 import android.view.View;
 import android.widget.EditText;
 
-public class DateEditTextData implements InputData {
+public class DateEditTextData extends AbstractInputData {
 public static final String DATE_STRING_FORMAT = "yyyy-MM-dd";
 	
 	@Override
-	public Date getValue(View view) {
+	public Date getValue() {
 		String stringValue = ((EditText) view).getText().toString();
 		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_STRING_FORMAT);
 		try {
@@ -25,7 +25,7 @@ public static final String DATE_STRING_FORMAT = "yyyy-MM-dd";
 	}
 
 	@Override
-	public void setValue(View view, Object value) {
+	public void setValue(Object value) {
 		Date date = (Date) value;
 		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_STRING_FORMAT);
 		String text = dateFormat.format(date);

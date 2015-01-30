@@ -15,15 +15,13 @@ import android.widget.LinearLayout;
 public class TFormView<T> extends LinearLayout{
 	FormInputs formInputs;
 	T model;
+	boolean editable;
 	
-	
-	public TFormView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		init();
-	}
 
-	public TFormView(Context context) {
+
+	public TFormView(Context context, boolean editable) {
 		super(context);
+		this.editable = editable;
 		init();
 	}
 	
@@ -42,7 +40,7 @@ public class TFormView<T> extends LinearLayout{
 	
 	public void setModel(T model, String[] inputNames) {
 		this.model = model;
-		formInputs = new FormInputs(model, getContext());
+		formInputs = new FormInputs(model, getContext(), editable);
 		formInputs.setInputNames(inputNames);
 		generateForm();
 	}
