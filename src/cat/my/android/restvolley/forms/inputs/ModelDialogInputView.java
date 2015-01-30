@@ -1,5 +1,6 @@
 package cat.my.android.restvolley.forms.inputs;
 
+import cat.my.android.restvolley.IDataSource;
 import cat.my.android.restvolley.IdentificableModel;
 import cat.my.android.restvolley.RestVolley;
 import cat.my.android.restvolley.Listeners.Listener;
@@ -9,7 +10,7 @@ import android.content.Context;
 import android.widget.EditText;
 
 public class ModelDialogInputView<T extends IdentificableModel> extends EditText{
-	ISynchDataSource<T> dataSource;
+	IDataSource<T> dataSource;
 	Class<T> selectedClass;
 	T selected;
 

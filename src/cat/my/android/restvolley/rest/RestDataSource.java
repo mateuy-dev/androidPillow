@@ -24,7 +24,7 @@ import android.content.Context;
 import cat.my.android.restvolley.IDataSource;
 import cat.my.android.restvolley.IdentificableModel;
 import cat.my.android.restvolley.RestVolley;
-import cat.my.android.restvolley.RestVolleyConfig;
+import cat.my.android.restvolley.RestVolleyConfigXml;
 import cat.my.android.restvolley.Listeners.Listener;
 import cat.my.android.restvolley.rest.ISessionController.NullSessionController;
 import cat.my.android.restvolley.rest.requests.GsonCollectionRequest;
@@ -61,7 +61,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 		return restMapping;
 	}
 	
-	private RestVolleyConfig getConfig(){
+	private RestVolleyConfigXml getConfig(){
 		return RestVolley.getInstance(context).getConfig();
 	}
 

@@ -4,7 +4,12 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.content.Context;
+
+import cat.my.android.restvolley.IDataSource;
 import cat.my.android.restvolley.IdentificableModel;
+import cat.my.android.restvolley.RestVolley;
+import cat.my.android.restvolley.RestVolleyConfigXml;
 import cat.my.android.restvolley.db.IDbMapping;
 import cat.my.android.restvolley.db.ReflectionDbMapping;
 import cat.my.android.restvolley.forms.views.FormActivity;
@@ -19,49 +24,41 @@ import cat.my.util.UnimplementedException;
  */
 public class ModelConfigurationFactory {
 	Map<Class<?>, ModelConfiguration<?>> modelConfigurations = new HashMap<Class<?>, ModelConfiguration<?>>();
-	
-	public void addModelConfiguration(ModelConfiguration<?> modelConfiguration){
-		modelConfigurations.put(modelConfiguration.getModelClass(), modelConfiguration);
-	}
-	
-	public <T extends IdentificableModel> IDbMapping<T> getDbMapping(Class<T> modelClass){
-		IDbMapping<T> result = getModelConfiguration(modelClass).getDbMapping();
-		if(result==null){
-			//if not set, we add generic one
-			result = new ReflectionDbMapping<T>(modelClass);
-			getModelConfiguration(modelClass).setDbMapping(result);
-		}
-		return result;
-	}
-	
-	public <T extends IdentificableModel> IRestMapping<T> getRestMapping(Class<T> modelClass){
-		IRestMapping<T> result = getModelConfiguration(modelClass).getRestMapping();
-		if(result==null){
-			result = new RailsRestMapping<T>(getApiUrl(), modelClass, getCollectionType(modelClass));
-			getModelConfiguration(modelClass).setRestMapping(result);
-		}
-		return result;
-	}
 
-	public Type getCollectionType(Class<?> modelClass){
-		return getModelConfiguration(modelClass).getCollectionType();
-	}
-	
-	public <T> Class<?> getForm(Class<T> modelClass){
-		Class<?> result = getModelConfiguration(modelClass).getFormClass();
-		if(result==null){
-			result = FormActivity.class;
-			getModelConfiguration(modelClass).setFormClass(result);
+	public ModelConfigurationFactory(Context context, RestVolleyConfigXml config, IModelConfigurations configuration) {
+		for(ModelConfiguration<?> conf : configuration.getModelConfigurators(context, config)){
+			modelConfigurations.put(conf.getModelClass(), conf);
 		}
-		return result;
 	}
 	
-	private String getApiUrl() {
-		throw new ToImplementException();
+//	public <T extends IdentificableModel> IDbMapping<T> getDbMapping(Class<T> modelClass){
+//		return getModelConfiguration(modelClass).getDbMapping();
+//	}
+//	
+//	public <T extends IdentificableModel> IRestMapping<T> getRestMapping(Class<T> modelClass){
+//		return getModelConfiguration(modelClass).getRestMapping();
+//	}
+//
+//	public <T extends IdentificableModel> Type getCollectionType(Class<T> modelClass){
+//		return getModelConfiguration(modelClass).getCollectionType();
+//	}
+//	
+//	public <T  extends IdentificableModel> Class<?> getForm(Class<T> modelClass){
+//		return getModelConfiguration(modelClass).getFormClass();
+//	}
+//	
+	public Map<Class<?>, ModelConfiguration<?>> getModelConfigurations() {
+		return modelConfigurations;
 	}
+//	
+//	public <T  extends IdentificableModel> IDataSource<T> getDataSource(Class<T> modelClass){
+//		return getModelConfiguration(modelClass).getDataSource();
+//	}
+	
+	
 	
 	@SuppressWarnings("unchecked")
-	private <T> ModelConfiguration<T> getModelConfiguration(Class<T> modelClass){
+	public <T extends IdentificableModel> ModelConfiguration<T> getModelConfiguration(Class<T> modelClass){
 		return (ModelConfiguration<T>) modelConfigurations.get(modelClass);
 	}
 }

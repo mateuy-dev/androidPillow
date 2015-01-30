@@ -12,6 +12,9 @@ import java.util.Map;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import cat.my.android.restvolley.conf.IModelConfigurations;
+import cat.my.android.restvolley.conf.ModelConfiguration;
+import cat.my.android.restvolley.conf.ModelConfigurationFactory;
 import cat.my.android.restvolley.sync.ISynchDataSource;
 import cat.my.android.restvolley.sync.SynchManager;
 import android.content.Context;
@@ -21,11 +24,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class RestVolley {
 	public static final String PREFERENCES_FILE_KEY = "cat_my_android_restvolley";
 	public static int xmlFileResId;
-	Map<Class<?>, ISynchDataSource<?>> dataSources;
-	RestVolleyConfig config;
+//	Map<Class<?>, ISynchDataSource<?>> dataSources;
+	RestVolleyConfigXml config;
 	
 	AbstractDBHelper dbHelper;
 	SynchManager synchManager;
+	ModelConfigurationFactory modelConfigurationFactory;
 	
 	private static RestVolley restVolley;
 	public static synchronized RestVolley getInstance(Context context){
@@ -49,9 +53,9 @@ public class RestVolley {
 		return restVolley;
 	}
 	
-	public Collection<ISynchDataSource<?>> getDataSources() {
-		return dataSources.values();
-	}
+//	public Collection<ISynchDataSource<?>> getDataSources() {
+//		return dataSources.values();
+//	}
 
 	public AbstractDBHelper getDbHelper() {
 		return dbHelper;
@@ -62,14 +66,20 @@ public class RestVolley {
 	}
 	
 	private void init(Context context, int xmlFileResId) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, XmlPullParserException, IOException{
-		config = new RestVolleyConfig(context, xmlFileResId);
+		config = new RestVolleyConfigXml(context, xmlFileResId);
 		dbHelper = getClassFor(context, config.getDbHelper());
-		dataSources = new HashMap<Class<?>, ISynchDataSource<?>>();
-		for(String dataSourceName: config.getDataSources()){
-			ISynchDataSource<?> currentModel = getClassFor(context, dataSourceName);
-            dataSources.put(currentModel.getModelClass(), currentModel);
+		Class<IModelConfigurations> modelConfigurationsclazz = (Class<IModelConfigurations>) Class.forName(config.getModelConfigurations());
+		IModelConfigurations modelConfigurations = modelConfigurationsclazz.newInstance();
+		modelConfigurationFactory = new ModelConfigurationFactory(context, config, modelConfigurations);
+		List<ISynchDataSource<?>> synchedSources = new ArrayList<ISynchDataSource<?>>();
+		for(ModelConfiguration<?> modelConf : modelConfigurationFactory.getModelConfigurations().values()){
+			IDataSource<?> dataSource = modelConf.getDataSource();
+			if(dataSource instanceof ISynchDataSource<?>){
+				synchedSources.add((ISynchDataSource<?>) dataSource);
+			}
 		}
-        synchManager = new SynchManager(context, dataSources.values(), dbHelper);
+		
+        synchManager = new SynchManager(context, synchedSources, dbHelper);
         synchManager.setDownloadTimeInterval(config.getDownloadTimeInterval());
 	}
 	
@@ -79,11 +89,22 @@ public class RestVolley {
     	return constructor.newInstance(context);
 	}
 
-	public RestVolleyConfig getConfig() {
+	public RestVolleyConfigXml getConfig() {
 		return config;
 	}
 	
-	public <T extends IdentificableModel> ISynchDataSource<T> getDataSource(Class<T> clazz){
-		return (ISynchDataSource<T>) dataSources.get(clazz);
+	/**
+	 * Shortcut for getModelConfiguration(modelClass).getDataSource();
+	 */
+	public <T extends IdentificableModel> IDataSource<T> getDataSource(Class<T> modelClass){
+		return getModelConfiguration(modelClass).getDataSource();
+	}
+	
+	public <T extends IdentificableModel> ModelConfiguration<T> getModelConfiguration(Class<T> modelClass){
+		return modelConfigurationFactory.getModelConfiguration(modelClass);
+	}
+	
+	public ModelConfigurationFactory getModelConfigurationFactory() {
+		return modelConfigurationFactory;
 	}
 }

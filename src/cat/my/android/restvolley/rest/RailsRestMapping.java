@@ -37,13 +37,13 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
 public class RailsRestMapping<T extends IdentificableModel> implements IRestMapping<T> {
-	String prefix;
+	String url;
 	Class<T> clazz;
 	Type collectionType;
 	CaseFormat caseFormat = new CaseFormat();
 	
-	public RailsRestMapping(String prefix, Class<T> clazz, Type collectionType){
-		this.prefix = prefix;
+	public RailsRestMapping(String url, Class<T> clazz, Type collectionType){
+		this.url = url;
 		this.clazz = clazz;
 		this.collectionType = collectionType;
 	}
@@ -99,20 +99,20 @@ public class RailsRestMapping<T extends IdentificableModel> implements IRestMapp
 	protected String getPath(){
 		String modelName = getModelName();
 		String plural = English.plural(modelName);
-		return prefix + "/" + plural + ".json";
+		return url + "/" + plural + ".json";
 	}
 	
 	protected String getPath(String id){
 		String modelName = getModelName();
 		String plural = English.plural(modelName);
-		return prefix + "/" + plural +"/"+ id +".json";
+		return url + "/" + plural +"/"+ id +".json";
 	}
 	
 	private String getPath(String id, String operation) {
 		String modelName = getModelName();
 		String plural = English.plural(modelName);
 		String opPath = "/" + operation;
-		return prefix + "/" + plural +"/"+ id + opPath +".json";
+		return url + "/" + plural +"/"+ id + opPath +".json";
 	}
 	
 	public String getModelName(){

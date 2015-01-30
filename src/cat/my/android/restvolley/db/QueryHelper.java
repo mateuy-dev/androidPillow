@@ -9,15 +9,17 @@ public class QueryHelper<T extends IdentificableModel> {
 	Context context;
 	Class<T> clazz;
 	IDbMapping<T> dbMapping;
+	RestVolley restVolley;
 	public QueryHelper(Context context, Class<T> clazz) {
 		this.clazz = clazz;
 		this.context = context;
-		dbMapping = RestVolley.getInstance(context).getDataSource(clazz).getDbFuncs();
+		restVolley = RestVolley.getInstance(context);
+		dbMapping = restVolley.getModelConfiguration(clazz).getDbMapping();
 	}
 	
 	public Query getHasManyToManyThrough(IdentificableModel referencedModel, Class<? extends IdentificableModel> through){
-		String tableName = RestVolley.getInstance(context).getDataSource(through).getDbFuncs().getTableName();
-		String referenceModelTableName = RestVolley.getInstance(context).getDataSource(referencedModel.getClass()).getDbFuncs().getTableName();
+		String tableName = restVolley.getModelConfiguration(through).getDbMapping().getTableName();
+		String referenceModelTableName = restVolley.getModelConfiguration(referencedModel.getClass()).getDbMapping().getTableName();
 		String idReferencedModelColumn = tableNameToId(referenceModelTableName);
 		String currentIdColumn = tableNameToId(dbMapping.getTableName());
 		

@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import cat.my.android.restvolley.IDataSource;
 import cat.my.android.restvolley.IdentificableModel;
 import cat.my.android.restvolley.Listeners;
 import cat.my.android.restvolley.Listeners.ErrorListener;
@@ -59,7 +60,7 @@ public class IdentificableModelSpinnerInputData<T extends IdentificableModel> ex
 	 * @param errorListener
 	 */
 	protected void loadData(Context context, Listener<Collection<T>> listener, ErrorListener errorListener) {
-		ISynchDataSource<T> dataSource = RestVolley.getInstance(context).getDataSource(parentClass);
+		IDataSource<T> dataSource = RestVolley.getInstance(context).getDataSource(parentClass);
 		dataSource.index(listener, errorListener);
 	}
 

@@ -2,54 +2,24 @@ package cat.my.android.restvolley.conf;
 
 import java.lang.reflect.Type;
 
+import cat.my.android.restvolley.IDataSource;
+import cat.my.android.restvolley.IdentificableModel;
 import cat.my.android.restvolley.db.IDbMapping;
 import cat.my.android.restvolley.rest.IRestMapping;
+import cat.my.android.restvolley.sync.ISynchDataSource;
 
-public class ModelConfiguration<T>{
-		Class<T> modelClass;
-		IDbMapping<T> dbMapping;
-		IRestMapping<T> restMapping;
-		Type collectionType;
-		Class<?> formClass;
-		
-		public ModelConfiguration(Class<T> modelClass) {
-			super();
-			this.modelClass = modelClass;
-		}
+public interface ModelConfiguration<T extends IdentificableModel> {
+	public Class<T> getModelClass();
+	
+	public Type getCollectionType();
 
-		public Class<T> getModelClass() {
-			return modelClass;
-		}
+	public IDbMapping<T> getDbMapping();
 
-		public IDbMapping<T> getDbMapping() {
-			return dbMapping;
-		}
+	public IRestMapping<T> getRestMapping();
+	
+	public IDataSource<T> getDataSource();
+	
+	public Class<?> getFormClass();
 
-		public void setDbMapping(IDbMapping<T> dbMapping) {
-			this.dbMapping = dbMapping;
-		}
-
-		public IRestMapping<T> getRestMapping() {
-			return restMapping;
-		}
-
-		public void setRestMapping(IRestMapping<T> restMapping) {
-			this.restMapping = restMapping;
-		}
-
-		public Type getCollectionType() {
-			return collectionType;
-		}
-
-		public void setCollectionType(Type collectionType) {
-			this.collectionType = collectionType;
-		}
-
-		public Class<?> getFormClass() {
-			return formClass;
-		}
-
-		public void setFormClass(Class<?> formClass) {
-			this.formClass = formClass;
-		}
-	}
+	
+}

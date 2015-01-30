@@ -1,5 +1,6 @@
 package cat.my.android.restvolley.forms.views;
 
+import cat.my.android.restvolley.IDataSource;
 import cat.my.android.restvolley.IdentificableModel;
 import cat.my.android.restvolley.RestVolley;
 import cat.my.android.restvolley.Listeners.Listener;
@@ -44,7 +45,7 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 		rootView.addView(formView);
 		
 		
-		ISynchDataSource<T> dataSource = RestVolley.getInstance(getActivity()).getDataSource(clazz);
+		IDataSource<T> dataSource = RestVolley.getInstance(getActivity()).getDataSource(clazz);
 		
 		try {
 			T idModel = null;

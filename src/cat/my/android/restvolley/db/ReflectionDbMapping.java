@@ -52,7 +52,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 			}
 			return value;
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new BreakFastException(e);
 		}
 	}
 	
