@@ -1,4 +1,4 @@
-package cat.my.android.pillow.views;
+package cat.my.android.pillow.view.base;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,14 +20,14 @@ import cat.my.android.pillow.data.sync.SynchDataSource;
 
 
 
-public abstract class PillowListAdapter<T extends IdentificableModel> extends BaseAdapter {
+public abstract class PillowBaseListAdapter<T extends IdentificableModel> extends BaseAdapter {
 	Context context;
 	List<T> models = new ArrayList<T>();
 	IDataSource<T> dataSource;
 	ErrorListener donwloadErrorListener = CommonListeners.volleyErrorListener;
 	ErrorListener refreshListErrorListener = CommonListeners.dummyErrorListener;
 
-	public PillowListAdapter(Context context, Class<T> clazz) {
+	public PillowBaseListAdapter(Context context, Class<T> clazz) {
 		super();
 		this.context = context;
 		this.dataSource = (IDataSource<T>) Pillow.getInstance(context).getDataSource(clazz);
@@ -42,19 +42,18 @@ public abstract class PillowListAdapter<T extends IdentificableModel> extends Ba
 				notifyDataSetChanged();
 			}
 		};
-		dataSourceIndex(listener, refreshListErrorListener);
+		dataSourceIndex(listener, CommonListeners.dummyErrorListener);
 	}
 	
-	public void downloadData(){
-		Listener<Collection<T>> listener = new Listener<Collection<T>>(){
-			@Override
-			public void onResponse(Collection<T> postsResponse) {
-				refreshList();
-			}
-		};
-		
-		((SynchDataSource<T>)dataSource).download(listener, donwloadErrorListener);
-	}
+//	public void downloadData(){
+//		Listener<Collection<T>> listener = new Listener<Collection<T>>(){
+//			@Override
+//			public void onResponse(Collection<T> postsResponse) {
+//				refreshList();
+//			}
+//		};
+//		((SynchDataSource<T>)dataSource).download(listener, donwloadErrorListener);
+//	}
 	
 	public void dataSourceIndex(Listener<Collection<T>> listener, ErrorListener errorListener){
 		dataSource.index(listener, errorListener);
@@ -82,19 +81,17 @@ public abstract class PillowListAdapter<T extends IdentificableModel> extends Ba
 	
 	public abstract View getView(T model, View convertView, ViewGroup parent);
 
-	public void setOps(IDataSource<T> ops) {
-		this.dataSource = ops;
-	}
+	
+//
+//	public void setRefreshListErrorListener(ErrorListener refreshListErrorListener) {
+//		this.refreshListErrorListener = refreshListErrorListener;
+//	}
 
-	public void setRefreshListErrorListener(ErrorListener refreshListErrorListener) {
-		this.refreshListErrorListener = refreshListErrorListener;
-	}
-
-	public Context getContext() {
+	protected Context getContext() {
 		return context;
 	}
 
-	public IDataSource<T> getDataSource() {
+	protected IDataSource<T> getDataSource() {
 		return dataSource;
 	}
 

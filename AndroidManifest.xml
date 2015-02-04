@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cat.my.android.pillow"
     android:versionCode="1"
@@ -6,10 +7,10 @@
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="20" />
-	<application>
-        <activity android:name="cat.my.android.pillow.view.forms.views.FormActivity">
+
+    <application>
+        <activity android:name=".view.forms.views.FormActivity" >
         </activity>
     </application>
-
 
 </manifest>

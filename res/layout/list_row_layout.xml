@@ -1,0 +1,71 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:background="#f0f0f0"
+    android:descendantFocusability="blocksDescendants"
+    >
+    <!-- android:descendantFocusability="blocksDescendants" enables list selection when buttons inside according to http://stackoverflow.com/questions/11428303/android-cant-click-on-listview-row-with-imagebutton -->
+          
+
+   <ImageView
+            android:id="@+id/row_icon"
+            android:layout_width="?android:attr/listPreferredItemHeight"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:layout_alignParentLeft="true"
+        	android:layout_alignParentTop="true"
+             /><!-- android:src="@drawable/ic_contact_picture_holo_light" -->
+      <View
+            android:id="@+id/row_icon_color"
+            android:layout_width="?android:attr/listPreferredItemHeight"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:layout_alignParentLeft="true"
+        	android:layout_alignParentTop="true"
+        	android:background="#ffffff"
+        	android:alpha="0.5"
+            />
+    
+    <TextView
+        android:id="@+id/row_main_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/row_icon"
+        android:layout_toLeftOf="@+id/edit_button"
+        android:layout_marginLeft= "4dp"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="" />
+    
+    <TextView
+            android:id="@+id/row_sub_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/row_main_text"
+            android:layout_below="@+id/row_main_text"
+            android:layout_alignRight="@+id/row_main_text"
+            android:singleLine="true"
+            android:text=""/>
+
+
+
+    <!-- ImageButton
+        android:id="@+id/reShareButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/edit_button"
+        android:layout_centerVertical="true"
+        android:minWidth="48dip"
+        android:src="@drawable/ic_action_share_dark" /-->
+    
+     <!-- ImageButton
+        android:id="@+id/edit_button"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:minWidth="48dip"
+        android:src="@drawable/ic_action_edit"/-->
+
+</RelativeLayout>

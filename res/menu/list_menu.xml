@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:pillow="http://schemas.android.com/apk/res-auto">
+	
+
+      <item
+            android:id="@+id/menu_action_new"
+            android:icon="@drawable/ic_action_new"
+            pillow:showAsAction="always"
+            android:title="@string/ic_action_new"
+            />
+
+</menu>
