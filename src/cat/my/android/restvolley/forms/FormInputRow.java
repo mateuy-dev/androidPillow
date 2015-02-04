@@ -1,6 +1,8 @@
 package cat.my.android.restvolley.forms;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
 import android.view.View;
@@ -11,7 +13,7 @@ public class FormInputRow{
 		InputDataManager inputManager = new InputDataManager();
 		Field field;
 		View input;
-		LinearLayout rootView;
+		List<View> views;
 		InputData inputData;
 		Context context;
 		Object model;
@@ -36,15 +38,15 @@ public class FormInputRow{
 			
 		}
 		private void createRootView() {
-			rootView = new LinearLayout(context);
 			TextView label = new TextView(context);
 			String labelText = StringResourceUtils.getLabel(context, field);
 			label.setText(labelText);
-			rootView.addView(label);
-			rootView.addView(input);
+			views = new ArrayList<View>();
+			views.add(label);
+			views.add(input);
 		}
-		public View getRootView() {
-			return rootView;
+		public List<View> getViews() {
+			return views;
 		}
 		
 		public Object getValue(){

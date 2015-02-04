@@ -8,11 +8,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import android.content.Context;
+import android.support.v7.widget.GridLayout;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
 
-public class TFormView<T> extends LinearLayout{
+public class TFormView<T> extends GridLayout{
 	FormInputs formInputs;
 	T model;
 	boolean editable;
@@ -26,7 +27,8 @@ public class TFormView<T> extends LinearLayout{
 	}
 	
 	private void init() {
-		setOrientation(VERTICAL);
+		setColumnCount(2);
+//		setOrientation(VERTICAL);
 	}
 
 	public T getModel() {

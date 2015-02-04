@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -62,21 +63,21 @@ public class FormInputs {
 		Collection<View> result = new ArrayList<View>();
 		if(inputNames==null){
 			for(FormInputRow row : inputViewMap.values()){
-				result.add(row.getRootView());
+				result.addAll(row.getViews());
 			}
 		} else {
 			for(String inputName: inputNames){
-				result.add(getInput(inputName));
+				result.addAll(getInput(inputName));
 			}
 		}
 		return result;
 	}
 	
-	private View getInput(String fieldName){
+	private List<View> getInput(String fieldName){
 		initInputs();
 		try {
 			Field field = model.getClass().getDeclaredField(fieldName);
-			return inputViewMap.get(field).getRootView();
+			return inputViewMap.get(field).getViews();
 		} catch (NoSuchFieldException e) {
 			return null;
 		}
