@@ -1,14 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cat.my.lib.restvolley"
+    package="cat.my.android.pillow"
     android:versionCode="1"
     android:versionName="1.0" >
 
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="20" />
-<!-- 		<application android:theme="@style/AppTheme" > -->
 	<application>
-        <activity android:name="cat.my.android.restvolley.forms.views.FormActivity">
+        <activity android:name="cat.my.android.pillow.view.forms.views.FormActivity">
         </activity>
     </application>
 

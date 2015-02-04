@@ -1,0 +1,101 @@
+package cat.my.android.pillow.views;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import android.content.Context;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import cat.my.android.pillow.IDataSource;
+import cat.my.android.pillow.IdentificableModel;
+import cat.my.android.pillow.Listeners.ErrorListener;
+import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.Pillow;
+import cat.my.android.pillow.data.sync.CommonListeners;
+import cat.my.android.pillow.data.sync.SynchDataSource;
+
+
+
+
+
+public abstract class PillowListAdapter<T extends IdentificableModel> extends BaseAdapter {
+	Context context;
+	List<T> models = new ArrayList<T>();
+	IDataSource<T> dataSource;
+	ErrorListener donwloadErrorListener = CommonListeners.volleyErrorListener;
+	ErrorListener refreshListErrorListener = CommonListeners.dummyErrorListener;
+
+	public PillowListAdapter(Context context, Class<T> clazz) {
+		super();
+		this.context = context;
+		this.dataSource = (IDataSource<T>) Pillow.getInstance(context).getDataSource(clazz);
+	}
+
+	public void refreshList(){
+		Listener<Collection<T>> listener = new Listener<Collection<T>>(){
+			@Override
+			public void onResponse(Collection<T> postsResponse) {
+				models.clear();
+				models.addAll(postsResponse);
+				notifyDataSetChanged();
+			}
+		};
+		dataSourceIndex(listener, refreshListErrorListener);
+	}
+	
+	public void downloadData(){
+		Listener<Collection<T>> listener = new Listener<Collection<T>>(){
+			@Override
+			public void onResponse(Collection<T> postsResponse) {
+				refreshList();
+			}
+		};
+		
+		((SynchDataSource<T>)dataSource).download(listener, donwloadErrorListener);
+	}
+	
+	public void dataSourceIndex(Listener<Collection<T>> listener, ErrorListener errorListener){
+		dataSource.index(listener, errorListener);
+	}
+
+	@Override
+	public int getCount() {
+		return models.size();
+	}
+
+	@Override
+	public T getItem(int position) {
+		return models.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return 0;
+	}
+
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		return getView(getItem(position), convertView, parent);
+	}
+	
+	public abstract View getView(T model, View convertView, ViewGroup parent);
+
+	public void setOps(IDataSource<T> ops) {
+		this.dataSource = ops;
+	}
+
+	public void setRefreshListErrorListener(ErrorListener refreshListErrorListener) {
+		this.refreshListErrorListener = refreshListErrorListener;
+	}
+
+	public Context getContext() {
+		return context;
+	}
+
+	public IDataSource<T> getDataSource() {
+		return dataSource;
+	}
+
+}
