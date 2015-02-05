@@ -19,16 +19,16 @@ import cat.my.util.exceptions.BreakFastException;
 public class FormFragment<T extends IdentificableModel>  extends Fragment{
 	public static final String EDIT_MODE_PARAM = "editMode";
 
-	
 	String modelId;
 	TFormView<T> formView;
+	IDataSource<T> dataSource;
 	
+	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
 		
-		LinearLayout rootView = new LinearLayout(getActivity());
-		rootView.setOrientation(LinearLayout.VERTICAL);
 		
 		
 		Bundle bundle = getArguments();
@@ -38,10 +38,9 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 		boolean editMode = bundle.getBoolean(EDIT_MODE_PARAM, true);
 		
 		formView = new TFormView<T>(getActivity(), editMode);
-		rootView.addView(formView);
 		
 		
-		IDataSource<T> dataSource = Pillow.getInstance(getActivity()).getDataSource(clazz);
+		dataSource = Pillow.getInstance(getActivity()).getDataSource(clazz);
 		
 		try {
 			T idModel = null;
@@ -67,7 +66,7 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 			throw new BreakFastException(e);
 		}
 		
-		return rootView;
+		return formView;
 	}
 	
 	public T getModel(){
@@ -76,6 +75,10 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 	
 	public String getModelId() {
 		return modelId;
+	}
+	
+	public IDataSource<T> getDataSource() {
+		return dataSource;
 	}
 
 }

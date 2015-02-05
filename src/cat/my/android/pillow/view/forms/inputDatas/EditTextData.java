@@ -17,7 +17,10 @@ public class EditTextData extends AbstractInputData {
 
 	@Override
 	public View createView(Context context) {
-		return new EditText(context);
+		EditText editText = new EditText(context);
+		editText.setEms(10);
+		return editText;
+		
 	}
 	
 	@Override

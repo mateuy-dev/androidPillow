@@ -12,6 +12,7 @@ public class FormInputRow{
 		InputDataManager inputManager = new InputDataManager();
 		Field field;
 		View input;
+		TextView label;
 		List<View> views;
 		InputData inputData;
 		Context context;
@@ -33,22 +34,25 @@ public class FormInputRow{
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			createRootView();
+			createLabelView();
 			
 		}
-		private void createRootView() {
-			TextView label = new TextView(context);
+		private void createLabelView() {
+			label = new TextView(context);
 			String labelText = StringResourceUtils.getLabel(context, field);
 			label.setText(labelText);
-			views = new ArrayList<View>();
-			views.add(label);
-			views.add(input);
 		}
-		public List<View> getViews() {
-			return views;
-		}
+		
 		
 		public Object getValue(){
 			return inputData.getValue();
+		}
+		
+		public View getLabel() {
+			return label;
+		}
+		
+		public View getInput() {
+			return input;
 		}
 	}

@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:pillow="http://schemas.android.com/apk/res-auto">
+	
+
+      <item
+            android:id="@+id/menu_action_edit"
+            android:icon="@drawable/ic_edit_white_24dp"
+            pillow:showAsAction="always"
+            android:title="@string/ic_action_edit"
+            />
+      
+      <item
+            android:id="@+id/menu_action_delete"
+            android:icon="@drawable/ic_delete_white_24dp"
+            pillow:showAsAction="always"
+            android:title="@string/ic_action_delete"
+            />
+
+</menu>

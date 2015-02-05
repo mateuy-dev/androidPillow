@@ -22,6 +22,7 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 	Type collectionType;
 	Class<?> formClass;
 	IDataSource<T> dataSource;
+	ModelViewConfiguration<T> viewConfiguration;
 	String url;
 	
 	public DefaultModelConfiguration(Context context, Class<T> modelClass, TypeToken<Collection<T>> collectionTypeToken, String url) {
@@ -46,19 +47,27 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 	public void setDataSource(IDataSource<T> dataSource) {
 		this.dataSource = dataSource;
 	}
+	
+	public void setViewConfiguration(ModelViewConfiguration<T> viewConfiguration) {
+		this.viewConfiguration = viewConfiguration;
+	}
 
-	protected IDataSource<T> createDataSource() {
+	protected IDataSource<T> createDefaultDataSource() {
 		return new SynchDataSource<T>(getDbMapping(), getRestMapping(), getContext());
 	}
 
-	protected IRestMapping<T> createRestMapping() {
+	protected IRestMapping<T> createDefaultRestMapping() {
 		return new RailsRestMapping<T>(getUrl(), getModelClass(), getCollectionType());
 	}
 
-	protected IDbMapping<T> createDbMapping() {
+	protected IDbMapping<T> createDefaultDbMapping() {
 		return new ReflectionDbMapping<T>(getModelClass());
 	}
 
+	protected ModelViewConfiguration<T> createDefaultViewConfiguration() {
+		return new DefaultModelViewConfiguration<T>(modelClass);
+	}
+	
 	private String getUrl() {
 		return url;
 	}
@@ -70,13 +79,13 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 	@Override
 	public IDbMapping<T> getDbMapping() {
 		if(dbMapping==null)
-			dbMapping = createDbMapping();
+			dbMapping = createDefaultDbMapping();
 		return dbMapping;
 	}
 	@Override
 	public IRestMapping<T> getRestMapping() {
 		if(restMapping==null){
-			restMapping =  createRestMapping();
+			restMapping =  createDefaultRestMapping();
 		}
 		return restMapping;
 	}
@@ -84,15 +93,19 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 	public Type getCollectionType() {
 		return collectionType;
 	}
+	
 	@Override
-	public Class<?> getFormClass() {
-		return formClass;
+	public ModelViewConfiguration<T> getViewConfiguration() {
+		if(viewConfiguration==null)
+			viewConfiguration = createDefaultViewConfiguration();
+		return viewConfiguration;
 	}
 	
+
 	@Override
 	public IDataSource<T> getDataSource() {
 		if(dataSource==null){
-			dataSource = createDataSource();
+			dataSource = createDefaultDataSource();
 		}
 		return dataSource;
 	}

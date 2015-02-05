@@ -20,7 +20,7 @@ import cat.my.android.pillow.data.sync.SynchDataSource;
 
 
 
-public abstract class PillowBaseListAdapter<T extends IdentificableModel> extends BaseAdapter {
+public abstract class PillowBaseListAdapter<T extends IdentificableModel> extends BaseAdapter implements IModelListAdapter<T> {
 	Context context;
 	List<T> models = new ArrayList<T>();
 	IDataSource<T> dataSource;

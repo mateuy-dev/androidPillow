@@ -18,7 +18,7 @@ public interface ModelConfiguration<T extends IdentificableModel> {
 	
 	public IDataSource<T> getDataSource();
 	
-	public Class<?> getFormClass();
+	public ModelViewConfiguration<T> getViewConfiguration();
 
 	
 }

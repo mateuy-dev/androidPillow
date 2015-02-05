@@ -53,26 +53,26 @@ public class FormInputs {
 		this.inputNames = inputNames;
 	}
 	
-	public Collection<View> getInputs(){
+	public Collection<FormInputRow> getInputs(){
 		initInputs();
-		Collection<View> result = new ArrayList<View>();
+		Collection<FormInputRow> result = new ArrayList<FormInputRow>();
 		if(inputNames==null){
 			for(FormInputRow row : inputViewMap.values()){
-				result.addAll(row.getViews());
+				result.add(row);
 			}
 		} else {
 			for(String inputName: inputNames){
-				result.addAll(getInput(inputName));
+				result.add(getInput(inputName));
 			}
 		}
 		return result;
 	}
 	
-	private List<View> getInput(String fieldName){
+	private FormInputRow getInput(String fieldName){
 		initInputs();
 		try {
 			Field field = model.getClass().getDeclaredField(fieldName);
-			return inputViewMap.get(field).getViews();
+			return inputViewMap.get(field);
 		} catch (NoSuchFieldException e) {
 			return null;
 		}

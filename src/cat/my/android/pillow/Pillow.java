@@ -12,6 +12,7 @@ import android.content.Context;
 import cat.my.android.pillow.conf.IModelConfigurations;
 import cat.my.android.pillow.conf.ModelConfiguration;
 import cat.my.android.pillow.conf.ModelConfigurationFactory;
+import cat.my.android.pillow.conf.ModelViewConfiguration;
 import cat.my.android.pillow.data.sync.ISynchDataSource;
 import cat.my.android.pillow.data.sync.SynchManager;
 
@@ -100,5 +101,11 @@ public class Pillow {
 	
 	public ModelConfigurationFactory getModelConfigurationFactory() {
 		return modelConfigurationFactory;
+	}
+	/**
+	 * Shortcut for getModelConfiguration(modelClass).getViewConfiguration();
+	 */
+	public <T extends IdentificableModel> ModelViewConfiguration<T> getViewConfiguration(Class<T> modelClass){
+		return getModelConfiguration(modelClass).getViewConfiguration();
 	}
 }
