@@ -71,7 +71,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 				Object value = null;
 				if(String.class.isAssignableFrom(fieldClass)){
 					value = cursor.getString(cursor.getColumnIndex(fieldName));
-				} else if(Integer.class.isAssignableFrom(fieldClass)){
+				} else if(isInt(fieldClass)){
 					value = cursor.getInt(cursor.getColumnIndex(fieldName));
 				} else if(Double.class.isAssignableFrom(fieldClass)){
 					value = cursor.getDouble(cursor.getColumnIndex(fieldName));
@@ -172,7 +172,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		Class<?> fieldClass = field.getType();
 		if(String.class.isAssignableFrom(fieldClass)){
 			type = DBUtil.STRING_TYPE;
-		} else if(Integer.class.isAssignableFrom(fieldClass)){
+		} else if(isInt(fieldClass)){
 			type = DBUtil.INT_TYPE;
 		} else if(Double.class.isAssignableFrom(fieldClass)){
 			type = DBUtil.DOUBLE_TYPE;
@@ -221,5 +221,10 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		
 		return new DBSelection(selection, args.toArray(new String[]{}));
 	}
+	
+	public boolean isInt(Class<?> fieldClass){
+		return Integer.class.isAssignableFrom(fieldClass) || int.class.isAssignableFrom(fieldClass);
+	}
+	
 
 }

@@ -22,6 +22,6 @@ public class IntEditTextData extends AbstractInputData {
 	}
 	
 	protected EditText getView(){
-		return (EditText) getView();
+		return (EditText) super.getView();
 	}
 }
