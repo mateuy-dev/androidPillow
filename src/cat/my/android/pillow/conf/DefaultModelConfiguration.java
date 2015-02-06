@@ -27,6 +27,7 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 	
 	public DefaultModelConfiguration(Context context, Class<T> modelClass, TypeToken<Collection<T>> collectionTypeToken, String url) {
 		super();
+		this.context = context;
 		this.modelClass = modelClass;
 		this.collectionType = collectionTypeToken.getType();
 		this.url = url;

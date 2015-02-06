@@ -1,7 +1,9 @@
 package cat.my.android.pillow.data.db;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -91,6 +93,8 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 			throw new BreakFastException(e);
 		}
 	}
+	
+	
 
 
 	/**
@@ -182,6 +186,40 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 			throw new UnimplementedException(fieldClass.toString());
 		}
 		return type;
+	}
+
+
+	@Override
+	public IDBSelection getSelection(T filter) {
+		Field[] fields = ReflectionUtil.getStoredFields(modelClass);
+		List<String> selectionList = new ArrayList<String>();
+		List<String> args = new ArrayList<String>();
+		
+		for(Field field:fields){
+			Object dbValue = dbValue(field, filter);
+			if(dbValue!=null){
+				String name = field.getName();
+				selectionList.add(name + " == ?");
+				if(dbValue instanceof String){
+					args.add(dbValue.toString());
+				} else {
+					args.add(dbValue.toString());
+				}
+				
+			}
+		}
+		StringBuilder builder = new StringBuilder();
+		boolean first = true;
+		for(String selectionItem:selectionList){
+			if(first)
+				first = false;
+			else
+				builder.append(" AND ");
+			builder.append(selectionItem);
+		}
+		String selection = builder.toString();
+		
+		return new DBSelection(selection, args.toArray(new String[]{}));
 	}
 
 }

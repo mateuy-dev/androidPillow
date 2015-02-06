@@ -42,4 +42,29 @@ public interface IDbMapping<T>{
 	public String getTableName();
 	
 	public String[][] getAttributes();
+	
+	public IDBSelection getSelection(T filter);
+	
+	public interface IDBSelection{
+		public String getSelection();
+		public String[] getArgs();
+	}
+	
+	public class DBSelection implements IDBSelection{
+		String selection;
+		String[] args;
+		public DBSelection(String selection, String[] args) {
+			this.selection = selection;
+			this.args = args;
+		}
+		@Override
+		public String getSelection() {
+			return selection;
+		}
+		@Override
+		public String[] getArgs() {
+			return args;
+		}
+		
+	}
 }

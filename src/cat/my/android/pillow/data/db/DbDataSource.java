@@ -33,6 +33,12 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 	}
 	
 	@Override
+	public void index(T model, Listener<Collection<T>> listener, ErrorListener errorListener) {
+		DBModelController<T> db = getDbModelController();
+		listener.onResponse(db.index(model));
+	}
+	
+	@Override
 	public void index(String selection, String[] selectionArgs, String order, Listener<Collection<T>> listener, ErrorListener errorListener) {
 		DBModelController<T> db = getDbModelController();
 		listener.onResponse(db.index(selection, selectionArgs, order));

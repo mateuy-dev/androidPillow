@@ -37,6 +37,10 @@ public class SynchDataSourceMainThreadProxy<T extends IdentificableModel> implem
 	public void index(Listener<Collection<T>> listener, ErrorListener errorListener) {
 		dataSource.index(new ExecuteOnMainThreadProxyListener<Collection<T>>(getContext(),listener), errorListener);
 	}
+	
+	public void index(T filter, Listener<Collection<T>> listener, ErrorListener errorListener) {
+		dataSource.index(filter, new ExecuteOnMainThreadProxyListener<Collection<T>>(getContext(),listener), errorListener);
+	}
 
 	public void index(String selection, String[] selectionArgs, String order, Listener<Collection<T>> listener,
 			ErrorListener errorListener) {

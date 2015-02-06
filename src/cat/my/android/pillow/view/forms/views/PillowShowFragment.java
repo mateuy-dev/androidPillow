@@ -56,9 +56,13 @@ public class PillowShowFragment<T extends IdentificableModel> extends Fragment{
 		dataSource.show(idModel, new Listener<T>() {
 			@Override
 			public void onResponse(T model) {
-				formView.setModel(model, atts);
+				updateView(model);
 			}
 		}, CommonListeners.dummyErrorListener);
+	}
+	
+	protected void updateView(T model) {
+		formView.setModel(model, atts);
 	}
 	
 	@Override
@@ -110,7 +114,7 @@ public class PillowShowFragment<T extends IdentificableModel> extends Fragment{
 	}
 
 	private void editModel() {
-		new NavigationUtil(this).editModel(getModel());
+		new NavigationUtil(this).displayEditModel(getModel());
 	}
 	
 	private void deleteModel() {
@@ -121,7 +125,7 @@ public class PillowShowFragment<T extends IdentificableModel> extends Fragment{
 				getDataSource().destroy(getModel(), new Listener<Void>() {
 					@Override
 					public void onResponse(Void response) {
-						new NavigationUtil(PillowShowFragment.this).list(getModel().getClass());
+						new NavigationUtil(PillowShowFragment.this).displayListModel(getModel().getClass());
 					}
 				}, CommonListeners.dummyErrorListener);
 			}

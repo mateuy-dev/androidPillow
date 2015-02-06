@@ -29,6 +29,10 @@ public class DbDataSourceMainThreadProxy <T extends IdentificableModel> implemen
 	public void index(Listener<Collection<T>> listener, ErrorListener errorListener) {
 		dataSource.index(new ExecuteOnMainThreadProxyListener<Collection<T>>(getContext(),listener) , errorListener);
 	}
+	
+	public void index(T model,Listener<Collection<T>> listener, ErrorListener errorListener) {
+		dataSource.index(model, new ExecuteOnMainThreadProxyListener<Collection<T>>(getContext(),listener) , errorListener);
+	}
 
 	public void index(String selection, String[] selectionArgs, String order, Listener<Collection<T>> listener,
 			ErrorListener errorListener) {

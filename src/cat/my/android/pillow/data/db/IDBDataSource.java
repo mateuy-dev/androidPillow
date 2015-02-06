@@ -9,10 +9,10 @@ import cat.my.android.pillow.Listeners.Listener;
 
 public interface IDBDataSource<T extends IdentificableModel> extends IDataSource<T>{
 
-	void index(String selection, String[] selectionArgs, String order, Listener<Collection<T>> listener,
-			ErrorListener errorListener);
+	public void index(String selection, String[] selectionArgs, String order, Listener<Collection<T>> listener, ErrorListener errorListener);
+	public void index(T filter, Listener<Collection<T>> listener, ErrorListener errorListener);
 	public DBModelController<T> getDbModelController();
-	void count(String selection, String[] selectionArgs, Listener<Integer> listener,
+	public void count(String selection, String[] selectionArgs, Listener<Integer> listener,
 			ErrorListener errorListener);
 	
 

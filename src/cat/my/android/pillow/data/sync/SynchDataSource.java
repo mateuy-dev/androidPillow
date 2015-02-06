@@ -14,8 +14,8 @@ import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.data.db.DBModelController;
 import cat.my.android.pillow.data.db.DbDataSource;
 import cat.my.android.pillow.data.db.IDbMapping;
-import cat.my.android.pillow.data.db.MTDbDataSource;
-import cat.my.android.pillow.data.db.MTDbDataSource.OperationRunnable;
+import cat.my.android.pillow.data.db.MultiThreadDbDataSource;
+import cat.my.android.pillow.data.db.MultiThreadDbDataSource.OperationRunnable;
 import cat.my.android.pillow.data.rest.IRestMapping;
 import cat.my.android.pillow.data.rest.ISessionController;
 import cat.my.android.pillow.data.rest.RestDataSource;
@@ -24,7 +24,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 	RestDataSource<T> restDataSource;
 	ISessionController authenticationData;
 	DeletedEntries<T> deletedEntries;
-	MTDbDataSource<T> dbSource;
+	MultiThreadDbDataSource<T> dbSource;
 	DBModelController<T> dbModelController;
 	IDbMapping<T> dbFuncs;
 	IRestMapping<T> restMap;
@@ -40,7 +40,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		deletedEntries = new DeletedEntries<T>(restDataSource, dbHelper);
 //		dbSource = new DbDataSource<T>(context, dbFuncs, dbHelper, deletedEntries);
 //		if(Pillow.getInstance(context).getConfig().isDbMultiThread()){
-		dbSource = new MTDbDataSource<T>(new DbDataSource<T>(context, dbFuncs, dbHelper, deletedEntries));
+		dbSource = new MultiThreadDbDataSource<T>(new DbDataSource<T>(context, dbFuncs, dbHelper, deletedEntries));
 		
 		dbModelController = dbSource.getDbModelController();
 		this.restMap=restMap;
@@ -57,6 +57,11 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 	@Override
 	public void index(Listener<Collection<T>> listener, ErrorListener errorListener) {
 		dbSource.index(listener, errorListener);
+	}
+	
+	@Override
+	public void index(T model, Listener<Collection<T>> listener, ErrorListener errorListener) {
+		dbSource.index(model, listener, errorListener);
 	}
 	
 	@Override

@@ -45,7 +45,9 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 		}
 	};
 	
-	
+	public IModelListAdapter<T> getListAdapter() {
+		return listAdapter;
+	}
 	
 	
 	@Override
@@ -67,7 +69,7 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				T model = listAdapter.getItem(position);
-				new NavigationUtil(PillowListFragment.this).showModel(model);
+				new NavigationUtil(PillowListFragment.this).displayShowModel(model);
 			}
 		});
 		
@@ -116,7 +118,7 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 			((ISynchDataSource<T>)ops).sendDirty(CommonListeners.dummyListener, CommonListeners.dummyErrorListener);
 	}
 	
-	private void createModel(){
+	protected void createModel(){
 		try {
 			Intent intent = new Intent(getActivity(), FormActivity.class);
 			T model = clazz.newInstance();

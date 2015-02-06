@@ -10,12 +10,12 @@ import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
 
 
-public class MTDbDataSource<T extends IdentificableModel> implements IDBDataSource<T>{
+public class MultiThreadDbDataSource<T extends IdentificableModel> implements IDBDataSource<T>{
 	static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
 	IDBDataSource<T> dataSource;
 
-	public MTDbDataSource(IDBDataSource<T> dataSource) {
+	public MultiThreadDbDataSource(IDBDataSource<T> dataSource) {
 		super();
 		this.dataSource=dataSource;
 	}
@@ -43,6 +43,23 @@ public class MTDbDataSource<T extends IdentificableModel> implements IDBDataSour
 		@Override
 		public void run() {
 			dataSource.index(listener, errorListener);
+		}
+	}
+	
+	@Override
+	public void index(T model, Listener<Collection<T>> listener, ErrorListener errorListener) {
+		threadPoolExecutor.execute(new FilterIndexRunnable(model, listener, errorListener));
+	}
+	
+	public class FilterIndexRunnable extends OperationRunnable<Listener<Collection<T>>>{
+		T model;
+		public FilterIndexRunnable(T model, Listener<Collection<T>> listener, ErrorListener errorListener) {
+			super(listener, errorListener);
+			this.model = model;
+		}
+		@Override
+		public void run() {
+			dataSource.index(model, listener, errorListener);
 		}
 	}
 	

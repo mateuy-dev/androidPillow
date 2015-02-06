@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import cat.my.android.pillow.IdentificableModel;
+import cat.my.android.pillow.data.db.IDbMapping.IDBSelection;
 import cat.my.android.pillow.data.sync.DeletedEntries;
 import cat.my.android.util.CursorUtil;
 import cat.my.util.StringUtil;
@@ -122,6 +123,11 @@ public class DBModelController<T extends IdentificableModel> {
 	 */
 	public List<T> index() {
 		return index(null, null, null);
+	}
+	
+	public List<T> index(T filer) {
+		IDBSelection selection = mapper.getSelection(filer);
+		return index(selection.getSelection(), selection.getArgs(), null);
 	}
 	
 	/**

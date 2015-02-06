@@ -33,39 +33,42 @@ public class NavigationUtil {
 		this.viewId = viewId;
 	}
 	
-	public <T extends IdentificableModel> void showModel(T model){
-		Fragment newFragment = getModelViewCongifuration(model).getShowFragment();
-		showModel(model, newFragment);
+	public void displayShowModel(IdentificableModel model){
+		Fragment newFragment = getShowModelFragment(model);
+		changeFragment(newFragment);
 	}
 	
-	public <T extends IdentificableModel> void editModel(T model){
+	public Fragment getShowModelFragment(IdentificableModel model){
+		Fragment newFragment = getModelViewCongifuration(model).getShowFragment();
+		Bundle bunlde = BundleUtils.createIdBundle(model);
+		newFragment.setArguments(bunlde);
+		return newFragment;
+	}
+	
+	public void displayEditModel(IdentificableModel model){
 		Context context = getContext();
 		Intent intent = new Intent(context, getModelViewCongifuration(model).getFormClass());
 		Bundle bundle = BundleUtils.createIdBundle(model);
 //		BundleUtils.setShownAtts(bundle, atts);
 		intent.putExtras(bundle);
 		context.startActivity(intent);
-//		
 //		FormFragment<T> fragment = new FormFragment<T>();
 //		editModel(model, fragment);
 	}
 	
-
-
-	public <T extends IdentificableModel> void list(Class<T> modelClass){
+	public  void displayListModel(Class<? extends IdentificableModel> modelClass){
+		Fragment newFragment = getListFragment(modelClass);
+		changeFragment(newFragment);
+	}
+	
+	public Fragment getListFragment(Class<? extends IdentificableModel> modelClass){
 		Fragment newFragment = getModelViewCongifuration(modelClass).getListFragment();
 		Bundle bundle = BundleUtils.createIdBundle(modelClass);
 		newFragment.setArguments(bundle);
-		changeFragment(newFragment);
+		return newFragment;
 	}
 	
-	private <T extends IdentificableModel> void showModel(T model, Fragment newFragment){
-		Bundle bunlde = BundleUtils.createIdBundle(model);
-		newFragment.setArguments(bunlde);
-		changeFragment(newFragment);
-	}
-	
-	private <T extends IdentificableModel> void editModel(T model, Fragment newFragment){
+	private  void editModel(IdentificableModel model, Fragment newFragment){
 		Bundle bunlde = BundleUtils.createIdBundle(model);
 		newFragment.setArguments(bunlde);
 		changeFragment(newFragment);

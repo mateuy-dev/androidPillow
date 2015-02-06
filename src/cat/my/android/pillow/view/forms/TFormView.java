@@ -31,7 +31,7 @@ public class TFormView<T> extends GridLayout{
 	
 	private void init() {
 		setColumnCount(2);
-		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT, Gravity.CENTER_HORIZONTAL);
+		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL);
 		int marginHorizontal = getContext().getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
 		int marginVertical = getContext().getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin);
 		setPadding(marginHorizontal, marginVertical, marginHorizontal, marginVertical);
