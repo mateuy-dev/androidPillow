@@ -18,6 +18,7 @@ public class DBUtil {
 	public static final String INT_TYPE = " INTEGER";
 	public static final String DECIMAL_TYPE = " INTEGER";
 	public static final String DOUBLE_TYPE = " DOUBLE";
+	public static final String CALENDAR_TYPE = "  TEXT";
 	public static final String DATE_TYPE = "  TEXT";
 	public static final String ENUM_TYPE = "  INTEGER";
 
@@ -46,12 +47,12 @@ public class DBUtil {
 		return dbToCalendar(value);
 	}
 	
-	public static final String DATE_STRING_FORMAT = "yyyy-MM-dd";
-	private static final String DATE_TIME_STRING_FORMAT = "yyyy-MM-dd HH:mm:ss";
+//	public static final String DATE_STRING_FORMAT = "yyyy-MM-dd";
+	public static final String DATE_TIME_STRING_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	
 	public static String calendarToDb(Calendar date){
 		if(date==null) return null;
-		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_STRING_FORMAT);
+		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
 		return dateFormat.format(date.getTime());
 	}
 	
@@ -62,7 +63,7 @@ public class DBUtil {
 	 */
 	public static String dateToDb(Object date){
 		if(date==null) return null;
-		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_STRING_FORMAT);
+		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
 		return dateFormat.format(date);
 	}
 	
@@ -73,7 +74,7 @@ public class DBUtil {
 	 */
 	public static Date dbToDate(String date){
 		if(date==null) return null;
-		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_STRING_FORMAT);
+		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
 		try {
 			return dateFormat.parse(date);
 		} catch (ParseException e) {
@@ -93,22 +94,24 @@ public class DBUtil {
 		cal.setTime(dbToDate(date));
 		return cal;
 	}
-	
+//	
 	public static String dateTimeToDb(Date date){
-		if(date==null) return null;
-		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
-		return dateFormat.format(date);
+		return dateToDb(date);
+//		if(date==null) return null;
+//		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
+//		return dateFormat.format(date);
 	}
-	
+//	
 	public static Date dbToDateTime(String date){
-		if(date==null) return null;
-		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
-		try {
-			return dateFormat.parse(date);
-		} catch (ParseException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return dbToDate(date);
+//		if(date==null) return null;
+//		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
+//		try {
+//			return dateFormat.parse(date);
+//		} catch (ParseException e) {
+//			e.printStackTrace();
+//			return null;
+//		}
 	}
 	
 	public static Integer enumToDb(Enum<?> value){

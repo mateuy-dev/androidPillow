@@ -24,6 +24,8 @@ public class PillowListAdapter<T extends IdentificableModel> extends PillowBaseL
 		super(context, clazz);
 	}
 	
+	
+	
 	public void updateListView(TextView titleView, TextView textView, T model){
 		textView.setText(model.getId());
 		titleView.setText(model.toString());

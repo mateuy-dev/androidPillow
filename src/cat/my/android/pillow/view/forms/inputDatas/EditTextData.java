@@ -5,6 +5,8 @@ import android.view.View;
 import android.widget.EditText;
 
 public class EditTextData extends AbstractInputData {
+	public static final int EMS = 10;
+	
 	@Override
 	public String getValue() {
 		return getView().getText().toString();
@@ -18,7 +20,7 @@ public class EditTextData extends AbstractInputData {
 	@Override
 	public View createView(Context context) {
 		EditText editText = new EditText(context);
-		editText.setEms(10);
+		editText.setEms(EMS);
 		return editText;
 		
 	}

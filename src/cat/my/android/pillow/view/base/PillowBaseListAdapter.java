@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import cat.my.android.pillow.IDataSource;
+import cat.my.android.pillow.IExtendedDataSource;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
@@ -21,6 +22,7 @@ import cat.my.android.pillow.data.sync.SynchDataSource;
 
 
 public abstract class PillowBaseListAdapter<T extends IdentificableModel> extends BaseAdapter implements IModelListAdapter<T> {
+	T filter;
 	Context context;
 	List<T> models = new ArrayList<T>();
 	IDataSource<T> dataSource;
@@ -56,7 +58,10 @@ public abstract class PillowBaseListAdapter<T extends IdentificableModel> extend
 //	}
 	
 	public void dataSourceIndex(Listener<Collection<T>> listener, ErrorListener errorListener){
-		dataSource.index(listener, errorListener);
+		if(filter!=null && dataSource instanceof IExtendedDataSource)
+			((IExtendedDataSource<T>)dataSource).index(filter, listener, errorListener);
+		else
+			dataSource.index(listener, errorListener);
 	}
 
 	@Override
@@ -93,6 +98,10 @@ public abstract class PillowBaseListAdapter<T extends IdentificableModel> extend
 
 	protected IDataSource<T> getDataSource() {
 		return dataSource;
+	}
+	
+	public void setFilter(T filter) {
+		this.filter = filter;
 	}
 
 }

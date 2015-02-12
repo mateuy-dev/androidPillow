@@ -34,6 +34,8 @@ import cat.my.util.exceptions.BreakFastException;
 
 
 public class PillowListFragment<T extends IdentificableModel> extends Fragment {
+	T filter;
+	boolean hideButtons;
 	Class<T> clazz;
 	IModelListAdapter<T> listAdapter;
 	IDataSource<T> ops;
@@ -53,8 +55,12 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.list_fragment, container, false);
+		if(getArguments()!=null){
+			filter = BundleUtils.getModel(getArguments());
+			hideButtons = BundleUtils.getHideButtons(getArguments());
+		}
 		
+		View rootView = inflater.inflate(R.layout.list_fragment, container, false);
 		clazz = BundleUtils.getModelClass(getArguments());
 		
 		Pillow pillow = Pillow.getInstance(getActivity());
@@ -63,6 +69,8 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 
 		ListView listview = (ListView) rootView.findViewById(R.id.listview);
 		listAdapter = pillow.getViewConfiguration(clazz).getListAdapter(getActivity());
+		if(filter!=null)
+			listAdapter.setFilter(filter);
 		listview.setAdapter(listAdapter);
 		
 		listview.setOnItemClickListener(new OnItemClickListener() {
@@ -73,13 +81,19 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 			}
 		});
 		
+		
 		ImageButton createButton = (ImageButton)rootView.findViewById(R.id.create_model_button);
-		createButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				createModel();
-			}
-		});
+		if(hideButtons){
+			createButton.setVisibility(View.GONE);
+		} else {
+			createButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					createModel();
+				}
+			});
+		}
+		
 		
 		return rootView;
 	}

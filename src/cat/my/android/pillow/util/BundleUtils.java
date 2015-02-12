@@ -1,6 +1,8 @@
 package cat.my.android.pillow.util;
 
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import cat.my.android.pillow.IdentificableModel;
 
 import com.google.gson.Gson;
@@ -16,6 +18,7 @@ public class BundleUtils {
 	public static final String CLASS_ATTRTRIBUTE = "class";
 	public static final String MODEL_ATTRTRIBUTE = "model";
 	public static final String ATTS_ATTRTRIBUTE = "atts";
+	public static final String HIDE_BUTTONS_ATTRIBUTE = "hideButtonsAttribute";
 	
 	public static Bundle copyBundle(Bundle toCopy){
 		Bundle result = new Bundle();
@@ -69,7 +72,10 @@ public class BundleUtils {
 	}
 	
 	public static String getId(Bundle bundle){
-		return bundle.getString(ID_ATTRIBUTE, null);
+		if(bundle.containsKey(ID_ATTRIBUTE))
+			return bundle.getString(ID_ATTRIBUTE);
+		else
+			return null;
 	}
 	
 	public static boolean containsId(Bundle bundle){
@@ -104,12 +110,20 @@ public class BundleUtils {
 	}
 	
 	public static <T> T getModel(Bundle bundle){
+		if(!bundle.containsKey(MODEL_ATTRTRIBUTE))
+			return null;
 		String modelJson = getStringModel(bundle);
 		T result = (T) new Gson().fromJson(modelJson, getModelClass(bundle));
 		return result;
 	}
 	
+	public static void setHideButtons(Bundle bundle){
+		bundle.putBoolean(HIDE_BUTTONS_ATTRIBUTE, true);
+	}
 	
+	public static boolean getHideButtons(Bundle bundle){
+		return bundle.containsKey(HIDE_BUTTONS_ATTRIBUTE) && bundle.getBoolean(HIDE_BUTTONS_ATTRIBUTE);
+	}
 
 	public static void setEnum(Bundle bundle, String key, Enum<?> value){
 		//TODO New type of bundle utils. Need to sort Bundle utils. 
@@ -119,4 +133,54 @@ public class BundleUtils {
 	public static <T> T getEnum(Bundle bundle, String key){
 		return (T) bundle.getSerializable(key);
 	}
+	
+	
+//	public static class BundleModel<T> implements Parcelable{
+//		Gson gson = new Gson();
+//		T model;
+//		Class<T> modelClass;
+//		
+//		public BundleModel(T model){
+//			this.model = model;
+//			this.modelClass = (Class<T>) model.getClass();
+//		}
+//		
+//		public BundleModel(Parcel parcel){
+//			this.modelClass = (Class<T>) parcel.readSerializable();
+//			this.model = modelFromString(parcel.readString());
+//		}
+//
+//		public static final Parcelable.Creator<BundleModel> CREATOR = new Parcelable.Creator<BundleModel>() {
+//			@Override
+//			public BundleModel createFromParcel(Parcel parcel) {
+//				return new BundleModel(parcel);
+//			}
+//
+//			@Override
+//			public BundleModel[] newArray(int size) {
+//				return new BundleModel[size];
+//			}
+//		};
+//
+//		@Override
+//		public int describeContents() {
+//			return 0;
+//		}
+//
+//		@Override
+//		public void writeToParcel(Parcel dest, int flags) {
+//			dest.writeSerializable(modelClass);
+//			dest.writeString(modelToString());
+//		}
+//		
+//		private String modelToString(){
+//			return gson.toJson(model);
+//		}
+//		
+//		private T modelFromString(String readString) {
+//			return gson.fromJson(readString, modelClass);
+//		}
+//		
+//	}
+	
 }

@@ -2,6 +2,7 @@ package cat.my.android.pillow.data.db;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -45,7 +46,9 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		try {
 			field.setAccessible(true);
 			Object value = field.get(model);
-			if(value instanceof Date){
+			if(value instanceof Calendar){
+				value = DBUtil.calendarToDb((Calendar)value);
+			} else if(value instanceof Date){
 				value = DBUtil.dateToDb((Date)value);
 			} else if(value instanceof Enum){
 				value = DBUtil.enumToDb((Enum<?>) value);
@@ -77,6 +80,8 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 					value = cursor.getDouble(cursor.getColumnIndex(fieldName));
 				} else if(Long.class.isAssignableFrom(fieldClass)){
 					value = cursor.getLong(cursor.getColumnIndex(fieldName));
+				} else if(Calendar.class.isAssignableFrom(fieldClass)){
+					value = DBUtil.getCalendar(cursor, cursor.getColumnIndex(fieldName));
 				} else if(Date.class.isAssignableFrom(fieldClass)){
 					value = DBUtil.getDate(cursor, cursor.getColumnIndex(fieldName));
 				} else if(Enum.class.isAssignableFrom(fieldClass)){
@@ -178,6 +183,8 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 			type = DBUtil.DOUBLE_TYPE;
 		} else if(Long.class.isAssignableFrom(fieldClass)){
 			throw new UnimplementedException();
+		} else if(Calendar.class.isAssignableFrom(fieldClass)){
+			type = DBUtil.CALENDAR_TYPE;
 		} else if(Date.class.isAssignableFrom(fieldClass)){
 			type = DBUtil.DATE_TYPE;
 		} else if(Enum.class.isAssignableFrom(fieldClass)){
@@ -196,15 +203,16 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		List<String> args = new ArrayList<String>();
 		
 		for(Field field:fields){
-			Object dbValue = dbValue(field, filter);
-			if(dbValue!=null){
+			Class<?> fieldClass = field.getType();
+			if(!isNull(field, filter)){
+				Object dbValue = dbValue(field, filter);
 				String name = field.getName();
 				selectionList.add(name + " == ?");
-				if(dbValue instanceof String){
+//				if(dbValue instanceof String){
+//					args.add(dbValue.toString());
+//				} else {
 					args.add(dbValue.toString());
-				} else {
-					args.add(dbValue.toString());
-				}
+//				}
 				
 			}
 		}
@@ -222,6 +230,25 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		return new DBSelection(selection, args.toArray(new String[]{}));
 	}
 	
+	private boolean isNull(Field field, T model) {
+		field.setAccessible(true);
+		try {
+			Object value = field.get(model);
+			if(value==null)
+				return true;
+			Class<?> fieldClass = field.getType();
+			if(int.class.isAssignableFrom(fieldClass)){
+				//TODO check this: we define 0 as a null value for int
+				int intValue = (Integer) value;
+				return intValue==0;
+			}
+			return false;
+			
+		} catch (Exception e) {
+			throw new BreakFastException(e);
+		}
+	}
+
 	public boolean isInt(Class<?> fieldClass){
 		return Integer.class.isAssignableFrom(fieldClass) || int.class.isAssignableFrom(fieldClass);
 	}

@@ -10,7 +10,7 @@ import cat.my.android.pillow.view.forms.InputData;
 
 
 public class ValuesTypes {
-	public enum ValueTypeClass{DEFAULT, COLOR}
+	public enum ValueTypeClass{DEFAULT, COLOR, DATE, DATETIME}
 	
 	@Target({ElementType.FIELD})
 	@Retention(RetentionPolicy.RUNTIME)

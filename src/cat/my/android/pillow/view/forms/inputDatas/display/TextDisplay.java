@@ -15,8 +15,12 @@ public class TextDisplay extends AbstractInputData{
 	@Override
 	public void setValue(Object value) {
 		this.value = value;
-		String text = value!=null ? value.toString() : "";
+		String text = value!=null ? valueToString() : "";
 		getView().setText(text);
+	}
+
+	protected String valueToString() {
+		return value.toString();
 	}
 
 	@Override

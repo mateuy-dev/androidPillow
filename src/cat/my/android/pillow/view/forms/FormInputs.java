@@ -12,6 +12,7 @@ import android.content.Context;
 import android.view.View;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.util.reflection.ReflectionUtil;
+import cat.my.util.exceptions.BreakFastException;
 
 public class FormInputs {
 	InputDataManager inputManager = new InputDataManager();
@@ -44,7 +45,7 @@ public class FormInputs {
 					inputViewMap.put(field, new FormInputRow(context, field, model, editable));
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				throw new BreakFastException(e);
 			}
 		}
 	}

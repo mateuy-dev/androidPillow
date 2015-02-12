@@ -6,5 +6,5 @@ import android.widget.ListAdapter;
 public interface IModelListAdapter<T extends IdentificableModel> extends ListAdapter{
 	public T getItem(int position);
 	public void refreshList();
-
+	public void setFilter(T filter);
 }

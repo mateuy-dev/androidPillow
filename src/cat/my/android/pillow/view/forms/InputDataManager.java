@@ -1,24 +1,37 @@
 package cat.my.android.pillow.view.forms;
 
 import java.lang.reflect.Field;
+import java.util.Calendar;
 import java.util.Date;
 
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueTypeClass;
+import cat.my.android.pillow.view.forms.inputDatas.CalendarInputData;
 import cat.my.android.pillow.view.forms.inputDatas.ColorInput;
 import cat.my.android.pillow.view.forms.inputDatas.DateEditTextData;
+import cat.my.android.pillow.view.forms.inputDatas.DateInputData;
 import cat.my.android.pillow.view.forms.inputDatas.EditTextData;
 import cat.my.android.pillow.view.forms.inputDatas.EnumInputData;
 import cat.my.android.pillow.view.forms.inputDatas.IdentificableModelSpinnerInputData;
 import cat.my.android.pillow.view.forms.inputDatas.IntEditTextData;
+import cat.my.android.pillow.view.forms.inputDatas.display.CalendarDisplay;
 import cat.my.android.pillow.view.forms.inputDatas.display.TextDisplay;
+import cat.my.util.exceptions.UnimplementedException;
 
 public class InputDataManager{
 	@SuppressWarnings("unchecked")
 	public InputData getInputData(Field field, boolean editable){
+		Class<?> valueClass = field.getType();
+		
 		if(!editable){
-			return new TextDisplay();
+			if (Calendar.class.isAssignableFrom(valueClass)){
+				return new CalendarDisplay();
+			} else {
+				return new TextDisplay();
+			}
+			
+			
 		}
 		
 		field.getAnnotations();
@@ -37,16 +50,18 @@ public class InputDataManager{
 			}
 		}
 		
-		Class<?> valueClass = field.getType();
+		
 		if(String.class.isAssignableFrom(valueClass)){
 			return new EditTextData();
 		} else if(Integer.class.isAssignableFrom(valueClass) || Integer.TYPE.isAssignableFrom(valueClass)){
 			return new IntEditTextData();
 		} else if(Enum.class.isAssignableFrom(valueClass)){
 			return new EnumInputData(valueClass);
+		}  else if (Calendar.class.isAssignableFrom(valueClass)){
+			return new CalendarInputData();
 		} else if (Date.class.isAssignableFrom(valueClass)){
-			return new DateEditTextData();
+			return new DateInputData();
 		}
-		return null;
+		throw new UnimplementedException();
 	}
 }

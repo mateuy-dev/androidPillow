@@ -4,6 +4,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import cat.my.util.exceptions.BreakFastException;
+
 import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
@@ -32,7 +34,7 @@ public class FormInputRow{
 			try {
 				inputData.setValue(field.get(model));
 			} catch (Exception e) {
-				e.printStackTrace();
+				throw new BreakFastException(e);
 			}
 			createLabelView();
 			
