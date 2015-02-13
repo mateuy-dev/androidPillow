@@ -10,11 +10,19 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.util.reflection.ReflectionUtil;
+import cat.my.android.pillow.util.reflection.ValuesTypes.OrderBy;
+import cat.my.android.pillow.util.reflection.ValuesTypes.OrderBy.OrderType;
+import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType;
 import cat.my.util.exceptions.BreakFastException;
 import cat.my.util.exceptions.UnimplementedException;
 
 public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMapping<T>{
 	Class<T> modelClass;
+	
+	String[] projectionAttributes;
+	String[][] atts;
+	boolean orderByLoaded=false;
+	String orderBy;
 	
 	public ReflectionDbMapping(Class<T> modelClass){
 		this.modelClass=modelClass;
@@ -32,7 +40,22 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 
 	@Override
 	public String getDefaultModelOrder() {
-		return null;
+		if(!orderByLoaded){
+			Field[] fields = ReflectionUtil.getStoredFields(modelClass);
+			for(Field field: fields){
+				OrderBy orderByAnnotation = (OrderBy) field.getAnnotation(OrderBy.class);
+				if(orderByAnnotation!=null){
+					orderBy = field.getName();
+					if (orderByAnnotation.type() == OrderType.DESC){
+						orderBy += " DESC";
+					}
+					break;
+				}
+				
+			}
+			orderByLoaded=true;
+		}
+		return orderBy;
 	}
 
 	@Override
@@ -132,7 +155,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		}
 	}
 	
-	String[] projectionAttributes;
+	
 	@Override
 	public synchronized String[] getModelAttributesForProjection() {
 		//TODO refactor and take id out.
@@ -152,7 +175,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		return projectionAttributes;
 	}
 
-	String[][] atts;
+	
 	@Override
 	public synchronized String[][] getAttributes() {
 		if(atts!=null)

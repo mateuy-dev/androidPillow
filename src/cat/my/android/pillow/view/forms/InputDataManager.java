@@ -34,7 +34,7 @@ public class InputDataManager{
 			
 		}
 		
-		field.getAnnotations();
+		
 		ValueType inputTypeAnnotation = (ValueType) field.getAnnotation(ValueType.class);
 		if(inputTypeAnnotation!=null){
 			ValueTypeClass valueType = inputTypeAnnotation.type();

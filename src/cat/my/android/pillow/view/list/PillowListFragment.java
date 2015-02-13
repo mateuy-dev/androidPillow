@@ -55,13 +55,13 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-		if(getArguments()!=null){
-			filter = BundleUtils.getModel(getArguments());
-			hideButtons = BundleUtils.getHideButtons(getArguments());
-		}
+		
+		filter = BundleUtils.getModel(getArguments());
+		hideButtons = BundleUtils.getHideButtons(getArguments());
+		clazz = BundleUtils.getModelClass(getArguments());
 		
 		View rootView = inflater.inflate(R.layout.list_fragment, container, false);
-		clazz = BundleUtils.getModelClass(getArguments());
+		
 		
 		Pillow pillow = Pillow.getInstance(getActivity());
 		ops = pillow.getDataSource(clazz);
@@ -96,6 +96,10 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 		
 		
 		return rootView;
+	}
+	
+	public T getFilter() {
+		return filter;
 	}
 	
 //	////We are not using menu anymore but floating button

@@ -27,7 +27,7 @@ public class PillowShowFragment<T extends IdentificableModel> extends Fragment{
 	String modelId;
 	TFormView<T> formView;
 	IDataSource<T> dataSource;
-	Class<T> clazz;
+	Class<T> modelClass;
 	String[] atts;
 	
 
@@ -36,11 +36,11 @@ public class PillowShowFragment<T extends IdentificableModel> extends Fragment{
 		Bundle bundle = getArguments();
 		atts = BundleUtils.getShownAtts(bundle);
 		modelId = BundleUtils.getId(bundle);
-		clazz = BundleUtils.getModelClass(bundle);
+		modelClass = BundleUtils.getModelClass(bundle);
 		
 		
 		formView = new TFormView<T>(getActivity(), false);
-		dataSource = Pillow.getInstance(getActivity()).getDataSource(clazz);
+		dataSource = Pillow.getInstance(getActivity()).getDataSource(modelClass);
 		
 		return formView;
 	}
@@ -48,7 +48,7 @@ public class PillowShowFragment<T extends IdentificableModel> extends Fragment{
 	public void loadModel(){
 		T idModel;
 		try {
-			idModel = clazz.newInstance();
+			idModel = modelClass.newInstance();
 		} catch (Exception e) {
 			throw new BreakFastException(e);
 		}
@@ -83,7 +83,9 @@ public class PillowShowFragment<T extends IdentificableModel> extends Fragment{
 		return dataSource;
 	}
 	
-	
+	public Class<T> getModelClass() {
+		return modelClass;
+	}
 
 	
 

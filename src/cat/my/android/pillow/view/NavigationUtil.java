@@ -61,6 +61,16 @@ public class NavigationUtil {
 		changeFragment(newFragment);
 	}
 	
+	public <T extends IdentificableModel> void displayListModel(Class<T> modelClass, T filter){
+		Fragment newFragment = getListFragment(modelClass);
+		//Arguments allready set, but we change it....
+		Bundle bundle = BundleUtils.createModelBundle(filter);
+		newFragment.setArguments(bundle);
+		//its a filtered view, we don't want buttons
+		BundleUtils.setHideButtons(bundle);
+		changeFragment(newFragment);
+	}
+	
 	public Fragment getListFragment(Class<? extends IdentificableModel> modelClass){
 		Fragment newFragment = getModelViewCongifuration(modelClass).getListFragment();
 		Bundle bundle = BundleUtils.createIdBundle(modelClass);

@@ -88,7 +88,7 @@ public class RailsRestMapping<T extends IdentificableModel> implements IRestMapp
 		GsonBuilder builder = new GsonBuilder();
 		builder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
 		builder.registerTypeAdapterFactory(new RailsEnumAdapterFactory());
-		builder.setDateFormat(DBUtil.DATE_TIME_STRING_FORMAT);
+		builder.setDateFormat(DBUtil.DATE_STRING_FORMAT);
 		return builder.create();
 	}
 	

@@ -5,6 +5,9 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import cat.my.util.CaseFormat;
+import cat.my.util.exceptions.BreakFastException;
+
 public class ReflectionUtil {
 	
 	/**
@@ -27,5 +30,17 @@ public class ReflectionUtil {
 
 	public static boolean isTransient(Field field){
 		return Modifier.isTransient(field.getModifiers());
+	}
+	
+	public static void setReferenceId(Object model, Class<?> referencedClass, String id){
+		String attribute = referencedClass.getSimpleName() +"Id";
+		attribute = new CaseFormat().firstLetterToLowerCase(attribute);
+		try {
+			Field field = model.getClass().getDeclaredField(attribute);
+			field.setAccessible(true);
+			field.set(model, id);
+		} catch (Exception e) {
+			throw new BreakFastException(e);
+		}
 	}
 }

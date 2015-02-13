@@ -43,6 +43,7 @@ public class BundleUtils {
 	}
 	
 	public static Bundle createIdBundle(Class<?> clazz){
+		//TODO change name at least!
 		return createIdBundle(null, clazz);
 	}
 	
