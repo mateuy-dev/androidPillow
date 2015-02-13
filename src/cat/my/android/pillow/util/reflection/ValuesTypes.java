@@ -27,7 +27,7 @@ public class ValuesTypes {
 	@Target({ElementType.FIELD})
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface OrderBy{
-		public enum OrderType{ASC, DESC}
-		OrderType type() default OrderType.ASC; 
+		public enum OrderType{ASC, DESC, ASC_NO_COLLATE, DESC_NO_COLLATE}
+		OrderType type() default OrderType.ASC;
 	}
 }

@@ -46,10 +46,20 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 				OrderBy orderByAnnotation = (OrderBy) field.getAnnotation(OrderBy.class);
 				if(orderByAnnotation!=null){
 					orderBy = field.getName();
-					if (orderByAnnotation.type() == OrderType.DESC){
+					switch(orderByAnnotation.type()){
+					case ASC:
+						break;
+					case DESC:
 						orderBy += " DESC";
+						break;
+					case ASC_NO_COLLATE:
+						orderBy += " COLLATE NOCASE";
+						break;
+					case DESC_NO_COLLATE:
+						orderBy += " COLLATE NOCASE DESC";
+						break;
 					}
-					break;
+					
 				}
 				
 			}
