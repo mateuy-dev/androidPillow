@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import android.database.Cursor;
@@ -21,13 +22,25 @@ public class DBUtil {
 	public static final String CALENDAR_TYPE = "  TEXT";
 	public static final String DATE_TYPE = "  TEXT";
 	public static final String ENUM_TYPE = "  INTEGER";
-
+	
+	
 	public static String createTable(IDbMapping<?> mapping){
 		return "CREATE TABLE " + mapping.getTableName() 
 				+" (" + DBModelController.COMMON_MODEL_ATTRIBUTES + DBUtil.COMMA_SEP + 
-				DBModelController.creteAttsString(mapping.getAttributes()) + ");";
+				DBModelController.creteAttsString(mapping.getAttributes()) 
+				+ addForeignKeys(mapping)+");";
 	} 
 	
+	private static String addForeignKeys(IDbMapping<?> mapping) {
+		List<String> keys = mapping.getForeignKeys();
+		StringBuilder builder = new StringBuilder();
+		for(String key:keys){
+			builder.append(", ");
+			builder.append(key);
+		}
+		return builder.toString();
+	}
+
 	public static String dropTable(IDbMapping<?> mapping){
 		return "DROP TABLE IF EXISTS "+mapping.getTableName();
 	}

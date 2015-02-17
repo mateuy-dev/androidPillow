@@ -3,8 +3,11 @@ package cat.my.android.pillow.data.db;
 import java.util.Collection;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteConstraintException;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import cat.my.android.pillow.IdentificableModel;
+import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.data.sync.DeletedEntries;
@@ -54,27 +57,39 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 
 	@Override
 	public void create(T model, Listener<T> listener, ErrorListener errorListener) {
-		DBModelController<T> db = getDbModelController();
-		db.create(model);
-		model = db.get(model.getId());
-		listener.onResponse(model);
+		try{
+			DBModelController<T> db = getDbModelController();
+			db.create(model);
+			model = db.get(model.getId());
+			listener.onResponse(model);
+		} catch (SQLiteException exception){
+			errorListener.onErrorResponse(new PillowError(exception));
+		}
 	}
 
 	@Override
 	public void update(T model, Listener<T> listener, ErrorListener errorListener) {
-		DBModelController<T> db =getDbModelController();
-		db.update(model);
-		//refresh model
-		model = db.get(model.getId());
-		listener.onResponse(model);
+		try{
+			DBModelController<T> db =getDbModelController();
+			db.update(model);
+			//refresh model
+			model = db.get(model.getId());
+			listener.onResponse(model);
+		} catch (SQLiteException exception){
+			errorListener.onErrorResponse(new PillowError(exception));
+		}
 	}
 
 	@Override
 	public void destroy(T model, Listener<Void> listener,
 			ErrorListener errorListener) {
-		DBModelController<T> db =getDbModelController();
-		db.delete(model);
-		listener.onResponse(null);
+		try{
+			DBModelController<T> db =getDbModelController();
+			db.delete(model);
+			listener.onResponse(null);
+		} catch (SQLiteException exception){
+			errorListener.onErrorResponse(new PillowError(exception));
+		}
 	}
 	
 	@Override

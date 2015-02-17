@@ -34,12 +34,29 @@ public abstract class AbstractDBHelper extends SQLiteOpenHelper{
 		createTables(db);
 	}
 	
+	@Override
+	public void onOpen(SQLiteDatabase db) {
+	    super.onOpen(db);
+	    if (!db.isReadOnly()) {
+	        // Enable foreign key constraints
+	        db.execSQL("PRAGMA foreign_keys=ON;");
+	    }
+	}
+	
+	protected void enableForeignKeys(SQLiteDatabase db) {
+		if (!db.isReadOnly()) {
+		    db.execSQL("PRAGMA foreign_keys=ON;");
+		}
+	}
+
 	public void resetTables(SQLiteDatabase db){
 		dropTables(db);
 		createTables(db);
 	}
 	
 	public void createTables(SQLiteDatabase db){
+		enableForeignKeys(db);
+		
 		db.execSQL(DeletedEntries.CREATE_TABLE);
 		for(IDbMapping<?> mapping: getMappings()){
 			db.execSQL(DBUtil.createTable(mapping));

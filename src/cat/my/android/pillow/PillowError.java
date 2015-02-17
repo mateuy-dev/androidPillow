@@ -6,50 +6,55 @@ import java.io.PrintWriter;
 import com.android.volley.VolleyError;
 
 public class PillowError {
-	VolleyError volleyError;
-
-	public PillowError(VolleyError volleyError) {
-		super();
-		this.volleyError = volleyError;
+	
+	Exception exception;
+	
+	public PillowError(Exception exception){
+		this.exception = exception;
 	}
 
+	/*public PillowError(VolleyError volleyError) {
+		super();
+		this.volleyError = volleyError;
+	}*/
+
 	public Throwable fillInStackTrace() {
-		return volleyError.fillInStackTrace();
+		return exception.fillInStackTrace();
 	}
 
 	public String getMessage() {
-		return volleyError.getMessage();
+		return exception.getMessage();
 	}
 
 	public String getLocalizedMessage() {
-		return volleyError.getLocalizedMessage();
+		return exception.getLocalizedMessage();
 	}
 
 	public StackTraceElement[] getStackTrace() {
-		return volleyError.getStackTrace();
+		return exception.getStackTrace();
 	}
 
 	public void printStackTrace() {
-		volleyError.printStackTrace();
+		exception.printStackTrace();
 	}
 
 	public void printStackTrace(PrintStream err) {
-		volleyError.printStackTrace(err);
+		exception.printStackTrace(err);
 	}
 
 	public void printStackTrace(PrintWriter err) {
-		volleyError.printStackTrace(err);
+		exception.printStackTrace(err);
 	}
 
 	public String toString() {
-		return volleyError.toString();
+		return exception.toString();
 	}
 
 	public Throwable getCause() {
-		return volleyError.getCause();
+		return exception.getCause();
 	}
 
-	public VolleyError getVolleyError() {
-		return volleyError;
+	public Exception getException() {
+		return exception;
 	}
 }

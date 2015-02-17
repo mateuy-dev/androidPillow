@@ -1,5 +1,7 @@
 package cat.my.android.pillow.data.db;
 
+import java.util.List;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 
@@ -45,6 +47,8 @@ public interface IDbMapping<T>{
 	
 	public IDBSelection getSelection(T filter);
 	
+	public List<String> getForeignKeys();
+	
 	public interface IDBSelection{
 		public String getSelection();
 		public String[] getArgs();
@@ -65,6 +69,7 @@ public interface IDbMapping<T>{
 		public String[] getArgs() {
 			return args;
 		}
-		
 	}
+
+	
 }
