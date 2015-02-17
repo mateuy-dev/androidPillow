@@ -273,7 +273,7 @@ public class DBModelController<T extends IdentificableModel> {
 			values.put(COLUMN_NAME_ID, model.getId());
 			values.put(COLUMN_CREATED_AT, milis);
 			values.put(COLUMN_UPDATED_AT, milis);
-			db.insert(getTableName(), null, values);
+			db.insertOrThrow(getTableName(), null, values);
 		} else if(op == OP_CACHE) {
 			Cursor cursor = getCursorForId(db, model.getId());
 			if(cursor.moveToNext()){
@@ -297,7 +297,7 @@ public class DBModelController<T extends IdentificableModel> {
 					values.put(COLUMN_NAME_ID, model.getId());
 					values.put(COLUMN_CREATED_AT, milis);
 					values.put(COLUMN_UPDATED_AT, milis);
-					db.insert(getTableName(), null, values);
+					db.insertOrThrow(getTableName(), null, values);
 				}
 			}
 			cursor.close();

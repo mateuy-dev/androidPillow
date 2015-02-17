@@ -9,7 +9,9 @@ import java.util.List;
 import android.content.ContentValues;
 import android.database.Cursor;
 import cat.my.android.pillow.IdentificableModel;
+import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.util.reflection.ReflectionUtil;
+import cat.my.android.pillow.util.reflection.ValuesTypes.BelongsToOnDelete;
 import cat.my.android.pillow.util.reflection.ValuesTypes.OrderBy;
 import cat.my.android.pillow.util.reflection.ValuesTypes.OrderBy.OrderType;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType;
@@ -221,10 +223,10 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 
 	@Override
 	public IDBSelection getSelection(T filter) {
-		Field[] fields = ReflectionUtil.getStoredFields(modelClass);
 		List<String> selectionList = new ArrayList<String>();
 		List<String> args = new ArrayList<String>();
 		
+		Field[] fields = ReflectionUtil.getStoredFields(modelClass);
 		for(Field field:fields){
 			Class<?> fieldClass = field.getType();
 			if(!isNull(field, filter)){
@@ -253,6 +255,40 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		return new DBSelection(selection, args.toArray(new String[]{}));
 	}
 	
+	@Override
+	public List<String> getForeignKeys(){
+		List<String> result = new ArrayList<String>();
+		Field[] fields = ReflectionUtil.getStoredFields(modelClass);
+		for(Field field:fields){
+			ValueType valueType = field.getAnnotation(ValueType.class);
+			if(valueType!=null && valueType.belongsTo()!=null){
+				Class<? extends IdentificableModel> referencedClass = valueType.belongsTo();
+				BelongsToOnDelete onDelete = valueType.belongsToMode();
+				
+				IDbMapping<?> referencedDbMapping = Pillow.getInstance().getModelConfiguration(referencedClass).getDbMapping();
+				String referencedTable = referencedDbMapping.getTableName();
+				
+				String key = "FOREIGN KEY("+field.getName()+") REFERENCES "+referencedTable+"(id)" + getString(onDelete);
+				
+				result.add(key);
+			}
+		}
+		return result;
+	}
+	
+	private String getString(BelongsToOnDelete onDelete) {
+		switch (onDelete) {
+		case SET_NULL:
+			return " ON DELETE SET NULL";
+		case CASCADE:
+			return  "ON DELETE CASCADE";
+		case RESTRICT:
+			return "";
+		}
+		throw new UnimplementedException();
+	}
+
+
 	private boolean isNull(Field field, T model) {
 		field.setAccessible(true);
 		try {

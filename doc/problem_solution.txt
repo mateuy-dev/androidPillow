@@ -1,0 +1,17 @@
+1.Synch and Foreign queries
+Problem
+When we sycnhronize, we may get an entity related to a non existing one. This will break foreign keys
+
+Solution 1.
+Flexible: une no foreing keys
+Solution 2 (Adopted)
+Set an order when synchornizing so we traverse the relation tree from bottom-top. The relations MUST be a tree, not a graph.
+What we do if there is a graph? We can convert a graph to a tree deleting some edges. We will need to define soft-relations (using annotations) to break the graph to a tree. This soft edges will not use foreign keys (flexible edges).
+
+Work to do
+1. Create algorith that creates relation tree (breaks if graph) to define order of syncronization.
+2. Use order in synch
+3. Enable soft links
+
+
+

@@ -3,7 +3,9 @@ package cat.my.android.pillow.data.sync;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -14,12 +16,14 @@ import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.data.db.DBUtil;
+import cat.my.android.pillow.util.reflection.RelationGraph;
 
 
 public class SynchManager {
-	
+	RelationGraph relationGraph; 
 	
 	List<ISynchDataSource<?>> synchDataSources= new ArrayList<ISynchDataSource<?>>();
+	List<ISynchDataSource<?>> sortedSynchDataSources;
 
 	SharedPreferences sharedPref;
 	AbstractDBHelper dbHelper;
@@ -31,10 +35,25 @@ public class SynchManager {
 		this.synchDataSources = new ArrayList<ISynchDataSource<?>>(synchDataSources);
 		this.dbHelper = dbHelper;
 		sharedPref = context.getSharedPreferences(Pillow.PREFERENCES_FILE_KEY, Context.MODE_PRIVATE);
+		relationGraph = new RelationGraph();
+		for(ISynchDataSource<?> dataSource: synchDataSources){
+			relationGraph.addClass(dataSource.getModelClass());
+		}
 	}
 	
-	public List<ISynchDataSource<?>> getSynchDataSources() {
-		return synchDataSources;
+	public synchronized List<ISynchDataSource<?>> getSortedSynchDataSources() {
+		if(sortedSynchDataSources==null){
+			List<Class<?>> order = relationGraph.getSynchOrder();
+			Map<Class<?>, ISynchDataSource<?>> map = new HashMap<Class<?>, ISynchDataSource<?>>();
+			for(ISynchDataSource<?> dataSource : synchDataSources){
+				map.put(dataSource.getModelClass(), dataSource);
+			}
+			sortedSynchDataSources = new ArrayList<ISynchDataSource<?>>();
+			for(Class<?> orderItem: order){
+				sortedSynchDataSources.add(map.get(orderItem));
+			}
+		}
+		return sortedSynchDataSources;
 	}
 	
 	private void resetTables() {
@@ -115,8 +134,8 @@ public class SynchManager {
 			this.errorListener = errorListener;
 		}
 		public void sendNext(){
-			if(i<synchDataSources.size()){
-				ISynchDataSource<?> dataSource = synchDataSources.get(i);
+			if(i<getSortedSynchDataSources().size()){
+				ISynchDataSource<?> dataSource = getSortedSynchDataSources().get(i);
 				++i;
 				dataSource.sendDirty(this, errorListener);
 			} else {
@@ -147,7 +166,7 @@ public class SynchManager {
 		@Override
 		public void onResponse(Object response) {
 			i++;
-			if(synchDataSources.size()>i){
+			if(getSortedSynchDataSources().size()>i){
 				downloadCurrent();
 			} else {
 				if(!errorFound){
@@ -158,7 +177,7 @@ public class SynchManager {
 		}
 		
 		private void downloadCurrent(){
-			synchDataSources.get(i).download(this, this);
+			getSortedSynchDataSources().get(i).download(this, this);
 		}
 		
 		public void start(){

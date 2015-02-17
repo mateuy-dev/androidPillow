@@ -5,6 +5,9 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType;
+import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType.DEFAULT_INPUT;
+import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType.NONE;
 import cat.my.util.CaseFormat;
 import cat.my.util.exceptions.BreakFastException;
 
@@ -30,6 +33,26 @@ public class ReflectionUtil {
 
 	public static boolean isTransient(Field field){
 		return Modifier.isTransient(field.getModifiers());
+	}
+	
+	public static List<Class<?>> getBelongsToClasses(Class<?> modelClass){
+		List<Class<?>> result = new ArrayList<Class<?>>();
+		for(Field field : getBelongsToFields(modelClass)){
+			ValueType valueType = field.getAnnotation(ValueType.class);
+			result.add(valueType.belongsTo());
+		}
+		return result;
+	}
+	
+	public static List<Field> getBelongsToFields(Class<?> modelClass){
+		List<Field> result = new ArrayList<Field>();
+		for(Field field: getStoredFields(modelClass)){
+			ValueType valueType = field.getAnnotation(ValueType.class);
+			if(valueType!=null && valueType.belongsTo()!=NONE.class){
+				result.add(field);
+			}
+		}
+		return result;
 	}
 	
 	public static void setReferenceId(Object model, Class<?> referencedClass, String id){

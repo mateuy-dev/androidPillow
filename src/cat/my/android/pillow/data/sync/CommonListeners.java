@@ -28,7 +28,7 @@ public class CommonListeners {
 	public static final ErrorListener volleyErrorListener= new ErrorListener(){
 		@Override
 		public void onErrorResponse(PillowError error) {
-			if(error.getVolleyError() instanceof NoConnectionError){
+			if(error.getException() instanceof NoConnectionError){
 				Log.i("AndroidPillow", error.getMessage());
 			} else {
 				error.printStackTrace();
