@@ -7,6 +7,7 @@ import android.widget.Toast;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.PillowError;
+import cat.my.util.exceptions.BreakFastException;
 
 import com.android.volley.NoConnectionError;
 import com.google.gson.Gson;
@@ -18,6 +19,12 @@ public class CommonListeners {
 			error.printStackTrace();
 		}
 	};
+	public static ErrorListener breakFastListener = new ErrorListener() {
+		@Override
+		public void onErrorResponse(PillowError error) {
+			throw new BreakFastException(error.getException());
+		}
+	};
 	public static ErrorListener silentErrorListener = new ErrorListener() {
 		@Override
 		public void onErrorResponse(PillowError error) {
@@ -25,13 +32,13 @@ public class CommonListeners {
 		}
 	};
 	
-	public static final ErrorListener volleyErrorListener= new ErrorListener(){
+	public static final ErrorListener defaultErrorListener= new ErrorListener(){
 		@Override
 		public void onErrorResponse(PillowError error) {
 			if(error.getException() instanceof NoConnectionError){
 				Log.i("AndroidPillow", error.getMessage());
 			} else {
-				error.printStackTrace();
+				throw new BreakFastException(error.getException());
 			}
 		}
 	};

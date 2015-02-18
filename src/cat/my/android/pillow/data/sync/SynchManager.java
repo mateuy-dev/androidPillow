@@ -187,7 +187,7 @@ public class SynchManager {
 		@Override
 		public void onErrorResponse(PillowError error) {
 			errorFound = true;
-			CommonListeners.volleyErrorListener.onErrorResponse(error);
+			CommonListeners.defaultErrorListener.onErrorResponse(error);
 		}
 	}
 }

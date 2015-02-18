@@ -25,8 +25,11 @@ public class RelationGraph {
 	public void addClass(Class<?> modelClass){
 		List<Class<?>> relations = ReflectionUtil.getBelongsToClasses(modelClass);
 		graph.add(modelClass);
+		
 		for(Class<?> relation: relations){
-			graph.addEdge(modelClass, relation);
+			//relation must be loaded before model Class
+			graph.add(relation);
+			graph.addEdge(relation, modelClass);
 		}
 	}
 	
@@ -89,7 +92,8 @@ public class RelationGraph {
 		}
 		
 		public void add(T value){
-			nodes.put(value, new Node(value));
+			if(!nodes.containsKey(value))
+				nodes.put(value, new Node(value));
 		}
 		
 		

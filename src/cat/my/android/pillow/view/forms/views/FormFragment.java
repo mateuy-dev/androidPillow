@@ -53,7 +53,7 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 					public void onResponse(T model) {
 						formView.setModel(model, atts);
 					}
-				}, CommonListeners.dummyErrorListener);
+				}, CommonListeners.defaultErrorListener);
 			} else {
 				//we check if there is a model in the bundle, other wise we use the empty model
 				T bundleModel = BundleUtils.getModel(bundle);

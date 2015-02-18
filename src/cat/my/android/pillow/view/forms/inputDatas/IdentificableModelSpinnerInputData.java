@@ -23,7 +23,7 @@ public class IdentificableModelSpinnerInputData<T extends IdentificableModel> ex
 	@Override
 	public ArrayAdapter<T> createAdapter(Context context, Spinner spinner) {
 		adapter = new CustomArrayAdapter<T>(spinner, context, android.R.layout.simple_spinner_item);
-		loadData(context, onLoadListener, CommonListeners.dummyErrorListener);
+		loadData(context, onLoadListener, CommonListeners.defaultErrorListener);
 		return adapter;
 	}
 	

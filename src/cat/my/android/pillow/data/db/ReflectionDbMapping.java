@@ -14,6 +14,7 @@ import cat.my.android.pillow.util.reflection.ReflectionUtil;
 import cat.my.android.pillow.util.reflection.ValuesTypes.BelongsToOnDelete;
 import cat.my.android.pillow.util.reflection.ValuesTypes.OrderBy;
 import cat.my.android.pillow.util.reflection.ValuesTypes.OrderBy.OrderType;
+import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType.NONE;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType;
 import cat.my.util.exceptions.BreakFastException;
 import cat.my.util.exceptions.UnimplementedException;
@@ -271,7 +272,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		Field[] fields = ReflectionUtil.getStoredFields(modelClass);
 		for(Field field:fields){
 			ValueType valueType = field.getAnnotation(ValueType.class);
-			if(valueType!=null && valueType.belongsTo()!=null){
+			if(valueType!=null && valueType.belongsTo()!=null && valueType.belongsTo()!=NONE.class){
 				Class<? extends IdentificableModel> referencedClass = valueType.belongsTo();
 				BelongsToOnDelete onDelete = valueType.belongsToMode();
 				

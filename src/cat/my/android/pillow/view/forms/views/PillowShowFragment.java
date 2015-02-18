@@ -58,7 +58,7 @@ public class PillowShowFragment<T extends IdentificableModel> extends Fragment{
 			public void onResponse(T model) {
 				updateView(model);
 			}
-		}, CommonListeners.dummyErrorListener);
+		}, CommonListeners.defaultErrorListener);
 	}
 	
 	protected void updateView(T model) {
@@ -129,7 +129,7 @@ public class PillowShowFragment<T extends IdentificableModel> extends Fragment{
 					public void onResponse(Void response) {
 						new NavigationUtil(PillowShowFragment.this).displayListModel(getModel().getClass());
 					}
-				}, CommonListeners.dummyErrorListener);
+				}, CommonListeners.defaultErrorListener);
 			}
 		}).setNegativeButton("cancel", new OnClickListener() {
 			@Override

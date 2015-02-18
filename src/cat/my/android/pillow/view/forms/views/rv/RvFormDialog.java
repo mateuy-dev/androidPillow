@@ -22,9 +22,9 @@ package cat.my.android.pillow.view.forms.views.rv;
 //			public void onClick(DialogInterface dialog, int which) {
 //				ISynchDataSource<T> dataSource = (ISynchDataSource<T>) Pillow.getInstance(getContext()).getDataSource(getModel().getClass());
 //				if(getModel().getId()==null){
-//					dataSource.create(getForm().getModel(), CommonListeners.dummyListener, CommonListeners.dummyErrorListener);
+//					dataSource.create(getForm().getModel(), CommonListeners.dummyListener, CommonListeners.defaultErrorListener);
 //				} else {
-//					dataSource.update(getForm().getModel(), CommonListeners.dummyListener, CommonListeners.dummyErrorListener);
+//					dataSource.update(getForm().getModel(), CommonListeners.dummyListener, CommonListeners.defaultErrorListener);
 //				}
 //			}
 //		};

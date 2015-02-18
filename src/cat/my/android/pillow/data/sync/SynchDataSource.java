@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
 import cat.my.android.pillow.IdentificableModel;
+import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.Pillow;
@@ -80,7 +81,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 			@Override
 			public void onResponse(T response) {
 				Listener<T> myListener = new SetAsNotDirityListener();
-				restDataSource.create(model, myListener, CommonListeners.volleyErrorListener);
+				restDataSource.create(model, myListener, CommonListeners.defaultErrorListener);
 				listener.onResponse(model);
 			}
 		};
@@ -94,7 +95,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 			@Override
 			public void onResponse(T response) {
 				Listener<T> myListener = new SetAsNotDirityListener();
-				restDataSource.update(model, myListener, CommonListeners.volleyErrorListener);
+				restDataSource.update(model, myListener, CommonListeners.defaultErrorListener);
 				listener.onResponse(model);
 			}
 		};
@@ -129,11 +130,11 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 			DBModelController<T> db = getDbModelController();
 			List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
 			for(T model : createdModels){
-				restDataSource.create(model, new SetAsNotDirityListener(), CommonListeners.volleyErrorListener);
+				restDataSource.create(model, new SetAsNotDirityListener(), CommonListeners.defaultErrorListener);
 			}
 			List<T> updatedModels=db.getDirty(DBModelController.DIRTY_STATUS_UPDATED);
 			for(T model : updatedModels){
-				restDataSource.update(model, new SetAsNotDirityListener(), CommonListeners.volleyErrorListener);
+				restDataSource.update(model, new SetAsNotDirityListener(), CommonListeners.defaultErrorListener);
 			}
 			deletedEntries.synchronize();
 			
@@ -160,9 +161,13 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 			Listener<Collection<T>> fillDatabaseListener = new Listener<Collection<T>>(){
 				@Override
 				public void onResponse(Collection<T> response) {
-					DBModelController<T> db = getDbModelController();
-					db.cacheAll(new ArrayList<T>(response));
-					getListener().onResponse(response);
+					try{
+						DBModelController<T> db = getDbModelController();
+						db.cacheAll(new ArrayList<T>(response));
+						getListener().onResponse(response);
+					} catch(Exception e){
+						getErrorListener().onErrorResponse(new PillowError(e));
+					}
 				}
 			};
 			restDataSource.index(fillDatabaseListener, getErrorListener());

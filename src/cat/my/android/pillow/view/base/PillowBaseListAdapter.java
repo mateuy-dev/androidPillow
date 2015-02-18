@@ -26,8 +26,8 @@ public abstract class PillowBaseListAdapter<T extends IdentificableModel> extend
 	Context context;
 	List<T> models = new ArrayList<T>();
 	IDataSource<T> dataSource;
-	ErrorListener donwloadErrorListener = CommonListeners.volleyErrorListener;
-	ErrorListener refreshListErrorListener = CommonListeners.dummyErrorListener;
+	ErrorListener donwloadErrorListener = CommonListeners.defaultErrorListener;
+	ErrorListener refreshListErrorListener = CommonListeners.defaultErrorListener;
 
 	public PillowBaseListAdapter(Context context, Class<T> clazz) {
 		super();
@@ -44,7 +44,7 @@ public abstract class PillowBaseListAdapter<T extends IdentificableModel> extend
 				notifyDataSetChanged();
 			}
 		};
-		dataSourceIndex(listener, CommonListeners.dummyErrorListener);
+		dataSourceIndex(listener, CommonListeners.defaultErrorListener);
 	}
 	
 //	public void downloadData(){

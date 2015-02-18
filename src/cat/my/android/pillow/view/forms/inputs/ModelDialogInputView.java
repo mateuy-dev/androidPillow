@@ -30,7 +30,7 @@ public class ModelDialogInputView<T extends IdentificableModel> extends EditText
 					selected = response;
 					setText(response.toString());
 				}
-			}, CommonListeners.silentErrorListener);
+			}, CommonListeners.defaultErrorListener);
 			
 		} catch (Exception e) {
 			//TODO check exception

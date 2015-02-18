@@ -133,7 +133,7 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 	
 	private void sendData() {
 		if(ops instanceof ISynchDataSource<?>)
-			((ISynchDataSource<T>)ops).sendDirty(CommonListeners.dummyListener, CommonListeners.dummyErrorListener);
+			((ISynchDataSource<T>)ops).sendDirty(CommonListeners.dummyListener, CommonListeners.defaultErrorListener);
 	}
 	
 	protected void createModel(){
