@@ -2,6 +2,8 @@ package cat.my.android.pillow.view.forms;
 
 import java.lang.reflect.Field;
 
+import cat.my.android.pillow.Pillow;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -28,7 +30,7 @@ public class StringResourceUtils {
 		if(id!=0)
 			label = context.getResources().getString(id);
 		else{
-			Log.e("AndroidPillow", "The following String needs to be added to string.xml: "+stringId);
+			Log.e(Pillow.LOG_ID, "The following String needs to be added to string.xml: "+stringId);
 		}
 		return label;
 	}

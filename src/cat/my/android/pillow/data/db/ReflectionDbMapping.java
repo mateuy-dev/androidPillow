@@ -267,37 +267,67 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 	}
 	
 	@Override
-	public List<String> getForeignKeys(){
+	public List<String> getTriggers() {
 		List<String> result = new ArrayList<String>();
 		Field[] fields = ReflectionUtil.getStoredFields(modelClass);
 		for(Field field:fields){
 			ValueType valueType = field.getAnnotation(ValueType.class);
-			if(valueType!=null && valueType.belongsTo()!=null && valueType.belongsTo()!=NONE.class){
+			if(valueType!=null && valueType.belongsTo()!=null && valueType.belongsTo()!=NONE.class && valueType.belongsToMode()!=BelongsToOnDelete.NO_ACTION){
 				Class<? extends IdentificableModel> referencedClass = valueType.belongsTo();
 				BelongsToOnDelete onDelete = valueType.belongsToMode();
-				
 				IDbMapping<?> referencedDbMapping = Pillow.getInstance().getModelConfiguration(referencedClass).getDbMapping();
-				String referencedTable = referencedDbMapping.getTableName();
+				String parentTable = referencedDbMapping.getTableName();
+				String childTable = getTableName();
+				String foreignId = field.getName();
 				
-				String key = "FOREIGN KEY("+field.getName()+") REFERENCES "+referencedTable+"(id)" + getString(onDelete);
-				
-				result.add(key);
+				String triggerName = "fkd_"+parentTable+"_"+childTable;
+				String trigger = null;
+				if(onDelete == BelongsToOnDelete.SET_NULL){
+					trigger = "CREATE TRIGGER "+triggerName+" BEFORE DELETE ON "+parentTable+" FOR EACH ROW BEGIN UPDATE "+childTable+" SET "+foreignId+"=NULL WHERE "+foreignId+" = OLD.id; END";
+				}else if (onDelete == BelongsToOnDelete.CASCADE){
+					trigger = "CREATE TRIGGER "+triggerName+" BEFORE DELETE ON "+parentTable+" FOR EACH ROW BEGIN DELETE FROM "+childTable+" WHERE "+foreignId+" = OLD.id; END";
+				} else{
+					throw new UnimplementedException();
+				}
+				result.add(trigger);
 			}
 		}
 		return result;
 	}
 	
-	private String getString(BelongsToOnDelete onDelete) {
-		switch (onDelete) {
-		case SET_NULL:
-			return " ON DELETE SET NULL";
-		case CASCADE:
-			return  "ON DELETE CASCADE";
-		case RESTRICT:
-			return "";
-		}
-		throw new UnimplementedException();
-	}
+//	Not used. Not using Foreign keys now (Check DBUtil)
+//	public List<String> getForeignKeys(){
+//		
+//		List<String> result = new ArrayList<String>();
+//		Field[] fields = ReflectionUtil.getStoredFields(modelClass);
+//		for(Field field:fields){
+//			ValueType valueType = field.getAnnotation(ValueType.class);
+//			if(valueType!=null && valueType.belongsTo()!=null && valueType.belongsTo()!=NONE.class){
+//				Class<? extends IdentificableModel> referencedClass = valueType.belongsTo();
+//				BelongsToOnDelete onDelete = valueType.belongsToMode();
+//				
+//				IDbMapping<?> referencedDbMapping = Pillow.getInstance().getModelConfiguration(referencedClass).getDbMapping();
+//				String referencedTable = referencedDbMapping.getTableName();
+//				
+//				String key = "FOREIGN KEY("+field.getName()+") REFERENCES "+referencedTable+"(id)" + getString(onDelete);
+//				
+//				result.add(key);
+//			}
+//		}
+//		return result;
+//	}
+//	
+//	private String getString(BelongsToOnDelete onDelete) {
+//		switch (onDelete) {
+//		case SET_NULL:
+//			return " ON DELETE SET NULL";
+//		case CASCADE:
+//			return  "ON DELETE CASCADE";
+//		case RESTRICT:
+//			return "";
+//		}
+//		throw new UnimplementedException();
+//	}
 
 
 	private boolean isNull(Field field, T model) {

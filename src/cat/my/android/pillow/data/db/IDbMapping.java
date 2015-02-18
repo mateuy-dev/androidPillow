@@ -47,7 +47,8 @@ public interface IDbMapping<T>{
 	
 	public IDBSelection getSelection(T filter);
 	
-	public List<String> getForeignKeys();
+//	Not used. Not using Foreign keys now (Check DBUtil)
+//	public List<String> getForeignKeys();
 	
 	public interface IDBSelection{
 		public String getSelection();
@@ -70,6 +71,8 @@ public interface IDbMapping<T>{
 			return args;
 		}
 	}
+
+	public List<String> getTriggers();
 
 	
 }

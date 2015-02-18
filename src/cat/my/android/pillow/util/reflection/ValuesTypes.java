@@ -11,7 +11,7 @@ import cat.my.android.pillow.view.forms.InputData;
 
 public class ValuesTypes {
 	public enum ValueTypeClass{DEFAULT, COLOR, DATE, DATETIME}
-	public enum BelongsToOnDelete{RESTRICT, SET_NULL, CASCADE}
+	public enum BelongsToOnDelete{NO_ACTION, SET_NULL, CASCADE} //RESTRICT
 	
 	@Target({ElementType.FIELD})
 	@Retention(RetentionPolicy.RUNTIME)
@@ -21,7 +21,7 @@ public class ValuesTypes {
 		
 		ValueTypeClass type() default ValueTypeClass.DEFAULT;
 		Class<? extends IdentificableModel> belongsTo() default NONE.class;
-		BelongsToOnDelete belongsToMode() default BelongsToOnDelete.RESTRICT;
+		BelongsToOnDelete belongsToMode() default BelongsToOnDelete.NO_ACTION;
 	}
 	
 	

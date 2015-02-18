@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -15,8 +17,10 @@ import cat.my.android.pillow.conf.ModelConfigurationFactory;
 import cat.my.android.pillow.conf.ModelViewConfiguration;
 import cat.my.android.pillow.data.sync.ISynchDataSource;
 import cat.my.android.pillow.data.sync.SynchManager;
+import cat.my.android.pillow.util.reflection.RelationGraph;
 
 public class Pillow {
+	public static final String LOG_ID = "pillow";
 	public static final String PREFERENCES_FILE_KEY = "cat_my_android_pillow";
 	public static int xmlFileResId;
 //	Map<Class<?>, ISynchDataSource<?>> dataSources;
@@ -25,6 +29,8 @@ public class Pillow {
 	AbstractDBHelper dbHelper;
 	SynchManager synchManager;
 	ModelConfigurationFactory modelConfigurationFactory;
+	RelationGraph relationGraph;
+	List<IDataSource<?>> sortedSynchDataSources;
 	
 	private static Pillow pillow;
 	public static synchronized Pillow getInstance(Context context){
@@ -66,16 +72,23 @@ public class Pillow {
 		Class<IModelConfigurations> modelConfigurationsclazz = (Class<IModelConfigurations>) Class.forName(config.getModelConfigurations());
 		IModelConfigurations modelConfigurations = modelConfigurationsclazz.newInstance();
 		modelConfigurationFactory = new ModelConfigurationFactory(context, config, modelConfigurations);
-		List<ISynchDataSource<?>> synchedSources = new ArrayList<ISynchDataSource<?>>();
-		for(ModelConfiguration<?> modelConf : modelConfigurationFactory.getModelConfigurations().values()){
-			IDataSource<?> dataSource = modelConf.getDataSource();
-			if(dataSource instanceof ISynchDataSource<?>){
-				synchedSources.add((ISynchDataSource<?>) dataSource);
+		relationGraph = new RelationGraph();
+		for(Class<?> modelClass: modelConfigurationFactory.getModelConfigurations().keySet()){
+			relationGraph.addClass(modelClass);
+		}
+		synchManager = new SynchManager(context, dbHelper);
+        synchManager.setDownloadTimeInterval(config.getDownloadTimeInterval());
+	}
+	
+	public synchronized List<IDataSource<?>> getSortedSynchDataSources() {
+		if(sortedSynchDataSources==null){
+			List<Class<?>> order = relationGraph.getSynchOrder();
+			sortedSynchDataSources = new ArrayList<IDataSource<?>>();
+			for(Class<?> orderItem: order){
+				sortedSynchDataSources.add(getDataSource((Class<? extends IdentificableModel>)orderItem));
 			}
 		}
-		
-        synchManager = new SynchManager(context, synchedSources, dbHelper);
-        synchManager.setDownloadTimeInterval(config.getDownloadTimeInterval());
+		return sortedSynchDataSources;
 	}
 	
 	private <T> T  getClassFor(Context context, String className) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{

@@ -13,6 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 import cat.my.android.pillow.AbstractDBHelper;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.IDataSource;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.data.db.DBUtil;
@@ -20,37 +21,28 @@ import cat.my.android.pillow.util.reflection.RelationGraph;
 
 
 public class SynchManager {
-	RelationGraph relationGraph; 
-	
-	List<ISynchDataSource<?>> synchDataSources= new ArrayList<ISynchDataSource<?>>();
-	List<ISynchDataSource<?>> sortedSynchDataSources;
-
+	Context context;
 	SharedPreferences sharedPref;
 	AbstractDBHelper dbHelper;
 	long downloadTimeInterval = 3600000; //1 hour
 	private static final String LAST_DOWNLOAD_DATE = "LAST_DOWNLOAD_DATE";
 	
-	public SynchManager(Context context, Collection<ISynchDataSource<?>> synchDataSources, AbstractDBHelper dbHelper) {
+	public SynchManager(Context context, AbstractDBHelper dbHelper) {
 		super();
-		this.synchDataSources = new ArrayList<ISynchDataSource<?>>(synchDataSources);
 		this.dbHelper = dbHelper;
+		this.context = context;
 		sharedPref = context.getSharedPreferences(Pillow.PREFERENCES_FILE_KEY, Context.MODE_PRIVATE);
-		relationGraph = new RelationGraph();
-		for(ISynchDataSource<?> dataSource: synchDataSources){
-			relationGraph.addClass(dataSource.getModelClass());
-		}
 	}
 	
-	public synchronized List<ISynchDataSource<?>> getSortedSynchDataSources() {
+	List<ISynchDataSource<?>> sortedSynchDataSources;
+	private synchronized List<ISynchDataSource<?>> getSortedSynchDataSources() {
 		if(sortedSynchDataSources==null){
-			List<Class<?>> order = relationGraph.getSynchOrder();
-			Map<Class<?>, ISynchDataSource<?>> map = new HashMap<Class<?>, ISynchDataSource<?>>();
-			for(ISynchDataSource<?> dataSource : synchDataSources){
-				map.put(dataSource.getModelClass(), dataSource);
-			}
 			sortedSynchDataSources = new ArrayList<ISynchDataSource<?>>();
-			for(Class<?> orderItem: order){
-				sortedSynchDataSources.add(map.get(orderItem));
+			List<IDataSource<?>> dataSources = Pillow.getInstance(context).getSortedSynchDataSources();
+			for(IDataSource<?> dataSource : dataSources){
+				if(dataSource instanceof ISynchDataSource){
+					sortedSynchDataSources.add((ISynchDataSource<?>) dataSource);
+				}
 			}
 		}
 		return sortedSynchDataSources;
@@ -142,6 +134,7 @@ public class SynchManager {
 				listener.onResponse(null);
 			}
 		}
+		
 		@Override
 		public void onResponse(Void response) {
 			sendNext();

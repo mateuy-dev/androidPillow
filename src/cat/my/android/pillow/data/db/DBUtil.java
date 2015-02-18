@@ -30,15 +30,19 @@ public class DBUtil {
 				DBModelController.creteAttsString(mapping.getAttributes()) 
 				+ addForeignKeys(mapping)+");";
 	} 
-	
+
+
 	private static String addForeignKeys(IDbMapping<?> mapping) {
-		List<String> keys = mapping.getForeignKeys();
-		StringBuilder builder = new StringBuilder();
-		for(String key:keys){
-			builder.append(", ");
-			builder.append(key);
-		}
-		return builder.toString();
+//		WE ARE NOT USING FOREIGN KEYS, BUT TRIGGERS (look at problem_solution.txt)
+//				DO NOT DELETE
+//		List<String> keys = mapping.getForeignKeys();
+//		StringBuilder builder = new StringBuilder();
+//		for(String key:keys){
+//			builder.append(", ");
+//			builder.append(key);
+//		}
+//		return builder.toString();
+		return "";
 	}
 
 	public static String dropTable(IDbMapping<?> mapping){

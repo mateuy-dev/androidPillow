@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.PillowError;
 import cat.my.util.exceptions.BreakFastException;
 
@@ -28,7 +29,7 @@ public class CommonListeners {
 	public static ErrorListener silentErrorListener = new ErrorListener() {
 		@Override
 		public void onErrorResponse(PillowError error) {
-			Log.w("AndroidPillow", error.getMessage());
+			Log.w(Pillow.LOG_ID, error.getMessage());
 		}
 	};
 	
@@ -36,7 +37,7 @@ public class CommonListeners {
 		@Override
 		public void onErrorResponse(PillowError error) {
 			if(error.getException() instanceof NoConnectionError){
-				Log.i("AndroidPillow", error.getMessage());
+				Log.i(Pillow.LOG_ID, error.getMessage());
 			} else {
 				throw new BreakFastException(error.getException());
 			}
