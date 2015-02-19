@@ -29,16 +29,21 @@ public class AsynchListener<T> implements Listener<T>, ErrorListener{
 		lock.countDown();
 	}
 	
-	public void await() throws InterruptedException{
-		lock.await();
+	public void await(){
+		try {
+			lock.await();
+		} catch (InterruptedException e) {
+			if(error!=null)
+				error = new PillowError(e);
+		}
 	}
 	
-	public T getResult() throws InterruptedException {
+	public T getResult() {
 		await();
 		return result;
 	}
 
-	public PillowError getError() throws InterruptedException {
+	public PillowError getError() {
 		await();
 		return error;
 	}

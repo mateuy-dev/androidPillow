@@ -70,10 +70,10 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 	@Override
 	public void update(T model, Listener<T> listener, ErrorListener errorListener) {
 		try{
-			DBModelController<T> db =getDbModelController();
-			db.update(model);
+			DBModelController<T> dbController =getDbModelController();
+			dbController.update(model);
 			//refresh model
-			model = db.get(model.getId());
+			model = dbController.get(model.getId());
 			listener.onResponse(model);
 		} catch (SQLiteException exception){
 			errorListener.onErrorResponse(new PillowError(exception));

@@ -22,9 +22,12 @@ public class SynchOnConnectionChangeReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		
 		if(connectivityManager.getActiveNetworkInfo()!=null && connectivityManager.getActiveNetworkInfo().isConnected()){
-			syncManager.synchronize(CommonListeners.dummyListener, CommonListeners.defaultErrorListener, false);
+			syncManager.synchronize(CommonListeners.dummyListener, CommonListeners.getDefaultThreadedErrorListener(), false);
 		}
+		
+		
 //		NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
 //		NetworkInfo mobNetInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 //		if (activeNetInfo != null) {

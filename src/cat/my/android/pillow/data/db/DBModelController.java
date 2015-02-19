@@ -62,10 +62,15 @@ public class DBModelController<T extends IdentificableModel> {
 		cursor.moveToFirst();
 		int count= cursor.getInt(0);
 		cursor.close();
-		db.close();
+		close(db);
+		
 		return count;
 	}
 	
+	private void close(SQLiteDatabase db) {
+//		db.close();
+	}
+
 	private String getTableName() {
 		return mapper.getTableName();
 	}
@@ -89,7 +94,7 @@ public class DBModelController<T extends IdentificableModel> {
 
 		T model = createModel(db, cursor, true);
 		cursor.close();
-		db.close();
+		close(db);
 		
 		return model;
 	}
@@ -142,7 +147,7 @@ public class DBModelController<T extends IdentificableModel> {
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor cursor = getCursor(db, selection, selectionArgs, order);
 		List<T> result = createModels(db, cursor);
-		db.close();
+		close(db);
 		return result;
 	}
 	
@@ -176,7 +181,7 @@ public class DBModelController<T extends IdentificableModel> {
 			//If the status is created it has not been sent to server yet, so we don't need to delete it.
 			deletedEntries.setToDelete(db, model);
 		}
-		db.close();
+		close(db);
 	}
 	
 	/**
@@ -214,13 +219,13 @@ public class DBModelController<T extends IdentificableModel> {
 	public void update(T model){
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		save(db, model, OP_UPDATE);
-		db.close();
+		close(db);
 	}
 	
 	public void create(T model){
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		save(db, model, OP_CREATE);
-		db.close();
+		close(db);
 	}
 	
 	public void cacheAll(List<T> models) {
@@ -234,7 +239,7 @@ public class DBModelController<T extends IdentificableModel> {
 		//TODO if its dirty_update it is a conflict!
 		db.delete(getTableName(), whereClause, whereArgs);
 		
-		db.close();
+		close(db);
 	}
 	
 	/**
@@ -319,7 +324,7 @@ public class DBModelController<T extends IdentificableModel> {
 		ContentValues values = new ContentValues();
 		values.put(COLUMN_NAME_DIRTY, DIRTY_STATUS_CLEAN);
 		db.update(getTableName(), values, WHERE_ID_SELECTION, new String[]{model.getId()});
-		db.close();
+		close(db);
 	}
 	
 	private String createUUID() {
@@ -391,7 +396,7 @@ public class DBModelController<T extends IdentificableModel> {
 		
 		String selection = COLUMN_NAME_ID + " = ?";
 		db.update(getTableName(), values, selection, new String[]{id});
-		db.close();
+		close(db);
 	}
 	
 	protected int getColumnIntegerValue(String id, String columnName) {
@@ -407,7 +412,7 @@ public class DBModelController<T extends IdentificableModel> {
 		}
 		int value = cursor.getInt(cursor.getColumnIndex(columnName));
 		cursor.close();
-		db.close();
+		close(db);
 		
 		return value;
 	}

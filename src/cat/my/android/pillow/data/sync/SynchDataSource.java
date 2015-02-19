@@ -31,6 +31,9 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 	IRestMapping<T> restMap;
 	Context context;
 	
+	//ensures that no more than one syncrhonization process is beeing done at the same time
+	Object synchronizationLock;
+	
 	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context
 , ISessionController authenticationData) {
 		this.context=context;
@@ -81,7 +84,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 			@Override
 			public void onResponse(T response) {
 				Listener<T> myListener = new SetAsNotDirityListener();
-				restDataSource.create(model, myListener, CommonListeners.defaultErrorListener);
+				restDataSource.create(model, myListener, CommonListeners.getDefaultThreadedErrorListener());
 				listener.onResponse(model);
 			}
 		};
@@ -95,7 +98,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 			@Override
 			public void onResponse(T response) {
 				Listener<T> myListener = new SetAsNotDirityListener();
-				restDataSource.update(model, myListener, CommonListeners.defaultErrorListener);
+				restDataSource.update(model, myListener, CommonListeners.getDefaultThreadedErrorListener());
 				listener.onResponse(model);
 			}
 		};
@@ -130,11 +133,24 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 			DBModelController<T> db = getDbModelController();
 			List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
 			for(T model : createdModels){
-				restDataSource.create(model, new SetAsNotDirityListener(), CommonListeners.defaultErrorListener);
+				AsynchListener<T> listener = new AsynchListener<T>();
+				restDataSource.create(model, listener, listener);
+				if(listener.getError()!=null){
+					getErrorListener().onErrorResponse(listener.getError());
+					return;
+				}
+				setAsNotDirty(listener.getResult());
+				
 			}
 			List<T> updatedModels=db.getDirty(DBModelController.DIRTY_STATUS_UPDATED);
 			for(T model : updatedModels){
-				restDataSource.update(model, new SetAsNotDirityListener(), CommonListeners.defaultErrorListener);
+				AsynchListener<T> listener = new AsynchListener<T>();
+				restDataSource.update(model, listener, listener);
+				if(listener.getError()!=null){
+					getErrorListener().onErrorResponse(listener.getError());
+					return;
+				}
+				setAsNotDirty(listener.getResult());
 			}
 			deletedEntries.synchronize();
 			
@@ -181,17 +197,20 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 
 	
 	public class SetAsNotDirityListener implements Listener<T>{
-		
 		public SetAsNotDirityListener() {
 			super();
 		}
 
 		@Override
 		public void onResponse(T response) {
-			DBModelController<T> db =getDbModelController();
-			db.markAsClean(response);
-			response = db.get(response.getId());
+			setAsNotDirty(response);
 		}
+	}
+	
+	private void setAsNotDirty(T model) {
+		DBModelController<T> db =getDbModelController();
+		db.markAsClean(model);
+		model = db.get(model.getId());
 	}
 	
 	@Override

@@ -21,8 +21,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
+import android.util.Log;
 import cat.my.android.pillow.IDataSource;
 import cat.my.android.pillow.IdentificableModel;
+import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.Pillow;
@@ -31,11 +33,15 @@ import cat.my.android.pillow.data.rest.ISessionController.NullSessionController;
 import cat.my.android.pillow.data.rest.requests.GsonCollectionRequest;
 import cat.my.android.pillow.data.rest.requests.GsonRequest;
 
+import com.android.volley.NoConnectionError;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 
 public class RestDataSource<T extends IdentificableModel> implements IDataSource<T> {
+	public static final String LOG_ID = Pillow.LOG_ID +" - RestDataSource";
+	public static boolean SIMULATE_OFFLINE_CONNECTIVITY_ON_TESTING = false;
+	
 	Context context;
 	RequestQueue volleyQueue;
 	ISessionController sessionController;
@@ -49,7 +55,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 	
 	public RestDataSource(IRestMapping<T> restMapping, Context context, ISessionController authenticationData) {
 		this.restMapping=restMapping;
-		this.volleyQueue = Volley.newRequestQueue(context);
+		this.volleyQueue = VolleyFactory.newRequestQueue(context);
 		if(authenticationData==null)
 			authenticationData = new NullSessionController();
 		this.sessionController = authenticationData;
@@ -90,6 +96,11 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 	}
 	
 	private void executeListOperation(final Route route, final Map<String, Object> params, final Listener<Collection<T>> listener, final ErrorListener errorListener) {
+		Log.d(LOG_ID, "Executing operation "+route.method + " "+route.url + " "+params);
+		if(SIMULATE_OFFLINE_CONNECTIVITY_ON_TESTING){
+			errorListener.onErrorResponse(new PillowError(new NoConnectionError()));
+			return;
+		}
 		Listener<Void> onSessionStarted = new Listener<Void>() {
 			@Override
 			public void onResponse(Void response) {
@@ -107,6 +118,11 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 	}
 	
 	private void executeOperation(final T model, final Route route, final Map<String, Object> params, final Listener<T> listener, final ErrorListener errorListener) {
+		Log.d(LOG_ID, "Executing operation "+route.method + " "+route.url + " "+params);
+		if(SIMULATE_OFFLINE_CONNECTIVITY_ON_TESTING){
+			errorListener.onErrorResponse(new PillowError(new NoConnectionError(new Exception("Simulate no connection"))));
+			return;
+		}
 		Listener<Void> onSessionStarted = new Listener<Void>() {
 			@Override
 			public void onResponse(Void response) {

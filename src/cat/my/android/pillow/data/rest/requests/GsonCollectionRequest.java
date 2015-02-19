@@ -31,17 +31,21 @@ import cat.my.android.pillow.data.rest.Route;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
  
 
 public class GsonCollectionRequest<T> extends AbstractGsonRequest<Collection<T>> {
+	StackTraceElement[] originalStackTraces;
+	
 	Type collectionType;
 	
-		public GsonCollectionRequest(Gson gson, Route route, Type collectionType, Map<String, Object> params, Listener<Collection<T>> listener, ErrorListener errorListener, int initialTimeOutMs) {
+	public GsonCollectionRequest(Gson gson, Route route, Type collectionType, Map<String, Object> params, Listener<Collection<T>> listener, ErrorListener errorListener, int initialTimeOutMs) {
 		super(gson, route, params, listener, errorListener, initialTimeOutMs);
 		this.collectionType = collectionType;
+		this.originalStackTraces = Thread.currentThread().getStackTrace();
 	}
     
     @Override

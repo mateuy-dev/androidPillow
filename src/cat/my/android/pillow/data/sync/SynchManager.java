@@ -6,10 +6,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import cat.my.android.pillow.AbstractDBHelper;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
@@ -17,15 +21,20 @@ import cat.my.android.pillow.IDataSource;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.data.db.DBUtil;
+
 import cat.my.android.pillow.util.reflection.RelationGraph;
 
 
 public class SynchManager {
+	public static final String LOG_ID = Pillow.LOG_ID +" SynchManager";
 	Context context;
 	SharedPreferences sharedPref;
 	AbstractDBHelper dbHelper;
 	long downloadTimeInterval = 3600000; //1 hour
 	private static final String LAST_DOWNLOAD_DATE = "LAST_DOWNLOAD_DATE";
+	Executor executor = Executors.newSingleThreadExecutor();
+	
+	
 	
 	public SynchManager(Context context, AbstractDBHelper dbHelper) {
 		super();
@@ -54,18 +63,12 @@ public class SynchManager {
 		db.close();
 	}
 	
-	public void reloadData(Listener<Void> listener){
+	public void reloadData(Listener<Void> listener, ErrorListener errorListener){
 		resetTables();
-		download(listener, true);
+		download(listener, errorListener, true);
 	}
 	
-	public void download(Listener<Void> listener, boolean force){
-		if(!force && getLastDownload()!=null && isValidDonwload()){
-			listener.onResponse(null);
-		} else {
-			new DownloadTask(listener).start();
-		}
-	}
+	
 	
 	private void setLastDownload(Date date) {
 		SharedPreferences.Editor editor = sharedPref.edit();
@@ -92,95 +95,104 @@ public class SynchManager {
 	}
 
 	public void synchronize(Listener<Void> listener, ErrorListener errorListener, boolean force){
-		new SynchronizeOperation(listener, errorListener, force).start();
+		if(!force && getLastDownload()!=null && isValidDonwload()){
+			executeOperation(new Operation(Type.DOWNLOAD, listener, errorListener));
+		} else {
+			executeOperation(new Operation(Type.FULL_SYNC, listener, errorListener));
+		}
 	}
-	
+
 	public void sendDirty(Listener<Void> listener, ErrorListener errorListener){
-		new SendDirtyOperation(listener, errorListener).start();
+		executeOperation(new Operation(Type.SEND_DIRTY, listener, errorListener));
 	}
 	
-	private class SynchronizeOperation implements Listener<Void>{
-		Listener<Void> listener;
-		ErrorListener errorListener;
-		boolean force;
-		public SynchronizeOperation(Listener<Void> listener, ErrorListener errorListener, boolean force) {
-			this.listener = listener;
-			this.errorListener = errorListener;
-			this.force = force;
-		}
-		public void start(){
-			sendDirty(this, errorListener);
-		}
-		@Override
-		public void onResponse(Void response) {
-			download(listener, force);
+	public void download(Listener<Void> listener, ErrorListener errorListener, boolean force){
+		if(!force && getLastDownload()!=null && isValidDonwload()){
+			listener.onResponse(null);
+		} else {
+			executeOperation(new Operation(Type.DOWNLOAD, listener, errorListener));
 		}
 	}
 	
-	private class SendDirtyOperation implements Listener<Void>{
-		Listener<Void> listener;
-		ErrorListener errorListener;
-		int i=0;
-		public SendDirtyOperation(Listener<Void> listener, ErrorListener errorListener) {
-			this.listener = listener;
-			this.errorListener = errorListener;
+	private synchronized void executeOperation(Operation operation) {
+		executor.execute(operation);
+	}
+	
+	public void realSendDirty(Listener<Void> listener, ErrorListener errorListener){
+		for(ISynchDataSource<?> dataSource : getSortedSynchDataSources()){
+			AsynchListener asyncListener = new AsynchListener<Void>();
+			Log.d(LOG_ID, "Sending Dirty "+dataSource.getClass().getSimpleName());
+			dataSource.sendDirty(asyncListener, asyncListener);
+			
+				asyncListener.await();
+				if(asyncListener.getError()!=null){
+					errorListener.onErrorResponse(asyncListener.getError());
+					return;
+				}
+				Log.d(LOG_ID, "Sent Dirty "+dataSource.getClass().getSimpleName());
+			
 		}
-		public void sendNext(){
-			if(i<getSortedSynchDataSources().size()){
-				ISynchDataSource<?> dataSource = getSortedSynchDataSources().get(i);
-				++i;
-				dataSource.sendDirty(this, errorListener);
-			} else {
-				listener.onResponse(null);
+		listener.onResponse(null);
+	}
+	
+	public void realDownload(Listener<Void> listener, ErrorListener errorListener){
+		Date date = new Date();
+			for(ISynchDataSource<?> dataSource : getSortedSynchDataSources()){
+				AsynchListener asyncListener = new AsynchListener<Void>();
+				dataSource.download(asyncListener,asyncListener);
+				
+					asyncListener.await();
+					if(asyncListener.getError()!=null){
+						errorListener.onErrorResponse(asyncListener.getError());
+						return;
+					}
+				
 			}
-		}
-		
-		@Override
-		public void onResponse(Void response) {
-			sendNext();
-		}
-		public void start(){
-			sendNext();
-		}
+			setLastDownload(new Date());
+			listener.onResponse(null);
 	}
 	
+	public void realSynchronize(Listener<Void> listener, ErrorListener errorListener){
+		AsynchListener asyncListener = new AsynchListener<Void>();
+		realSendDirty(asyncListener, asyncListener);
+		
+			asyncListener.await();
+			if(asyncListener.getError()!=null){
+				errorListener.onErrorResponse(asyncListener.getError());
+				return;
+			}
+		
+		realDownload(listener, errorListener);
+	}
+
 	private boolean isValidDonwload() {
 		return getLastDownload().getTime() + downloadTimeInterval > new Date().getTime();
 	}
-
-	private class DownloadTask implements Listener, ErrorListener{
-		int i=0;
-		Listener<Void> listener;
-		boolean errorFound = false;
-		public DownloadTask(Listener<Void> listener) {
+	
+	enum Type{FULL_SYNC, SEND_DIRTY, DOWNLOAD};
+	protected class Operation implements Runnable{
+		Type type;
+		Listener listener;
+		ErrorListener errorListener;
+		public Operation(Type type, Listener listener, ErrorListener errorListener) {
+			super();
+			this.type = type;
 			this.listener = listener;
+			this.errorListener = errorListener;
 		}
-
 		@Override
-		public void onResponse(Object response) {
-			i++;
-			if(getSortedSynchDataSources().size()>i){
-				downloadCurrent();
-			} else {
-				if(!errorFound){
-					setLastDownload(new Date());
-					listener.onResponse(null);
-				}
+		public void run() {
+			switch(type){
+			case SEND_DIRTY:
+				realSendDirty(listener, errorListener);
+				break;
+			case DOWNLOAD:
+				realDownload(listener, errorListener);
+				break;
+			case FULL_SYNC:
+				realSynchronize(listener, errorListener);
+				break;
 			}
-		}
-		
-		private void downloadCurrent(){
-			getSortedSynchDataSources().get(i).download(this, this);
-		}
-		
-		public void start(){
-			downloadCurrent();
-		}
-
-		@Override
-		public void onErrorResponse(PillowError error) {
-			errorFound = true;
-			CommonListeners.defaultErrorListener.onErrorResponse(error);
 		}
 	}
 }

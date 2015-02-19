@@ -12,6 +12,7 @@ import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.data.rest.ISessionController;
 import cat.my.android.pillow.data.rest.RailsRestMapping;
 import cat.my.android.pillow.data.rest.RestDataSource;
+import cat.my.android.pillow.data.sync.CommonListeners;
 import cat.my.android.pillow.data.sync.CommonListeners.ProxyListener;
 
 import com.android.volley.Request.Method;
@@ -103,7 +104,7 @@ public abstract class AbstractUserController<T extends IdentificableModel> {
 	 * Deletes all the user realated data and donwload the new user one. 
 	 */
 	public void reloadData(Listener<Void> listener){
-		Pillow.getInstance().getSynchManager().reloadData(listener);
+		Pillow.getInstance().getSynchManager().reloadData(listener, CommonListeners.defaultErrorListener);
 	}
 	
 	

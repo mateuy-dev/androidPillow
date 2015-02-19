@@ -8,10 +8,12 @@ import java.util.concurrent.TimeUnit;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.util.concurrency.FullStackThreadPoolExecutor;
 
 
 public class MultiThreadDbDataSource<T extends IdentificableModel> implements IDBDataSource<T>{
 	static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+//	static ThreadPoolExecutor threadPoolExecutor = new FullStackThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
 	IDBDataSource<T> dataSource;
 

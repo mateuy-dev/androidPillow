@@ -44,6 +44,33 @@ public class CommonListeners {
 		}
 	};
 	
+	public static ErrorListener getDefaultThreadedErrorListener(){
+		return new DefaultThreadedErrorListener();
+	}
+	
+	public static class DefaultThreadedErrorListener implements ErrorListener{
+		long initialThreadId;
+		StackTraceElement[] originalStack;
+		public DefaultThreadedErrorListener() {
+			Thread current = Thread.currentThread();
+			initialThreadId = current.getId();
+			originalStack = current.getStackTrace();
+		}
+		
+		@Override
+		public void onErrorResponse(PillowError error) {
+			if(error.getException() instanceof NoConnectionError){
+				Log.i(Pillow.LOG_ID, error.getMessage());
+			} else {
+				BreakFastException throwable = new BreakFastException(error.getException());
+				if(Thread.currentThread().getId()!=initialThreadId){
+					throwable.setStackTrace(originalStack);
+				}
+				throw throwable;
+			}
+		}
+	};
+	
 	public static Listener dummyListener = new Listener() {
 		@Override
 		public void onResponse(Object response) {

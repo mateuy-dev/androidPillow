@@ -37,6 +37,11 @@ public abstract class AbstractDBHelper extends SQLiteOpenHelper{
 	}
 	
 	@Override
+	public SQLiteDatabase getReadableDatabase() {
+		return super.getReadableDatabase();
+	}
+	
+	@Override
 	public void onCreate(SQLiteDatabase db) {
 		createTables(db);
 	}

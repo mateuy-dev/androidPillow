@@ -11,11 +11,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.test.InstrumentationTestCase;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.data.rest.IRestMapping;
 import cat.my.android.pillow.data.rest.RailsRestMapping;
+import cat.my.android.pillow.data.rest.RestDataSource;
 import cat.my.android.pillow.data.rest.Route;
 import cat.my.android.pillow.data.sync.AsynchListener;
 import cat.my.android.pillow.data.sync.ISynchDataSource;
@@ -25,63 +28,20 @@ import com.google.gson.reflect.TypeToken;
 
 public abstract class AbstractInstrumentationTestCase<T extends IdentificableModel> extends InstrumentationTestCase{
 	Class<T> clazz;
+	AsynchOps asynchOps;
 	
 	public AbstractInstrumentationTestCase(Class<T> clazz) {
 		super();
 		this.clazz = clazz;
 	}
 	
-	public void testController(){
-		assertNotNull(getController());
+	public AsynchOps getAsynchOps() {
+		if(asynchOps==null){
+			asynchOps = new AsynchOps(getContext());
+		}
+		return asynchOps;
 	}
 	
-	/**
-	 * Test Create, show and delete operation local and remote
-	 */
-	public void testBasicOperations() throws Throwable {
-		//create post
-		ISynchDataSource<T> controller = getController();
-		
-		T createdPost = createDBModel();
-		assertNotNull(createdPost);
-		assertNotNull(createdPost.getId());
-		
-		//check create
-		checkLocalVersionSameAs(createdPost);
-		checkServerVersionSameAs(createdPost);
-		
-		//update
-		AsynchListener<T> listener = new AsynchListener<T>();
-		updateModel(createdPost);
-//		createdPost.setTitle("new Title");
-		controller.update(createdPost, listener, listener);
-		T updatedPost = listener.getResult();
-		assertSame(createdPost, updatedPost);
-		
-		//check update
-		checkLocalVersionSameAs(updatedPost);
-		checkServerVersionSameAs(updatedPost);
-
-		//delete post
-		AsynchListener<Void> deleteListener = new AsynchListener<Void>();
-		controller.destroy(createdPost, deleteListener, deleteListener);
-		deleteListener.await();
-		
-		//check deleted locally
-		listener = new AsynchListener<T>();
-		controller.show(createdPost, listener, listener);
-		T showPost = listener.getResult();
-		assertNull(showPost);
-		
-		//check deleted remotelly
-		sendDirty();
-		HttpResponse response = getServerResponse(createdPost);
-		assertEquals(response.getStatusLine().getStatusCode(), 404);
-	}
-
-	protected abstract void updateModel(T toUpdateModel);
-	protected abstract T createDBModel() throws Exception;
-
 	protected void checkLocalVersionSameAs(T model) throws Exception{
 		AsynchListener<T> listener = new AsynchListener<T>();
 		getController().show(model, listener, listener);
@@ -117,6 +77,9 @@ public abstract class AbstractInstrumentationTestCase<T extends IdentificableMod
 	
 	
 	protected void sendDirty() throws InterruptedException{
+		//TODO DELETE THIS SLEEP!!!
+		Thread.sleep(3000);
+		
 		AsynchListener<Void> dirtyListener = new AsynchListener<Void>();
 		getController().sendDirty(dirtyListener, dirtyListener);
 		dirtyListener.await();
@@ -146,5 +109,12 @@ public abstract class AbstractInstrumentationTestCase<T extends IdentificableMod
 		assertEquals(model1Json, model2Json);
 	}
 
+	public void stopConnection(){
+		RestDataSource.SIMULATE_OFFLINE_CONNECTIVITY_ON_TESTING = true;
+	}
 	
+	public void startConnection(){
+		RestDataSource.SIMULATE_OFFLINE_CONNECTIVITY_ON_TESTING = false;
+	}
+	 
 }
