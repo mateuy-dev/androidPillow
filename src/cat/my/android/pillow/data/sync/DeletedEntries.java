@@ -1,11 +1,14 @@
 package cat.my.android.pillow.data.sync;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.data.core.IPillowResult;
+import cat.my.android.pillow.data.core.PillowResultListener;
 import cat.my.android.pillow.data.db.DBUtil;
 import cat.my.android.pillow.data.rest.RestDataSource;
 import cat.my.android.util.CursorUtil;
@@ -30,12 +33,14 @@ public class DeletedEntries<T extends IdentificableModel> {
 
 	SQLiteOpenHelper dbHelper;
 	RestDataSource<T> dataSource;
+	Context context;
 
 	public static final String WHERE_ID_SELECTION = ID_COLUMN + " == ?";
 
-	public DeletedEntries(RestDataSource<T> dataSource, SQLiteOpenHelper dbHelper) {
+	public DeletedEntries(Context context, RestDataSource<T> dataSource, SQLiteOpenHelper dbHelper) {
 		this.dbHelper = dbHelper;
 		this.dataSource = dataSource;
+		this.context= context;
 	}
 
 	public <T extends IdentificableModel> void setToDelete(SQLiteDatabase db, T model) {
@@ -58,8 +63,19 @@ public class DeletedEntries<T extends IdentificableModel> {
 		db.close();
 	}
 	
-	public void setAllreadyDeleted(T model){
-		dataSource.destroy(model, new OnServerDeletedListener(model.getId()), CommonListeners.defaultErrorListener);
+	public IPillowResult<Void> setAllreadyDeleted(T model){
+		final String id = model.getId();
+		final PillowResultListener<Void> result = new PillowResultListener<Void>(context);
+		Listener<Void> onServerDeletedListener = new Listener<Void>(){
+			@Override
+			public void onResponse(Void response) {
+				setAsDeleted(id);
+				result.setResult(null);
+			}
+		};
+		dataSource.destroy(model).setListeners(onServerDeletedListener, result);
+		
+		return result;
 	}
 	
 	public void setAsDeleted(SQLiteDatabase db, String id) {
@@ -90,19 +106,7 @@ public class DeletedEntries<T extends IdentificableModel> {
 		}
 	}
 	
-	public class OnServerDeletedListener implements Listener<Void>{
-		String id;
-		
-		public OnServerDeletedListener(String id) {
-			super();
-			this.id = id;
-		}
-
-		@Override
-		public void onResponse(Void response) {
-			setAsDeleted(id);
-		}
-	}
+	
 	
 	private Cursor getCursor(){
 		//TODO order may be important!!!

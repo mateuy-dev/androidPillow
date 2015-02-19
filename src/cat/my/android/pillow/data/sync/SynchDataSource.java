@@ -12,6 +12,10 @@ import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.Pillow;
+import cat.my.android.pillow.data.core.IPillowResult;
+import cat.my.android.pillow.data.core.PillowResult;
+import cat.my.android.pillow.data.core.PillowResultListener;
+import cat.my.android.pillow.data.core.ProxyPillowResult;
 import cat.my.android.pillow.data.db.DBModelController;
 import cat.my.android.pillow.data.db.DbDataSource;
 import cat.my.android.pillow.data.db.IDbMapping;
@@ -41,7 +45,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		this.dbFuncs=dbFuncs;
 		restDataSource = new RestDataSource<T>(restMap, context, authenticationData);
 		SQLiteOpenHelper dbHelper = Pillow.getInstance(context).getDbHelper();
-		deletedEntries = new DeletedEntries<T>(restDataSource, dbHelper);
+		deletedEntries = new DeletedEntries<T>(context, restDataSource, dbHelper);
 //		dbSource = new DbDataSource<T>(context, dbFuncs, dbHelper, deletedEntries);
 //		if(Pillow.getInstance(context).getConfig().isDbMultiThread()){
 		dbSource = new MultiThreadDbDataSource<T>(new DbDataSource<T>(context, dbFuncs, dbHelper, deletedEntries));
@@ -59,147 +63,143 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 	}
 	
 	@Override
-	public void index(Listener<Collection<T>> listener, ErrorListener errorListener) {
-		dbSource.index(listener, errorListener);
+	public IPillowResult<Collection<T>> index() {
+		return dbSource.index();
 	}
 	
 	@Override
-	public void index(T model, Listener<Collection<T>> listener, ErrorListener errorListener) {
-		dbSource.index(model, listener, errorListener);
+	public IPillowResult<Collection<T>> index(T model) {
+		return dbSource.index(model);
 	}
 	
 	@Override
-	public void index(String selection, String[] selectionArgs, String order, Listener<Collection<T>> listener, ErrorListener errorListener) {
-		dbSource.index(selection, selectionArgs, order, listener, errorListener);
+	public IPillowResult<Collection<T>> index(String selection, String[] selectionArgs, String order) {
+		return dbSource.index(selection, selectionArgs, order);
 	}
 	
 	@Override
-	public void show(T model, Listener<T> listener, ErrorListener errorListener) {
-		dbSource.show(model, listener, errorListener);
+	public IPillowResult<T> show(T model) {
+		return dbSource.show(model);
 	}
 	
 	@Override
-	public void create(final T model, final Listener<T> listener, ErrorListener errorListener) {
+	public IPillowResult<Integer> count(String selection, String[] selectionArgs) {
+		return dbSource.count(selection, selectionArgs);
+	}
+	
+	@Override
+	public IPillowResult<T> create(final T model) {
+		//The Pillow result is finished when result created in DB not in server.
 		Listener<T> createdOnDbListener = new Listener<T>(){
 			@Override
 			public void onResponse(T response) {
 				Listener<T> myListener = new SetAsNotDirityListener();
-				restDataSource.create(model, myListener, CommonListeners.getDefaultThreadedErrorListener());
-				listener.onResponse(model);
+				restDataSource.create(model).setListeners(myListener, CommonListeners.getDefaultThreadedErrorListener());
 			}
 		};
-		dbSource.create(model, createdOnDbListener, errorListener);
+		
+		return dbSource.create(model).addSystemListener(createdOnDbListener);
 	}
 	
+	
+	
 	@Override
-	public void update(final T model, final Listener<T> listener, ErrorListener errorListener) {
+	public IPillowResult<T> update(final T model) {
 		//@param listener ATENTION: update operation may return empty result on server. This will result in null T in the listener. Return the T from the server if required
+		
+		//The Pillow result is finished when result created in DB not in server.
 		Listener<T> updatedOnDbListener = new Listener<T>(){
 			@Override
 			public void onResponse(T response) {
 				Listener<T> myListener = new SetAsNotDirityListener();
-				restDataSource.update(model, myListener, CommonListeners.getDefaultThreadedErrorListener());
-				listener.onResponse(model);
+				restDataSource.update(model).setListeners(myListener, CommonListeners.getDefaultThreadedErrorListener());
 			}
 		};
-		dbSource.update(model, updatedOnDbListener, errorListener);
+		return dbSource.update(model).addSystemListener(updatedOnDbListener);
 	}
 	
 	@Override
-	public void destroy(final T model, final Listener<Void> listener, ErrorListener errorListener) {
+	public IPillowResult<Void> destroy(final T model) {
+		//The Pillow result is finished when result created in DB not in server.
+		
 		Listener<Void> deletedOnDbListener = new Listener<Void>(){
 			@Override
 			public void onResponse(Void response) {
-				deletedEntries.setAllreadyDeleted(model);
-				listener.onResponse(response);
+				deletedEntries.setAllreadyDeleted(model).setListeners(CommonListeners.dummyListener, CommonListeners.getDefaultThreadedErrorListener());
 			}
 		};
-		dbSource.destroy(model, deletedOnDbListener, errorListener);
+		return dbSource.destroy(model).addSystemListener(deletedOnDbListener);
+		
 	}
 	
-	@Override
-	public void count(String selection, String[] selectionArgs, Listener<Integer> listener,
-			ErrorListener errorListener) {
-		dbSource.count(selection, selectionArgs, listener, errorListener);
-	}
 	
-	private class SendDirtyRunnable extends OperationRunnable<Listener<Void>>{
-		public SendDirtyRunnable(Listener<Void> listener, ErrorListener errorListener) {
-			super(listener, errorListener);
-		}
-
+	
+	private class SendDirtyRunnable extends OperationRunnable<Void>{
 		@Override
-		public void run() {
-			DBModelController<T> db = getDbModelController();
-			List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
-			for(T model : createdModels){
-				AsynchListener<T> listener = new AsynchListener<T>();
-				restDataSource.create(model, listener, listener);
-				if(listener.getError()!=null){
-					getErrorListener().onErrorResponse(listener.getError());
-					return;
-				}
-				setAsNotDirty(listener.getResult());
-				
-			}
-			List<T> updatedModels=db.getDirty(DBModelController.DIRTY_STATUS_UPDATED);
-			for(T model : updatedModels){
-				AsynchListener<T> listener = new AsynchListener<T>();
-				restDataSource.update(model, listener, listener);
-				if(listener.getError()!=null){
-					getErrorListener().onErrorResponse(listener.getError());
-					return;
-				}
-				setAsNotDirty(listener.getResult());
-			}
-			deletedEntries.synchronize();
+		protected IPillowResult<Void> createMainPillowResult() {
 			
-			getListener().onResponse(null);
+			try {
+				DBModelController<T> db = getDbModelController();
+				List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
+				for(T model : createdModels){
+					T created = restDataSource.create(model).getResult();
+					setAsNotDirty(created);
+				}
+				List<T> updatedModels=db.getDirty(DBModelController.DIRTY_STATUS_UPDATED);
+				for(T model : updatedModels){
+					T updated = restDataSource.update(model).getResult();
+					setAsNotDirty(updated);
+				}
+				
+				deletedEntries.synchronize();
+				
+				return PillowResult.newVoidResult(context);
+			} catch (Exception e) {
+				return new PillowResult<Void>(context, new PillowError(e));
+			}
 		}
+		
 	}
 	
 	@Override
-	public void sendDirty(Listener<Void> listener, ErrorListener errorListener){
-		getThreadPoolExecutor().execute(new SendDirtyRunnable(listener, errorListener));
+	public IPillowResult<Void> sendDirty(){
+		return execute(new SendDirtyRunnable());
 	}
 	
-	private ThreadPoolExecutor getThreadPoolExecutor() {
-		return dbSource.getThreadPoolExecutor();
+	private <K> IPillowResult<K> execute(OperationRunnable<K> runnable){
+		dbSource.getThreadPoolExecutor().execute(runnable);
+		return runnable.getProxyResult();
 	}
 	
-	private class DownloadRunnable extends OperationRunnable<Listener<Collection<T>>>{
-		public DownloadRunnable(Listener<Collection<T>> listener, ErrorListener errorListener) {
-			super(listener, errorListener);
-		}
-
+	private class DownloadRunnable extends OperationRunnable<Collection<T>>{
 		@Override
-		public void run() {
+		protected IPillowResult<Collection<T>> createMainPillowResult() {
+			final PillowResultListener<Collection<T>> result = new PillowResultListener<Collection<T>>(context);
+			
 			Listener<Collection<T>> fillDatabaseListener = new Listener<Collection<T>>(){
 				@Override
 				public void onResponse(Collection<T> response) {
 					try{
 						DBModelController<T> db = getDbModelController();
 						db.cacheAll(new ArrayList<T>(response));
-						getListener().onResponse(response);
+						result.setResult(response);
 					} catch(Exception e){
-						getErrorListener().onErrorResponse(new PillowError(e));
+						result.setError(new PillowError(e));
 					}
 				}
 			};
-			restDataSource.index(fillDatabaseListener, getErrorListener());
+			restDataSource.index().setListeners(fillDatabaseListener, result);
+			return result;
 		}
 	}
 	
 	@Override
-	public void download(final Listener<Collection<T>> listener, ErrorListener errorListener) {
-		getThreadPoolExecutor().execute(new DownloadRunnable(listener, errorListener));
+	public IPillowResult<Collection<T>> download() {
+		return execute(new DownloadRunnable());
 	}
 
 	
 	public class SetAsNotDirityListener implements Listener<T>{
-		public SetAsNotDirityListener() {
-			super();
-		}
 
 		@Override
 		public void onResponse(T response) {

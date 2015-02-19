@@ -48,7 +48,7 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 			if (modelId != null) {
 				//update, we should look for current values
 				idModel.setId(modelId);
-				dataSource.show(idModel, new Listener<T>() {
+				dataSource.show(idModel).setViewListeners(new Listener<T>() {
 					@Override
 					public void onResponse(T model) {
 						formView.setModel(model, atts);

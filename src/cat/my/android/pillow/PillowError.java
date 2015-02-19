@@ -5,56 +5,23 @@ import java.io.PrintWriter;
 
 import com.android.volley.VolleyError;
 
-public class PillowError {
-	
-	Exception exception;
-	
-	public PillowError(Exception exception){
-		this.exception = exception;
-	}
+@SuppressWarnings("serial")
+public class PillowError extends Exception{
 
-	/*public PillowError(VolleyError volleyError) {
+	public PillowError() {
 		super();
-		this.volleyError = volleyError;
-	}*/
-
-	public Throwable fillInStackTrace() {
-		return exception.fillInStackTrace();
 	}
 
-	public String getMessage() {
-		return exception.getMessage();
+	public PillowError(String detailMessage, Throwable throwable) {
+		super(detailMessage, throwable);
 	}
 
-	public String getLocalizedMessage() {
-		return exception.getLocalizedMessage();
+	public PillowError(String detailMessage) {
+		super(detailMessage);
 	}
 
-	public StackTraceElement[] getStackTrace() {
-		return exception.getStackTrace();
+	public PillowError(Throwable throwable) {
+		super(throwable);
 	}
-
-	public void printStackTrace() {
-		exception.printStackTrace();
-	}
-
-	public void printStackTrace(PrintStream err) {
-		exception.printStackTrace(err);
-	}
-
-	public void printStackTrace(PrintWriter err) {
-		exception.printStackTrace(err);
-	}
-
-	public String toString() {
-		return exception.toString();
-	}
-
-	public Throwable getCause() {
-		return exception.getCause();
-	}
-
-	public Exception getException() {
-		return exception;
-	}
+	
 }

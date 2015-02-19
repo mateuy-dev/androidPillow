@@ -131,11 +131,6 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 		listAdapter.refreshList();
 	}
 	
-	private void sendData() {
-		if(ops instanceof ISynchDataSource<?>)
-			((ISynchDataSource<T>)ops).sendDirty(CommonListeners.dummyListener, CommonListeners.defaultErrorListener);
-	}
-	
 	protected void createModel(){
 		try {
 			Intent intent = new Intent(getActivity(), FormActivity.class);

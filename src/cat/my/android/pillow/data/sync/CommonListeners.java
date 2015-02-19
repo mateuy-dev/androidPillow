@@ -8,6 +8,8 @@ import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.PillowError;
+import cat.my.android.pillow.data.core.IPillowResult;
+import cat.my.android.pillow.data.core.PillowResult;
 import cat.my.util.exceptions.BreakFastException;
 
 import com.android.volley.NoConnectionError;
@@ -23,7 +25,7 @@ public class CommonListeners {
 	public static ErrorListener breakFastListener = new ErrorListener() {
 		@Override
 		public void onErrorResponse(PillowError error) {
-			throw new BreakFastException(error.getException());
+			throw new BreakFastException(error);
 		}
 	};
 	public static ErrorListener silentErrorListener = new ErrorListener() {
@@ -36,10 +38,10 @@ public class CommonListeners {
 	public static final ErrorListener defaultErrorListener= new ErrorListener(){
 		@Override
 		public void onErrorResponse(PillowError error) {
-			if(error.getException() instanceof NoConnectionError){
+			if(error.getCause() instanceof NoConnectionError){
 				Log.i(Pillow.LOG_ID, error.getMessage());
 			} else {
-				throw new BreakFastException(error.getException());
+				throw new BreakFastException(error.getCause());
 			}
 		}
 	};
@@ -59,10 +61,10 @@ public class CommonListeners {
 		
 		@Override
 		public void onErrorResponse(PillowError error) {
-			if(error.getException() instanceof NoConnectionError){
+			if(error.getCause() instanceof NoConnectionError){
 				Log.i(Pillow.LOG_ID, error.getMessage());
 			} else {
-				BreakFastException throwable = new BreakFastException(error.getException());
+				BreakFastException throwable = new BreakFastException(error.getCause());
 				if(Thread.currentThread().getId()!=initialThreadId){
 					throwable.setStackTrace(originalStack);
 				}
@@ -181,5 +183,21 @@ public class CommonListeners {
 		public MultipleTasksProxyListener(int tasks, Listener<T> listener, T response) {
 			super(tasks, new ProxyListener<T, D>(listener, response));
 		}
+	}
+	
+	public static abstract class MultipleResultTasksListener<T> implements Listener<T>{
+		PillowResult<T> result;
+
+		public MultipleResultTasksListener(PillowResult<T> result) {
+			this.result = result;
+		}
+		@Override
+		public void onResponse(T response) {
+			result.setResult(subTask(response));
+		}
+
+		public abstract T subTask(T response);
+
+		
 	}
 }

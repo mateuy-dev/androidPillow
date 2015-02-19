@@ -8,6 +8,8 @@ import java.util.concurrent.TimeUnit;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.data.core.IPillowResult;
+import cat.my.android.pillow.data.core.ProxyPillowResult;
 import cat.my.android.pillow.util.concurrency.FullStackThreadPoolExecutor;
 
 
@@ -23,157 +25,104 @@ public class MultiThreadDbDataSource<T extends IdentificableModel> implements ID
 	}
 
 	public abstract static class OperationRunnable<L> implements Runnable{
-		L listener;
-		ErrorListener errorListener;
-		public OperationRunnable(L listener, ErrorListener errorListener) {
-			super();
-			this.listener = listener;
-			this.errorListener = errorListener;
+		ProxyPillowResult<L> proxyResult;
+		public OperationRunnable() {
+			this.proxyResult = new ProxyPillowResult<L>();
 		}
-		public L getListener() {
-			return listener;
+		public ProxyPillowResult<L> getProxyResult() {
+			return proxyResult;
 		}
-		public ErrorListener getErrorListener() {
-			return errorListener;
+		public void run(){
+			proxyResult.setMainPillowResult(createMainPillowResult());
 		}
+		protected abstract IPillowResult<L> createMainPillowResult();
 	}
 	
-	public class SimpleIndexRunnable extends OperationRunnable<Listener<Collection<T>>>{
-		public SimpleIndexRunnable(Listener<Collection<T>> listener, ErrorListener errorListener) {
-			super(listener, errorListener);
-		}
-		@Override
-		public void run() {
-			dataSource.index(listener, errorListener);
-		}
+	private <K> IPillowResult<K> execute(OperationRunnable<K> runnable){
+		threadPoolExecutor.execute(runnable);
+		return runnable.getProxyResult();
+	}
+	
+	
+	@Override
+	public IPillowResult<Collection<T>> index() {
+		return execute(new OperationRunnable<Collection<T>>(){
+			@Override public IPillowResult<Collection<T>> createMainPillowResult() {
+				return dataSource.index();
+			}
+		});
+	}
+	
+	
+	@Override
+	public IPillowResult<Collection<T>> index(final T model) {
+		return execute(new OperationRunnable<Collection<T>>(){
+			@Override public IPillowResult<Collection<T>> createMainPillowResult() {
+				return dataSource.index(model);
+			}
+		});
 	}
 	
 	@Override
-	public void index(T model, Listener<Collection<T>> listener, ErrorListener errorListener) {
-		threadPoolExecutor.execute(new FilterIndexRunnable(model, listener, errorListener));
-	}
-	
-	public class FilterIndexRunnable extends OperationRunnable<Listener<Collection<T>>>{
-		T model;
-		public FilterIndexRunnable(T model, Listener<Collection<T>> listener, ErrorListener errorListener) {
-			super(listener, errorListener);
-			this.model = model;
-		}
-		@Override
-		public void run() {
-			dataSource.index(model, listener, errorListener);
-		}
-	}
-	
-	@Override
-	public void index(Listener<Collection<T>> listener, ErrorListener errorListener) {
-		threadPoolExecutor.execute(new SimpleIndexRunnable(listener, errorListener));
-	}
-	
-	public class ComplexIndexRunnable extends OperationRunnable<Listener<Collection<T>>>{
-		String selection; String[] selectionArgs; String order;
-		public ComplexIndexRunnable(String selection, String[] selectionArgs, String order, Listener<Collection<T>> listener, ErrorListener errorListener) {
-			super(listener, errorListener);
-			this.selection=selection; this.selectionArgs=selectionArgs; this.order=order;
-		}
-		@Override
-		public void run() {
-			dataSource.index(selection, selectionArgs, order, listener, errorListener);
-		}
-	}
-	
-	@Override
-	public void index(String selection, String[] selectionArgs, String order, Listener<Collection<T>> listener, ErrorListener errorListener) {
-		threadPoolExecutor.execute(new ComplexIndexRunnable(selection, selectionArgs, order, listener, errorListener));
-	}
-	
-	public class ShowRunnable extends OperationRunnable<Listener<T>>{
-		T model;
-		public ShowRunnable(T model, Listener<T> listener, ErrorListener errorListener) {
-			super(listener, errorListener);
-			this.model = model;
-		}
-		@Override
-		public void run() {
-			dataSource.show(model, listener, errorListener);
-		}
+	public IPillowResult<Collection<T>> index(final String selection, final String[] selectionArgs, final String order) {
+		return execute(new OperationRunnable<Collection<T>>(){
+			@Override
+			protected IPillowResult<Collection<T>> createMainPillowResult() {
+				return dataSource.index(selection, selectionArgs, order);
+			}
+			
+		});
 	}
 
 	@Override
-	public void show(T model, Listener<T> listener, ErrorListener errorListener) {
-		threadPoolExecutor.execute(new ShowRunnable(model, listener, errorListener));
-	}
-
-	public class CreateRunnable extends OperationRunnable<Listener<T>>{
-		T model;
-		public CreateRunnable(T model, Listener<T> listener, ErrorListener errorListener) {
-			super(listener, errorListener);
-			this.model = model;
-		}
-		@Override
-		public void run() {
-			dataSource.create(model, listener, errorListener);
-		}
+	public IPillowResult<T> show(final T model) {
+		return execute(new OperationRunnable<T>() {
+			@Override
+			protected IPillowResult<T> createMainPillowResult() {
+				return dataSource.show(model);
+			}
+		});
 	}
 	
 	@Override
-	public void create(T model, Listener<T> listener, ErrorListener errorListener) {
-		threadPoolExecutor.execute(new CreateRunnable(model, listener, errorListener));
-	}
-	
-	public class UpdateRunnable extends OperationRunnable<Listener<T>>{
-		T model;
-		public UpdateRunnable(T model, Listener<T> listener, ErrorListener errorListener) {
-			super(listener, errorListener);
-			this.model = model;
-		}
-		@Override
-		public void run() {
-			dataSource.update(model, listener, errorListener);
-		}
-	}
-
-	@Override
-	public void update(T model, Listener<T> listener, ErrorListener errorListener) {
-		threadPoolExecutor.execute(new UpdateRunnable(model, listener, errorListener));
-	}
-	
-	public class DestroyRunnable extends OperationRunnable<Listener<Void>>{
-		T model;
-		public DestroyRunnable(T model, Listener<Void> listener, ErrorListener errorListener) {
-			super(listener, errorListener);
-			this.model = model;
-		}
-		@Override
-		public void run() {
-			dataSource.destroy(model, listener, errorListener);
-		}
-	}
-
-	@Override
-	public void destroy(T model, Listener<Void> listener,
-			ErrorListener errorListener) {
-		threadPoolExecutor.execute(new DestroyRunnable(model, listener, errorListener));
-	}
-	
-	public class CountRunnable extends OperationRunnable<Listener<Integer>>{
-		String selection;
-		String[] selectionArgs;
-		public CountRunnable(String selection, String[] selectionArgs,Listener<Integer> listener, ErrorListener errorListener) {
-			super(listener, errorListener);
-			this.selection = selection;
-			this.selectionArgs = selectionArgs;
-		}
-		@Override
-		public void run() {
-			dataSource.count(selection, selectionArgs, listener, errorListener);
-		}
+	public IPillowResult<T> create(final T model) {
+		return execute(new OperationRunnable<T>(){
+			@Override
+			protected IPillowResult<T> createMainPillowResult() {
+				return dataSource.create(model);
+			}
+		});
 	}
 	
 	@Override
-	public void count(String selection, String[] selectionArgs, Listener<Integer> listener,
-			ErrorListener errorListener) {
-		threadPoolExecutor.execute(new CountRunnable(selection, selectionArgs, listener, errorListener));
+	public IPillowResult<T> update(final T model) {
+		return execute(new OperationRunnable<T>(){
+			@Override
+			protected IPillowResult<T> createMainPillowResult() {
+				return dataSource.update(model);
+			}
+		});
+	}
+	
+	@Override
+	public IPillowResult<Void> destroy(final T model) {
+		return execute(new OperationRunnable<Void>(){
+			@Override
+			protected IPillowResult<Void> createMainPillowResult() {
+				return dataSource.destroy(model);
+			}
+		});
+	}
+	
+	
+	@Override
+	public IPillowResult<Integer> count(final String selection, final String[] selectionArgs) {
+		return execute(new OperationRunnable<Integer>(){
+			@Override
+			protected IPillowResult<Integer> createMainPillowResult() {
+				return dataSource.count(selection, selectionArgs);
+			}
+		});
 	}
 
 	

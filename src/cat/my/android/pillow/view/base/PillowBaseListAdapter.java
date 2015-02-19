@@ -59,9 +59,9 @@ public abstract class PillowBaseListAdapter<T extends IdentificableModel> extend
 	
 	public void dataSourceIndex(Listener<Collection<T>> listener, ErrorListener errorListener){
 		if(filter!=null && dataSource instanceof IExtendedDataSource)
-			((IExtendedDataSource<T>)dataSource).index(filter, listener, errorListener);
+			((IExtendedDataSource<T>)dataSource).index(filter).setViewListeners(listener, errorListener);
 		else
-			dataSource.index(listener, errorListener);
+			dataSource.index().setViewListeners(listener, errorListener);
 	}
 
 	@Override

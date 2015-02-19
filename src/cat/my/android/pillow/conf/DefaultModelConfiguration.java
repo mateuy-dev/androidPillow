@@ -11,7 +11,6 @@ import cat.my.android.pillow.data.db.ReflectionDbMapping;
 import cat.my.android.pillow.data.rest.IRestMapping;
 import cat.my.android.pillow.data.rest.RailsRestMapping;
 import cat.my.android.pillow.data.sync.SynchDataSource;
-import cat.my.android.pillow.data.sync.SynchDataSourceMainThreadProxy;
 
 import com.google.gson.reflect.TypeToken;
 
@@ -55,7 +54,7 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 	}
 
 	protected IDataSource<T> createDefaultDataSource() {
-		return new SynchDataSourceMainThreadProxy<T>(getDbMapping(), getRestMapping(), getContext());
+		return new SynchDataSource<T>(getDbMapping(), getRestMapping(), getContext());
 	}
 
 	protected IRestMapping<T> createDefaultRestMapping() {

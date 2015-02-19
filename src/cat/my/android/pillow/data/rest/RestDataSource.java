@@ -29,6 +29,9 @@ import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.PillowConfigXml;
+import cat.my.android.pillow.data.core.IPillowResult;
+import cat.my.android.pillow.data.core.PillowResult;
+import cat.my.android.pillow.data.core.PillowResultListener;
 import cat.my.android.pillow.data.rest.ISessionController.NullSessionController;
 import cat.my.android.pillow.data.rest.requests.GsonCollectionRequest;
 import cat.my.android.pillow.data.rest.requests.GsonRequest;
@@ -44,7 +47,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 	
 	Context context;
 	RequestQueue volleyQueue;
-	ISessionController sessionController;
+//	ISessionController sessionController;
 	IRestMapping<T> restMapping;
 	
 	
@@ -58,7 +61,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 		this.volleyQueue = VolleyFactory.newRequestQueue(context);
 		if(authenticationData==null)
 			authenticationData = new NullSessionController();
-		this.sessionController = authenticationData;
+//		this.sessionController = authenticationData;
 		this.context = context;
 	}
 	
@@ -80,53 +83,59 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 //		this.serverRequiresAuthentication = serverRequiresAuthentication;
 //	}
 	
-	public void executeCollectionListOperation(int method, String operation, Map<String, Object> params, Listener<Collection<T>> listener, ErrorListener errorListener) {
+	public IPillowResult<Collection<T>> executeCollectionListOperation(int method, String operation, Map<String, Object> params) {
 		Route route = restMapping.getCollectionRoute(method, operation);
-		executeListOperation(route, params, listener, errorListener);
+		return executeListOperation(route, params);
 	}
 	
-	public void executeMemberOperation(T model, int method, String operation, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener) {
+	public IPillowResult<T> executeMemberOperation(T model, int method, String operation, Map<String, Object> params) {
 		Route route = restMapping.getMemberRoute(model, method, operation);
-		executeOperation(model, route, params, listener, errorListener);
+		return executeOperation(model, route, params);
 	}
 	
-	public void executeCollectionOperation(T model, int method, String operation, Map<String, Object> params, Listener<T> listener, ErrorListener errorListener) {
+	public IPillowResult<T> executeCollectionOperation(T model, int method, String operation, Map<String, Object> params) {
 		Route route = restMapping.getCollectionRoute(method, operation);
-		executeOperation(model, route, params, listener, errorListener);
+		return executeOperation(model, route, params);
 	}
 	
-	private void executeListOperation(final Route route, final Map<String, Object> params, final Listener<Collection<T>> listener, final ErrorListener errorListener) {
+	private IPillowResult<Collection<T>> executeListOperation(final Route route, final Map<String, Object> params) {
+		PillowResultListener<Collection<T>> result = new PillowResultListener<Collection<T>>(context);
+		
 		Log.d(LOG_ID, "Executing operation "+route.method + " "+route.url + " "+params);
 		if(SIMULATE_OFFLINE_CONNECTIVITY_ON_TESTING){
-			errorListener.onErrorResponse(new PillowError(new NoConnectionError()));
-			return;
+			return result.setError(new PillowError(new NoConnectionError()));
 		}
-		Listener<Void> onSessionStarted = new Listener<Void>() {
-			@Override
-			public void onResponse(Void response) {
-				Map<String, Object> map=new HashMap<String, Object>(sessionController.getSession());
+//		Listener<Void> onSessionStarted = new Listener<Void>() {
+//			@Override
+//			public void onResponse(Void response) {
+//				Map<String, Object> map=new HashMap<String, Object>(sessionController.getSession());
+		Map<String, Object> map = new HashMap<String, Object>();
 				if(params!=null){
 					map.putAll(params);
 				}
-				GsonCollectionRequest<T> gsonRequest = new GsonCollectionRequest<T>(restMapping.getSerializer(), route, restMapping.getCollectionType(), map, listener, errorListener, getConfig().getDownloadTimeInterval());
+				GsonCollectionRequest<T> gsonRequest = new GsonCollectionRequest<T>(restMapping.getSerializer(), route, restMapping.getCollectionType(), map, result, result, getConfig().getDownloadTimeInterval());
 				gsonRequest.setShouldCache(false);
 				volleyQueue.add(gsonRequest);
-			}
-		};
+//			}
+//		};
 		//we need to check that session has been started. The operation will be executed once the session has started
-		sessionController.init(onSessionStarted, errorListener);
+		//TODO Enable session again!!
+//		sessionController.init(onSessionStarted, errorListener);
+		
+		return result;
 	}
 	
-	private void executeOperation(final T model, final Route route, final Map<String, Object> params, final Listener<T> listener, final ErrorListener errorListener) {
+	private IPillowResult<T> executeOperation(final T model, final Route route, final Map<String, Object> params) {
+		PillowResultListener<T> result = new PillowResultListener<T>(context);
 		Log.d(LOG_ID, "Executing operation "+route.method + " "+route.url + " "+params);
 		if(SIMULATE_OFFLINE_CONNECTIVITY_ON_TESTING){
-			errorListener.onErrorResponse(new PillowError(new NoConnectionError(new Exception("Simulate no connection"))));
-			return;
+			return result.setError(new PillowError(new NoConnectionError()));
 		}
-		Listener<Void> onSessionStarted = new Listener<Void>() {
-			@Override
-			public void onResponse(Void response) {
-			Map<String, Object> map=new HashMap<String, Object>(sessionController.getSession());
+//		Listener<Void> onSessionStarted = new Listener<Void>() {
+//			@Override
+//			public void onResponse(Void response) {
+//			Map<String, Object> map=new HashMap<String, Object>(sessionController.getSession());
+		Map<String, Object> map = new HashMap<String, Object>();
 			if(params!=null){
 				map.putAll(params);
 			}
@@ -134,46 +143,48 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 				map.put(restMapping.getModelName(), model);
 			}
 			
-			GsonRequest<T> gsonRequest = new GsonRequest<T>(restMapping.getSerializer(), route, restMapping.getModelClass(), map, listener, errorListener, getConfig().getDownloadTimeInterval());
+			GsonRequest<T> gsonRequest = new GsonRequest<T>(restMapping.getSerializer(), route, restMapping.getModelClass(), map, result, result, getConfig().getDownloadTimeInterval());
 			gsonRequest.setShouldCache(false);
 			volleyQueue.add(gsonRequest);
-			}
-		};
+//			}
+//		};
 		//we need to check that session has been started. The operation will be executed once the session has started
-		sessionController.init(onSessionStarted, errorListener);
+//		sessionController.init(onSessionStarted, errorListener);
+			return result;
 	}
 	
 	@Override
-	public void index(Listener<Collection<T>> listener, ErrorListener errorListener) {
+	public IPillowResult<Collection<T>> index() {
 		Route route = restMapping.getIndexPath();
-		executeListOperation(route, null, listener, errorListener);
+		return executeListOperation(route, null);
 	}
 
 	@Override
-	public void show(T model, Listener<T> listener, ErrorListener errorListener) {
+	public IPillowResult<T> show(T model) {
 		Route route = restMapping.getShowPath(model);
-		executeOperation(model, route, null, listener, errorListener);
+		return executeOperation(model, route, null);
 	}
 	
 	@Override
-	public void create(T model, Listener<T> listener, ErrorListener errorListener) {
+	public IPillowResult<T> create(T model) {
 		Route route = restMapping.getCreatePath(model);
-		executeOperation(model, route, null, listener, errorListener);
+		return executeOperation(model, route, null);
 	}
 	
 	@Override
-	public void update(T model, Listener<T> listener, ErrorListener errorListener) {
+	public IPillowResult<T> update(T model) {
 		//@param listener ATENTION: update operation may return empty result on server. This will result in null T in the listener. Return the T from the server if required
 		Route route = restMapping.getUpdatePath(model);
-		executeOperation(model, route, null, listener, errorListener);
+		return executeOperation(model, route, null);
 		
 	}
 	
 	@Override
-	public void destroy(T model, Listener<Void> listener, ErrorListener errorListener) {
+	public IPillowResult<Void> destroy(T model) {
 		Route route = restMapping.getDestroyPath(model);
-		Listener<T> proxyListener = new VoidListenerProxy(listener);
-		executeOperation(model, route, null, proxyListener, errorListener);
+		IPillowResult result = executeOperation(model, route, null);
+		//Ugly way of changing T to Void...
+		return result;
 	}
 	
 	public class VoidListenerProxy implements Listener<T>{

@@ -24,7 +24,7 @@ public class ModelDialogInputView<T extends IdentificableModel> extends EditText
 		try {
 			toSearch = selectedClass.newInstance();
 			toSearch.setId(modelId);
-			dataSource.show(toSearch, new Listener<T>() {
+			dataSource.show(toSearch).setViewListeners(new Listener<T>() {
 				@Override
 				public void onResponse(T response) {
 					selected = response;

@@ -32,11 +32,10 @@ public abstract class  AbstractIdentificableModelTestCase<T extends Identificabl
 		checkServerVersionSameAs(createdPost);
 		
 		//update
-		AsynchListener<T> listener = new AsynchListener<T>();
+		
 		updateModel(createdPost);
 //		createdPost.setTitle("new Title");
-		controller.update(createdPost, listener, listener);
-		T updatedPost = listener.getResult();
+		T updatedPost = controller.update(createdPost).getResult();
 		assertSame(createdPost, updatedPost);
 		
 		//check update
@@ -44,14 +43,10 @@ public abstract class  AbstractIdentificableModelTestCase<T extends Identificabl
 		checkServerVersionSameAs(updatedPost);
 
 		//delete post
-		AsynchListener<Void> deleteListener = new AsynchListener<Void>();
-		controller.destroy(createdPost, deleteListener, deleteListener);
-		deleteListener.await();
+		controller.destroy(createdPost).getResult();
 		
 		//check deleted locally
-		listener = new AsynchListener<T>();
-		controller.show(createdPost, listener, listener);
-		T showPost = listener.getResult();
+		T showPost = controller.show(createdPost).getResult();
 		assertNull(showPost);
 		
 		//check deleted remotelly

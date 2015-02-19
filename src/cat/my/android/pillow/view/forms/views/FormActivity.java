@@ -52,9 +52,9 @@ public class FormActivity<T extends IdentificableModel>  extends ActionBarActivi
 				T model = formFragment.getModel();
 				ISynchDataSource<T> dataSource = (ISynchDataSource<T>) Pillow.getInstance(FormActivity.this).getDataSource(model.getClass());
 				if(StringUtil.isBlanck(model.getId())){
-					dataSource.create(model, getOnSaveListener(), CommonListeners.defaultErrorListener);
+					dataSource.create(model).setViewListeners(getOnSaveListener(), CommonListeners.defaultErrorListener);
 				} else {
-					dataSource.update(model, getOnSaveListener(), CommonListeners.defaultErrorListener);
+					dataSource.update(model).setViewListeners(getOnSaveListener(), CommonListeners.defaultErrorListener);
 				}
 			}
 			

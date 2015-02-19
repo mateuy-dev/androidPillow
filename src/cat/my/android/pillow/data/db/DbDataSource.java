@@ -10,6 +10,8 @@ import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.data.core.IPillowResult;
+import cat.my.android.pillow.data.core.PillowResult;
 import cat.my.android.pillow.data.sync.DeletedEntries;
 
 
@@ -30,74 +32,71 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 	}
 
 	@Override
-	public void index(Listener<Collection<T>> listener, ErrorListener errorListener) {
+	public IPillowResult<Collection<T>> index() {
 		DBModelController<T> db = getDbModelController();
-		listener.onResponse(db.index());
+		return new PillowResult<Collection<T>>(context, db.index());
 	}
 	
 	@Override
-	public void index(T model, Listener<Collection<T>> listener, ErrorListener errorListener) {
+	public IPillowResult<Collection<T>> index(T model) {
 		DBModelController<T> db = getDbModelController();
-		listener.onResponse(db.index(model));
+		return new PillowResult<Collection<T>>(context, db.index(model));
 	}
 	
 	@Override
-	public void index(String selection, String[] selectionArgs, String order, Listener<Collection<T>> listener, ErrorListener errorListener) {
+	public IPillowResult<Collection<T>> index(String selection, String[] selectionArgs, String order) {
 		DBModelController<T> db = getDbModelController();
-		listener.onResponse(db.index(selection, selectionArgs, order));
+		return new PillowResult<Collection<T>>(context, db.index(selection, selectionArgs, order));
 	}
 
 	@Override
-	public void show(T model, Listener<T> listener,
-			ErrorListener errorListener) {
+	public IPillowResult<T> show(T model) {
 		DBModelController<T> db =getDbModelController();
 		T result = db.get(model.getId());
-		listener.onResponse(result);
+		return new PillowResult<T>(context, result);
 	}
 
 	@Override
-	public void create(T model, Listener<T> listener, ErrorListener errorListener) {
+	public IPillowResult<T> create(T model) {
 		try{
 			DBModelController<T> db = getDbModelController();
 			db.create(model);
 			model = db.get(model.getId());
-			listener.onResponse(model);
+			return new PillowResult<T>(context, model);
 		} catch (SQLiteException exception){
-			errorListener.onErrorResponse(new PillowError(exception));
+			return new PillowResult<T>(context, new PillowError(exception));
 		}
 	}
 
 	@Override
-	public void update(T model, Listener<T> listener, ErrorListener errorListener) {
+	public PillowResult<T> update(T model) {
 		try{
 			DBModelController<T> dbController =getDbModelController();
 			dbController.update(model);
 			//refresh model
 			model = dbController.get(model.getId());
-			listener.onResponse(model);
+			return new PillowResult<T>(context, model);
 		} catch (SQLiteException exception){
-			errorListener.onErrorResponse(new PillowError(exception));
+			return new PillowResult<T>(context, new PillowError(exception));
 		}
 	}
 
 	@Override
-	public void destroy(T model, Listener<Void> listener,
-			ErrorListener errorListener) {
+	public PillowResult<Void> destroy(T model) {
 		try{
 			DBModelController<T> db =getDbModelController();
 			db.delete(model);
-			listener.onResponse(null);
+			return PillowResult.newVoidResult(context);
 		} catch (SQLiteException exception){
-			errorListener.onErrorResponse(new PillowError(exception));
+			return new PillowResult<Void>(context, new PillowError(exception));
 		}
 	}
 	
 	@Override
-	public void count(String selection, String[] selectionArgs, Listener<Integer> listener,
-			ErrorListener errorListener) {
+	public PillowResult<Integer> count(String selection, String[] selectionArgs) {
 		DBModelController<T> db =getDbModelController();
 		int result = db.getCount(selection, selectionArgs);
-		listener.onResponse(result);
+		return new PillowResult<Integer>(context, result);
 	}
 	
 	public DBModelController<T> getDbModelController(){

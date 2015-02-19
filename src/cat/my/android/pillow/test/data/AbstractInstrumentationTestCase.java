@@ -16,6 +16,8 @@ import android.net.wifi.WifiManager;
 import android.test.InstrumentationTestCase;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Pillow;
+import cat.my.android.pillow.PillowError;
+import cat.my.android.pillow.data.core.IPillowResult;
 import cat.my.android.pillow.data.rest.IRestMapping;
 import cat.my.android.pillow.data.rest.RailsRestMapping;
 import cat.my.android.pillow.data.rest.RestDataSource;
@@ -28,33 +30,22 @@ import com.google.gson.reflect.TypeToken;
 
 public abstract class AbstractInstrumentationTestCase<T extends IdentificableModel> extends InstrumentationTestCase{
 	Class<T> clazz;
-	AsynchOps asynchOps;
 	
 	public AbstractInstrumentationTestCase(Class<T> clazz) {
 		super();
 		this.clazz = clazz;
 	}
-	
-	public AsynchOps getAsynchOps() {
-		if(asynchOps==null){
-			asynchOps = new AsynchOps(getContext());
-		}
-		return asynchOps;
-	}
+
 	
 	protected void checkLocalVersionSameAs(T model) throws Exception{
-		AsynchListener<T> listener = new AsynchListener<T>();
-		getController().show(model, listener, listener);
-		T showModel = listener.getResult();
+		T showModel = getController().show(model).getResult();
 		assertNotNull(showModel);
 		assertSame(model, showModel);
 	}
 	
 	protected void checkServerVersionSameAs(T model) throws Exception{
 		sendDirty();
-		AsynchListener<T> listener = new AsynchListener<T>();
-		getController().getRestDataSource().show(model, listener, listener);
-		T showModel = listener.getResult();
+		T showModel = getController().getRestDataSource().show(model).getResult();
 		assertNotNull(showModel);
 		assertSame(model, showModel);
 		
@@ -76,13 +67,14 @@ public abstract class AbstractInstrumentationTestCase<T extends IdentificableMod
 	}
 	
 	
-	protected void sendDirty() throws InterruptedException{
-		//TODO DELETE THIS SLEEP!!!
-		Thread.sleep(3000);
-		
-		AsynchListener<Void> dirtyListener = new AsynchListener<Void>();
-		getController().sendDirty(dirtyListener, dirtyListener);
-		dirtyListener.await();
+	protected void sendDirty() throws Exception{
+		getController().sendDirty().getResult();
+	}
+	
+	protected IPillowResult<Void> synchornize() throws PillowError{
+		IPillowResult<Void> result = Pillow.getInstance(getContext()).getSynchManager().synchronize(true);
+		result.getResult();
+		return result;
 	}
 
 	protected <T2 extends IdentificableModel> ISynchDataSource<T2> getController(Class<T2> clazz){
