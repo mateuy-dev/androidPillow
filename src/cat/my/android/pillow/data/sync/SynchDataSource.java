@@ -3,7 +3,9 @@ package cat.my.android.pillow.data.sync;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -18,6 +20,7 @@ import cat.my.android.pillow.data.core.PillowResultListener;
 import cat.my.android.pillow.data.core.ProxyPillowResult;
 import cat.my.android.pillow.data.db.DBModelController;
 import cat.my.android.pillow.data.db.DbDataSource;
+import cat.my.android.pillow.data.db.IDBDataSourceForSynch;
 import cat.my.android.pillow.data.db.IDbMapping;
 import cat.my.android.pillow.data.db.MultiThreadDbDataSource;
 import cat.my.android.pillow.data.db.MultiThreadDbDataSource.OperationRunnable;
@@ -26,10 +29,12 @@ import cat.my.android.pillow.data.rest.ISessionController;
 import cat.my.android.pillow.data.rest.RestDataSource;
 
 public class SynchDataSource<T extends IdentificableModel> implements ISynchDataSource<T>{
+	private static ThreadPoolExecutor operationthreadPool = new ThreadPoolExecutor(3, 5, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+	
 	RestDataSource<T> restDataSource;
 	ISessionController authenticationData;
 	DeletedEntries<T> deletedEntries;
-	MultiThreadDbDataSource<T> dbSource;
+	IDBDataSourceForSynch<T> dbSource;
 	DBModelController<T> dbModelController;
 	IDbMapping<T> dbFuncs;
 	IRestMapping<T> restMap;
@@ -143,12 +148,12 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 				List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
 				for(T model : createdModels){
 					T created = restDataSource.create(model).getResult();
-					setAsNotDirty(created);
+					dbSource.setAsNotDirty(created).await();
 				}
 				List<T> updatedModels=db.getDirty(DBModelController.DIRTY_STATUS_UPDATED);
 				for(T model : updatedModels){
 					T updated = restDataSource.update(model).getResult();
-					setAsNotDirty(updated);
+					dbSource.setAsNotDirty(updated).await();
 				}
 				
 				deletedEntries.synchronize();
@@ -166,8 +171,8 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		return execute(new SendDirtyRunnable());
 	}
 	
-	private <K> IPillowResult<K> execute(OperationRunnable<K> runnable){
-		dbSource.getThreadPoolExecutor().execute(runnable);
+	protected <K> IPillowResult<K> execute(OperationRunnable<K> runnable){
+		operationthreadPool.execute(runnable);
 		return runnable.getProxyResult();
 	}
 	
@@ -203,15 +208,15 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 
 		@Override
 		public void onResponse(T response) {
-			setAsNotDirty(response);
+			dbSource.setAsNotDirty(response);
 		}
 	}
 	
-	private void setAsNotDirty(T model) {
+	/*private void setAsNotDirty(T model) {
 		DBModelController<T> db =getDbModelController();
 		db.markAsClean(model);
 		model = db.get(model.getId());
-	}
+	}*/
 	
 	@Override
 	public DBModelController<T> getDbModelController(){

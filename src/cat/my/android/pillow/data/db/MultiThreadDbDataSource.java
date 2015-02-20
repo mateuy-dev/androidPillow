@@ -5,21 +5,26 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import android.content.Context;
+
 import cat.my.android.pillow.IdentificableModel;
+import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.data.core.IPillowResult;
+import cat.my.android.pillow.data.core.PillowResult;
 import cat.my.android.pillow.data.core.ProxyPillowResult;
 import cat.my.android.pillow.util.concurrency.FullStackThreadPoolExecutor;
 
 
-public class MultiThreadDbDataSource<T extends IdentificableModel> implements IDBDataSource<T>{
-	static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+public class MultiThreadDbDataSource<T extends IdentificableModel> implements IDBDataSourceForSynch<T>{
+	private static ThreadPoolExecutor dbThreadPool = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 //	static ThreadPoolExecutor threadPoolExecutor = new FullStackThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
-	IDBDataSource<T> dataSource;
+	IDBDataSourceForSynch<T> dataSource;
 
-	public MultiThreadDbDataSource(IDBDataSource<T> dataSource) {
+	public MultiThreadDbDataSource(IDBDataSourceForSynch<T> dataSource) {
 		super();
 		this.dataSource=dataSource;
 	}
@@ -33,13 +38,18 @@ public class MultiThreadDbDataSource<T extends IdentificableModel> implements ID
 			return proxyResult;
 		}
 		public void run(){
-			proxyResult.setMainPillowResult(createMainPillowResult());
+			try {
+				proxyResult.setMainPillowResult(createMainPillowResult());
+			} catch (PillowError e) {
+				Context context = Pillow.getInstance().getContext();
+				proxyResult.setMainPillowResult(new PillowResult<L>(context, e));
+			}
 		}
-		protected abstract IPillowResult<L> createMainPillowResult();
+		protected abstract IPillowResult<L> createMainPillowResult() throws PillowError;
 	}
 	
 	private <K> IPillowResult<K> execute(OperationRunnable<K> runnable){
-		threadPoolExecutor.execute(runnable);
+		dbThreadPool.execute(runnable);
 		return runnable.getProxyResult();
 	}
 	
@@ -131,8 +141,16 @@ public class MultiThreadDbDataSource<T extends IdentificableModel> implements ID
 	}
 
 	
-	public ThreadPoolExecutor getThreadPoolExecutor() {
-		return threadPoolExecutor;
+
+
+	@Override
+	public IPillowResult<T> setAsNotDirty(final T model) {
+		return execute(new OperationRunnable<T>() {
+			@Override
+			protected IPillowResult<T> createMainPillowResult() throws PillowError {
+				return dataSource.setAsNotDirty(model);
+			}
+		});
 	}
 
 }

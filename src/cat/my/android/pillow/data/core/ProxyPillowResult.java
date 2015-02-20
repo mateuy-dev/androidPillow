@@ -25,7 +25,6 @@ public class ProxyPillowResult<T> implements IPillowResult<T>{
 	
 	public synchronized void setMainPillowResult(IPillowResult<T> mainPillowResult) {
 		this.mainPillowResult = mainPillowResult;
-		lock.countDown();
 		if(listener!=null){
 			if(viewListener)
 				mainPillowResult.setViewListeners(listener, errorListener);
@@ -35,20 +34,26 @@ public class ProxyPillowResult<T> implements IPillowResult<T>{
 		for(Listener<T> listener: systemListeners){
 			mainPillowResult.addSystemListener(listener);
 		}
+		lock.countDown();
 	}
 	
 	public synchronized ProxyPillowResult<T> addSystemListener(Listener<T> listener){
 		systemListeners.add(listener);
 		return this;
 	}
-
+	
 	@Override
-	public T getResult() throws PillowError {
+	public void await() throws PillowError {
 		try {
 			lock.await();
 		} catch (InterruptedException e) {
 			throw new PillowError(e);
 		}
+	}
+
+	@Override
+	public T getResult() throws PillowError {
+		await();
 		return mainPillowResult.getResult();
 	}
 	
@@ -85,4 +90,6 @@ public class ProxyPillowResult<T> implements IPillowResult<T>{
 		}
 		return this;
 	}
+
+	
 }

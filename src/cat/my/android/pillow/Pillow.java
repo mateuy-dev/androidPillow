@@ -31,6 +31,7 @@ public class Pillow {
 	ModelConfigurationFactory modelConfigurationFactory;
 	RelationGraph relationGraph;
 	List<IDataSource<?>> sortedSynchDataSources;
+	Context context;
 	
 	private static Pillow pillow;
 	public static synchronized Pillow getInstance(Context context){
@@ -67,6 +68,7 @@ public class Pillow {
 	}
 	
 	private void init(Context context, int xmlFileResId) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, XmlPullParserException, IOException{
+		this.context=context;
 		config = new PillowConfigXml(context, xmlFileResId);
 		dbHelper = getClassFor(context, config.getDbHelper());
 		Class<IModelConfigurations> modelConfigurationsclazz = (Class<IModelConfigurations>) Class.forName(config.getModelConfigurations());
@@ -89,6 +91,9 @@ public class Pillow {
 			}
 		}
 		return sortedSynchDataSources;
+	}
+	public Context getContext() {
+		return context;
 	}
 	
 	private <T> T  getClassFor(Context context, String className) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{

@@ -9,6 +9,7 @@ public interface IPillowResult<T>{
 	/*Listener<T> listener;
 	ErrorListener errorListener;*/
 	
+	public void await() throws PillowError;
 	public T getResult() throws PillowError;
 	public IPillowResult<T> setListeners(Listener<T> listener, ErrorListener errorListener);
 	public IPillowResult<T> setViewListeners(Listener<T> listener, ErrorListener errorListener);

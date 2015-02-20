@@ -15,7 +15,7 @@ import cat.my.android.pillow.data.core.PillowResult;
 import cat.my.android.pillow.data.sync.DeletedEntries;
 
 
-public class DbDataSource<T extends IdentificableModel> implements IDBDataSource<T>{
+public class DbDataSource<T extends IdentificableModel> implements IDBDataSourceForSynch<T>{
 	SQLiteOpenHelper dbHelper;
 	IDbMapping<T> funcs;
 	DBModelController<T> dbModelController;
@@ -97,6 +97,14 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 		DBModelController<T> db =getDbModelController();
 		int result = db.getCount(selection, selectionArgs);
 		return new PillowResult<Integer>(context, result);
+	}
+	
+	@Override
+	public IPillowResult<T> setAsNotDirty(T model){
+		DBModelController<T> db =getDbModelController();
+		db.markAsClean(model);
+		model = db.get(model.getId());
+		return new PillowResult<T>(context, model);
 	}
 	
 	public DBModelController<T> getDbModelController(){

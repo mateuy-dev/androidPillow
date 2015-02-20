@@ -35,8 +35,8 @@ public class PillowResult<T> implements IPillowResult<T>{
 	public PillowResult(Context context, T result){
 		//No waiting
 		this.context = context;
-		lock = new CountDownLatch(0);
 		this.result = result;
+		lock = new CountDownLatch(0);
 	}
 	
 	/**
@@ -45,8 +45,8 @@ public class PillowResult<T> implements IPillowResult<T>{
 	public PillowResult(Context context, PillowError error){
 		//No waiting
 		this.context = context;
-		lock = new CountDownLatch(0);
 		this.error = error;
+		lock = new CountDownLatch(0);
 	}
 	
 	public PillowResult(Context context, Exception exception){
@@ -129,16 +129,20 @@ public class PillowResult<T> implements IPillowResult<T>{
 		return this;
 	}
 	
-	public void await() throws InterruptedException{
-		lock.await();
+	public void await() throws PillowError{
+		try {
+			lock.await();
+		} catch (InterruptedException e) {
+			throw new PillowError(e);
+		}
 	}
 	
 	private void controlledAwait(){
 		try {
 			await();
-		} catch (InterruptedException exception) {
+		} catch (PillowError exception) {
 			if(error!=null)
-				setError(new PillowError(exception));
+				setError(exception);
 		}
 	}
 
