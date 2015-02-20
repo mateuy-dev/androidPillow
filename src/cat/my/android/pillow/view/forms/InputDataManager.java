@@ -13,6 +13,7 @@ import cat.my.android.pillow.view.forms.inputDatas.DateEditTextData;
 import cat.my.android.pillow.view.forms.inputDatas.DateInputData;
 import cat.my.android.pillow.view.forms.inputDatas.EditTextData;
 import cat.my.android.pillow.view.forms.inputDatas.EnumInputData;
+import cat.my.android.pillow.view.forms.inputDatas.IdModelAutoCompleteEditTextData;
 import cat.my.android.pillow.view.forms.inputDatas.IdentificableModelSpinnerInputData;
 import cat.my.android.pillow.view.forms.inputDatas.IntEditTextData;
 import cat.my.android.pillow.view.forms.inputDatas.display.CalendarDisplay;
@@ -46,7 +47,8 @@ public class InputDataManager{
 			} else if(inputTypeAnnotation.belongsTo() !=null){
 				//The field is a belogsTo attribute (foreign key)
 				Class<? extends IdentificableModel> parentClass = inputTypeAnnotation.belongsTo();
-				return new IdentificableModelSpinnerInputData(parentClass);
+//				return new IdentificableModelSpinnerInputData(parentClass);
+				return new IdModelAutoCompleteEditTextData(parentClass);
 			}
 		}
 		

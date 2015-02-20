@@ -24,7 +24,7 @@ import cat.my.android.pillow.data.sync.SynchDataSource;
 public abstract class PillowBaseListAdapter<T extends IdentificableModel> extends BaseAdapter implements IModelListAdapter<T> {
 	T filter;
 	Context context;
-	List<T> models = new ArrayList<T>();
+	protected List<T> models = new ArrayList<T>();
 	IDataSource<T> dataSource;
 	ErrorListener donwloadErrorListener = CommonListeners.defaultErrorListener;
 	ErrorListener refreshListErrorListener = CommonListeners.defaultErrorListener;

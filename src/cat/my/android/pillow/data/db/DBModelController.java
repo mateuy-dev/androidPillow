@@ -272,7 +272,8 @@ public class DBModelController<T extends IdentificableModel> {
 		long milis = System.currentTimeMillis();
 		if(op==OP_CREATE){
 			//create
-			model.setId(createUUID());
+			if(model.getId()==null)
+				model.setId(createUUID());
 			mapper.addModelContentValues(model, values);
 			values.put(COLUMN_NAME_DIRTY, DIRTY_STATUS_CREATED);
 			values.put(COLUMN_NAME_ID, model.getId());
