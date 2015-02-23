@@ -13,7 +13,9 @@ import cat.my.android.pillow.IExtendedDataSource;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.Listeners.ViewListener;
 import cat.my.android.pillow.Pillow;
+import cat.my.android.pillow.data.core.IPillowResult;
 import cat.my.android.pillow.data.sync.CommonListeners;
 
 
@@ -35,7 +37,7 @@ public abstract class PillowBaseListAdapter<T extends IdentificableModel> extend
 	}
 
 	public void refreshList(){
-		Listener<Collection<T>> listener = new Listener<Collection<T>>(){
+		ViewListener<Collection<T>> listener = new ViewListener<Collection<T>>(){
 			@Override
 			public void onResponse(Collection<T> postsResponse) {
 				models.clear();
@@ -43,7 +45,7 @@ public abstract class PillowBaseListAdapter<T extends IdentificableModel> extend
 				notifyDataSetChanged();
 			}
 		};
-		dataSourceIndex(listener, CommonListeners.defaultErrorListener);
+		dataSourceIndex().setListeners(listener, CommonListeners.defaultErrorListener);
 	}
 	
 //	public void downloadData(){
@@ -56,11 +58,11 @@ public abstract class PillowBaseListAdapter<T extends IdentificableModel> extend
 //		((SynchDataSource<T>)dataSource).download(listener, donwloadErrorListener);
 //	}
 	
-	public void dataSourceIndex(Listener<Collection<T>> listener, ErrorListener errorListener){
+	public IPillowResult<Collection<T>> dataSourceIndex(){
 		if(filter!=null && dataSource instanceof IExtendedDataSource)
-			((IExtendedDataSource<T>)dataSource).index(filter).setViewListeners(listener, errorListener);
+			return ((IExtendedDataSource<T>)dataSource).index(filter);
 		else
-			dataSource.index().setViewListeners(listener, errorListener);
+			return dataSource.index();
 	}
 
 	@Override

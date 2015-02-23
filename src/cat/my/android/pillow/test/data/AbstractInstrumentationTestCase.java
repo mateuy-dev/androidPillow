@@ -64,7 +64,7 @@ public abstract class AbstractInstrumentationTestCase<T extends IdentificableMod
 	
 	
 	protected void sendDirty() throws Exception{
-		Thread.currentThread().sleep(2000);
+//		Thread.currentThread().sleep(2000);
 		getController().sendDirty().getResult();
 	}
 	

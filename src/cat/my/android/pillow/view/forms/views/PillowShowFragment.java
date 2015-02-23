@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import cat.my.android.pillow.IDataSource;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.Listeners.ViewListener;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.R;
 import cat.my.android.pillow.data.sync.CommonListeners;
@@ -52,7 +53,7 @@ public class PillowShowFragment<T extends IdentificableModel> extends Fragment{
 			throw new BreakFastException(e);
 		}
 		idModel.setId(modelId);
-		dataSource.show(idModel).setViewListeners(new Listener<T>() {
+		dataSource.show(idModel).setListeners(new ViewListener<T>() {
 			@Override
 			public void onResponse(T model) {
 				updateView(model);
@@ -123,7 +124,7 @@ public class PillowShowFragment<T extends IdentificableModel> extends Fragment{
 		builder.setTitle("Delete").setMessage("are you sure...?").setPositiveButton("OK", new OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				getDataSource().destroy(getModel()).setViewListeners(new Listener<Void>() {
+				getDataSource().destroy(getModel()).setListeners(new ViewListener<Void>() {
 					@Override
 					public void onResponse(Void response) {
 						new NavigationUtil(PillowShowFragment.this).displayListModel(getModel().getClass());

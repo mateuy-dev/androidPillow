@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.Listeners.ViewListener;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.data.core.PillowResult;
@@ -78,7 +79,7 @@ public class CommonListeners {
 		}
 	};
 	
-	public static class DummyToastListener<T> implements Listener<T>{
+	public static class DummyToastListener<T> implements ViewListener<T>{
 		String text;
 		Context context;
 		public DummyToastListener(Context context, String text) {

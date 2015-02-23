@@ -9,18 +9,17 @@ import android.content.Context;
 import android.os.Handler;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.Listeners.ViewErrorListener;
+import cat.my.android.pillow.Listeners.ViewListener;
 import cat.my.android.pillow.PillowError;
-import cat.my.util.exceptions.ToImplementException;
 
 public class PillowResult<T> implements IPillowResult<T>{
 	CountDownLatch lock;
 	T result;
 	PillowError error;
-	Listener<T> listener;
-	ErrorListener errorListener;
+	List<Listener<T>> listeners = new ArrayList<Listener<T>>();
+	List<ErrorListener> errorListeners = new ArrayList<ErrorListener>();
 	Context context;
-	boolean viewListeners = false;
-	List<Listener<T>> systemListeners = new ArrayList<Listener<T>>();
 	
 	public PillowResult(Context context){
 		this.context = context;
@@ -52,39 +51,31 @@ public class PillowResult<T> implements IPillowResult<T>{
 		this(context, new PillowError(exception));
 	}
 	
-	public synchronized PillowResult<T> addSystemListener(Listener<T> listener){
-		systemListeners.add(listener);
-		if(lock.getCount()==0){
-			callListeners();
-		}
-		return this;
-	}
-	
 	/**
 	 * Listener set is synchonized
 	 */
 	@Override
-	public PillowResult<T> setListeners(Listener<T> listener, ErrorListener errorListener){
-		return setViewListeners( listener, errorListener, false);
-	}
-	
-	@Override
-	public PillowResult<T> setViewListeners(Listener<T> listener, ErrorListener errorListener){
-		return setViewListeners(listener, errorListener, true);
-	}
-	
-	public synchronized PillowResult<T> setViewListeners(Listener<T> listener, ErrorListener errorListener, boolean viewListeners){
-		if(this.listener!=null || this.errorListener!=null)
-			throw new ToImplementException("should be a list of exceptions");
-		this.viewListeners = viewListeners;
-		this.listener = listener;
-		this.errorListener = errorListener;
+	public synchronized PillowResult<T> setListeners(Listener<T> listener, ErrorListener errorListener){
+		if(listener!=null)
+			listeners.add(listener);
+		
+		if(errorListener!=null)
+			errorListeners.add(errorListener);
+		
 		if(lock.getCount()==0){
 			//Result already finished so we call the listeners
 			callListeners();
 		}
 		return this;
 	}
+	
+	public IPillowResult<T> addListener(Listener<T> listener){
+		return setListeners(listener, null);
+	}
+	public IPillowResult<T> addErrorListener(ErrorListener errorListener){
+		return setListeners(null, errorListener);
+	}
+
 	
 	
 	
@@ -93,28 +84,26 @@ public class PillowResult<T> implements IPillowResult<T>{
 	 */
 	private void callListeners(){
 		if(error!=null){
-			if(errorListener!=null){
-				if(!viewListeners){
+			for(Iterator<ErrorListener> it=errorListeners.iterator(); it.hasNext();){
+				ErrorListener errorListener = it.next(); 
+				if(!(errorListener instanceof ViewErrorListener)){
 					errorListener.onErrorResponse(error);
-					errorListener=null;
 				}else{
 					Handler mainHandler = new Handler(context.getMainLooper());
-					mainHandler.post(new ErrorListenerRunnable());
+					mainHandler.post(new ErrorListenerRunnable(errorListener));
 				}
+				it.remove();
 			}
 		} else {
-			if(listener!=null){
-				if(!viewListeners){
+			for(Iterator<Listener<T>> it=listeners.iterator(); it.hasNext();){
+				Listener<T> listener = it.next(); 
+				if(!(listener instanceof ViewListener)){
 					listener.onResponse(result);
 					listener=null;
 				}else{
 					Handler mainHandler = new Handler(context.getMainLooper());
-					mainHandler.post(new ListenerRunnable());
+					mainHandler.post(new ListenerRunnable(listener));
 				}
-			}
-			for(Iterator<Listener<T>> it=systemListeners.iterator(); it.hasNext();){
-				Listener<T> systemListener = it.next(); 
-				systemListener.onResponse(result);
 				it.remove();
 			}
 		}
@@ -171,6 +160,10 @@ public class PillowResult<T> implements IPillowResult<T>{
 	}
 
 	private class ListenerRunnable implements Runnable{
+		Listener<T> listener;
+		public ListenerRunnable(Listener<T> listener) {
+			this.listener = listener;
+		}
 		@Override
 		public void run() {
 			if(listener!=null){
@@ -180,12 +173,16 @@ public class PillowResult<T> implements IPillowResult<T>{
 		}
 	}
 	private class ErrorListenerRunnable implements Runnable{
+		ErrorListener errorListener;
+		public ErrorListenerRunnable(ErrorListener errorListener) {
+			this.errorListener = errorListener;
+		}	
 		@Override
 		public void run() {
 			if(errorListener!=null){
 				errorListener.onErrorResponse(error);
 				errorListener = null;
 			}
-		}	
+		}
 	}
 }

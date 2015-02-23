@@ -9,6 +9,7 @@ import cat.my.android.pillow.IDataSource;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.Listeners.ViewListener;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.data.sync.CommonListeners;
 import cat.my.android.pillow.view.forms.BelongsToInputData;
@@ -61,10 +62,10 @@ public class IdentificableModelSpinnerInputData<T extends IdentificableModel> ex
 	 */
 	protected void loadData(Context context, Listener<Collection<T>> listener, ErrorListener errorListener) {
 		IDataSource<T> dataSource = Pillow.getInstance(context).getDataSource(parentClass);
-		dataSource.index().setViewListeners(listener, errorListener);
+		dataSource.index().setListeners(listener, errorListener);
 	}
 
-	Listener<Collection<T>> onLoadListener = new Listener<Collection<T>>(){
+	ViewListener<Collection<T>> onLoadListener = new ViewListener<Collection<T>>(){
 		@Override
 		public void onResponse(Collection<T> items) {
 			for(T item:items){

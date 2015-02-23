@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import cat.my.android.pillow.IDataSource;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.Listeners.ViewListener;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.data.sync.CommonListeners;
 import cat.my.android.pillow.util.BundleUtils;
@@ -47,7 +48,7 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 			if (modelId != null) {
 				//update, we should look for current values
 				idModel.setId(modelId);
-				dataSource.show(idModel).setViewListeners(new Listener<T>() {
+				dataSource.show(idModel).setListeners(new ViewListener<T>() {
 					@Override
 					public void onResponse(T model) {
 						formView.setModel(model, atts);

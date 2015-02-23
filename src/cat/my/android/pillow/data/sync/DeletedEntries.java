@@ -8,10 +8,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.data.core.IPillowResult;
+import cat.my.android.pillow.data.core.MultiTaskVoidResult;
 import cat.my.android.pillow.data.core.PillowResultListener;
 import cat.my.android.pillow.data.db.DBUtil;
 import cat.my.android.pillow.data.rest.RestDataSource;
 import cat.my.android.util.CursorUtil;
+import cat.my.util.exceptions.BreakFastException;
 
 
 
@@ -83,7 +85,8 @@ public class DeletedEntries<T extends IdentificableModel> {
 		db.delete(TABLE, WHERE_ID_SELECTION, selectionArgs);
 	}
 	
-	public void synchronize(){
+	public IPillowResult<Void> synchronize(){
+		MultiTaskVoidResult result = new MultiTaskVoidResult(context);
 		Cursor cursor = getCursor();
 		while(cursor.moveToNext()){
 			String id = CursorUtil.getString(cursor, ID_COLUMN);
@@ -93,17 +96,14 @@ public class DeletedEntries<T extends IdentificableModel> {
 				Class<T> clazz = getModelClass();
 				T model = clazz.newInstance();
 				model.setId(id);
-				setAllreadyDeleted(model);
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				//TODO this means that the model does not have a default constructor!
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				IPillowResult<Void> subOperation = setAllreadyDeleted(model);
+				result.addOperation(subOperation);
+			} catch (Exception e) {
+				throw new BreakFastException(e);
 			}
-			
 		}
+		result.setLastOperationAdded();
+		return result;
 	}
 	
 	

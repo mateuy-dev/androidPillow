@@ -5,6 +5,7 @@ import android.widget.EditText;
 import cat.my.android.pillow.IDataSource;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.Listeners.ViewListener;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.data.sync.CommonListeners;
 
@@ -24,7 +25,7 @@ public class ModelDialogInputView<T extends IdentificableModel> extends EditText
 		try {
 			toSearch = selectedClass.newInstance();
 			toSearch.setId(modelId);
-			dataSource.show(toSearch).setViewListeners(new Listener<T>() {
+			dataSource.show(toSearch).setListeners(new ViewListener<T>() {
 				@Override
 				public void onResponse(T response) {
 					selected = response;

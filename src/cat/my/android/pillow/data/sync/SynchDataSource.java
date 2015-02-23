@@ -3,6 +3,7 @@ package cat.my.android.pillow.data.sync;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +28,8 @@ import cat.my.android.pillow.data.rest.ISessionController;
 import cat.my.android.pillow.data.rest.RestDataSource;
 
 public class SynchDataSource<T extends IdentificableModel> implements ISynchDataSource<T>{
-	private static ThreadPoolExecutor operationthreadPool = new ThreadPoolExecutor(3, 5, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+	private static ThreadPoolExecutor operationthreadPool = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+	
 	
 	RestDataSource<T> restDataSource;
 	ISessionController authenticationData;
@@ -41,8 +43,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 	//ensures that no more than one syncrhonization process is beeing done at the same time
 	Object synchronizationLock;
 	
-	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context
-, ISessionController authenticationData) {
+	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context, ISessionController authenticationData) {
 		this.context=context;
 		this.authenticationData=authenticationData;
 		this.dbFuncs=dbFuncs;
@@ -96,12 +97,13 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		Listener<T> createdOnDbListener = new Listener<T>(){
 			@Override
 			public void onResponse(T response) {
-				Listener<T> myListener = new SetAsNotDirityListener();
-				restDataSource.create(model).setListeners(myListener, CommonListeners.getDefaultThreadedErrorListener());
+				sendDirty();
+				//Listener<T> myListener = new SetAsNotDirityListener();
+				//restDataSource.create(model).setListeners(myListener, CommonListeners.getDefaultThreadedErrorListener());
 			}
 		};
 		
-		return dbSource.create(model).addSystemListener(createdOnDbListener);
+		return dbSource.create(model).addListener(createdOnDbListener);
 	}
 	
 	
@@ -114,11 +116,12 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		Listener<T> updatedOnDbListener = new Listener<T>(){
 			@Override
 			public void onResponse(T response) {
-				Listener<T> myListener = new SetAsNotDirityListener();
-				restDataSource.update(model).setListeners(myListener, CommonListeners.getDefaultThreadedErrorListener());
+				sendDirty();
+				//Listener<T> myListener = new SetAsNotDirityListener();
+				//restDataSource.update(model).setListeners(myListener, CommonListeners.getDefaultThreadedErrorListener());
 			}
 		};
-		return dbSource.update(model).addSystemListener(updatedOnDbListener);
+		return dbSource.update(model).addListener(updatedOnDbListener);
 	}
 	
 	@Override
@@ -128,10 +131,11 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		Listener<Void> deletedOnDbListener = new Listener<Void>(){
 			@Override
 			public void onResponse(Void response) {
-				deletedEntries.setAllreadyDeleted(model).setListeners(CommonListeners.dummyListener, CommonListeners.getDefaultThreadedErrorListener());
+				sendDirty();
+//				deletedEntries.setAllreadyDeleted(model).setListeners(CommonListeners.dummyListener, CommonListeners.getDefaultThreadedErrorListener());
 			}
 		};
-		return dbSource.destroy(model).addSystemListener(deletedOnDbListener);
+		return dbSource.destroy(model).addListener(deletedOnDbListener);
 		
 	}
 	
@@ -140,7 +144,6 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 	private class SendDirtyRunnable extends OperationRunnable<Void>{
 		@Override
 		protected IPillowResult<Void> createMainPillowResult() {
-			
 			try {
 				DBModelController<T> db = getDbModelController();
 				List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
@@ -154,7 +157,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 					dbSource.setAsNotDirty(updated).await();
 				}
 				
-				deletedEntries.synchronize();
+				deletedEntries.synchronize().await();
 				
 				return PillowResult.newVoidResult(context);
 			} catch (Exception e) {

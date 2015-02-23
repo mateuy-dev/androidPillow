@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.Listener;
+import cat.my.android.pillow.Listeners.ViewListener;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.R;
 import cat.my.android.pillow.data.sync.CommonListeners;
@@ -52,9 +53,9 @@ public class FormActivity<T extends IdentificableModel>  extends ActionBarActivi
 				T model = formFragment.getModel();
 				ISynchDataSource<T> dataSource = (ISynchDataSource<T>) Pillow.getInstance(FormActivity.this).getDataSource(model.getClass());
 				if(StringUtil.isBlanck(model.getId())){
-					dataSource.create(model).setViewListeners(getOnSaveListener(), CommonListeners.defaultErrorListener);
+					dataSource.create(model).setListeners(getOnSaveListener(), CommonListeners.defaultErrorListener);
 				} else {
-					dataSource.update(model).setViewListeners(getOnSaveListener(), CommonListeners.defaultErrorListener);
+					dataSource.update(model).setListeners(getOnSaveListener(), CommonListeners.defaultErrorListener);
 				}
 			}
 			
@@ -66,7 +67,7 @@ public class FormActivity<T extends IdentificableModel>  extends ActionBarActivi
 		return closeOnSaveListener;
 	}
 	
-	private Listener<T> closeOnSaveListener = new Listener<T>() {
+	private ViewListener<T> closeOnSaveListener = new ViewListener<T>() {
 		@Override
 		public void onResponse(T response) {
 			finish();

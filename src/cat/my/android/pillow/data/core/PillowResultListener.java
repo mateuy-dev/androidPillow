@@ -37,7 +37,4 @@ public class PillowResultListener<T> extends PillowResult<T> implements Listener
 
 	}
 
-	
-	
-
 }

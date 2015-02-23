@@ -58,13 +58,16 @@ public abstract class AbstractUserController<T extends IdentificableModel> {
 	 * @return 
 	 */
 	private IPillowResult<T> signUpAsGuest(){
+		final PillowResult<T> result = new PillowResult<T>(context);
 		Listener<T> onCreateListener = new Listener<T>() {
 			@Override
 			public void onResponse(T response) {
 				storeAuthToken(response.getId());
+				result.setResult(response);
 			}
 		};
-		return userDataSource.create(createGuestUser()).addSystemListener(onCreateListener);
+		userDataSource.create(createGuestUser()).addListener(onCreateListener);
+		return result;
 	}
 	
 	/**
@@ -107,7 +110,7 @@ public abstract class AbstractUserController<T extends IdentificableModel> {
 				reloadData().setListeners(result,result);
 			}
 		};
-		userDataSource.create(createGuestUser()).addSystemListener(onCreateListener);
+		userDataSource.create(createGuestUser()).addListener(onCreateListener);
 		return result;
 	}
 	

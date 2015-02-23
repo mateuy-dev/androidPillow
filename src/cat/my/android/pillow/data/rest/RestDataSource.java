@@ -123,8 +123,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 		};
 		
 		IPillowResult<SessionData> sessionData = sessionController.getSession();
-		//TODO ADD ERROR CASE
-		sessionData.addSystemListener(onSessionStarted);
+		sessionData.setListeners(onSessionStarted, result);
 		
 		return result;
 	}
@@ -153,8 +152,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 			}
 		};
 		IPillowResult<SessionData> sessionData = sessionController.getSession();
-		//TODO ADD ERROR CASE
-		sessionData.addSystemListener(onSessionStarted);
+		sessionData.setListeners(onSessionStarted, result);
 		
 		return result;
 	}
