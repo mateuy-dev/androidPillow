@@ -11,18 +11,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.wifi.WifiManager;
 import android.test.InstrumentationTestCase;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.data.core.IPillowResult;
 import cat.my.android.pillow.data.rest.IRestMapping;
-import cat.my.android.pillow.data.rest.RailsRestMapping;
 import cat.my.android.pillow.data.rest.RestDataSource;
 import cat.my.android.pillow.data.rest.Route;
-import cat.my.android.pillow.data.sync.AsynchListener;
 import cat.my.android.pillow.data.sync.ISynchDataSource;
 
 import com.google.gson.Gson;
@@ -68,6 +64,7 @@ public abstract class AbstractInstrumentationTestCase<T extends IdentificableMod
 	
 	
 	protected void sendDirty() throws Exception{
+		Thread.currentThread().sleep(2000);
 		getController().sendDirty().getResult();
 	}
 	

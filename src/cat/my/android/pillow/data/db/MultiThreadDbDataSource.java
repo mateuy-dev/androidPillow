@@ -5,17 +5,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import android.content.Context;
-
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Pillow;
-import cat.my.android.pillow.Listeners.ErrorListener;
-import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.data.core.IPillowResult;
-import cat.my.android.pillow.data.core.PillowResult;
-import cat.my.android.pillow.data.core.ProxyPillowResult;
-import cat.my.android.pillow.util.concurrency.FullStackThreadPoolExecutor;
+import cat.my.android.pillow.data.core.PillowResultListener;
 
 
 public class MultiThreadDbDataSource<T extends IdentificableModel> implements IDBDataSourceForSynch<T>{
@@ -30,19 +24,18 @@ public class MultiThreadDbDataSource<T extends IdentificableModel> implements ID
 	}
 
 	public abstract static class OperationRunnable<L> implements Runnable{
-		ProxyPillowResult<L> proxyResult;
+		PillowResultListener<L> proxyResult;
 		public OperationRunnable() {
-			this.proxyResult = new ProxyPillowResult<L>();
+			this.proxyResult = new PillowResultListener<L>(Pillow.getInstance().getContext());
 		}
-		public ProxyPillowResult<L> getProxyResult() {
+		public PillowResultListener<L> getProxyResult() {
 			return proxyResult;
 		}
 		public void run(){
 			try {
-				proxyResult.setMainPillowResult(createMainPillowResult());
+				createMainPillowResult().setListeners(proxyResult, proxyResult);
 			} catch (PillowError e) {
-				Context context = Pillow.getInstance().getContext();
-				proxyResult.setMainPillowResult(new PillowResult<L>(context, e));
+				proxyResult.setError(e);
 			}
 		}
 		protected abstract IPillowResult<L> createMainPillowResult() throws PillowError;

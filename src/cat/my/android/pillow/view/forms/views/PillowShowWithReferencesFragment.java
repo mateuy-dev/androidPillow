@@ -9,13 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-
-
-
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Pillow;
-import cat.my.android.pillow.R;
-import cat.my.android.pillow.conf.ModelViewConfiguration;
 import cat.my.android.pillow.util.BundleUtils;
 import cat.my.android.pillow.util.reflection.ReflectionUtil;
 import cat.my.util.exceptions.BreakFastException;

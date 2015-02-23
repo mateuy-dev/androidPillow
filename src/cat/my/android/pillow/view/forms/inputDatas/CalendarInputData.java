@@ -6,8 +6,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import cat.my.util.exceptions.BreakFastException;
-
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.Context;
@@ -15,6 +13,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import cat.my.util.exceptions.BreakFastException;
 
 public class CalendarInputData extends AbstractInputData {
 	public static final String DATE_STRING_FORMAT = "dd-MM-yyyy";

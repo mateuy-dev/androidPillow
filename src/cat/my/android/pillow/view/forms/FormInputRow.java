@@ -1,14 +1,13 @@
 package cat.my.android.pillow.view.forms;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
-
-import cat.my.util.exceptions.BreakFastException;
 
 import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
+import cat.my.android.pillow.view.reflection.ViewConfig.ViewType;
+import cat.my.util.exceptions.BreakFastException;
 
 public class FormInputRow{
 		InputDataManager inputManager = new InputDataManager();
@@ -20,6 +19,7 @@ public class FormInputRow{
 		Context context;
 		Object model;
 		boolean editable;
+		int order;
 		
 		public FormInputRow(Context context, Field field, Object model, boolean editable){
 			this.field = field;
@@ -37,6 +37,10 @@ public class FormInputRow{
 				throw new BreakFastException(e);
 			}
 			createLabelView();
+			ViewType viewType = field.getAnnotation(ViewType.class);
+			if(viewType!=null){
+				order = viewType.order();
+			}
 			
 		}
 		private void createLabelView() {
@@ -56,5 +60,9 @@ public class FormInputRow{
 		
 		public View getInput() {
 			return input;
+		}
+		
+		public int getOrder() {
+			return order;
 		}
 	}

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType;
-import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType.DEFAULT_INPUT;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType.NONE;
 import cat.my.util.CaseFormat;
 import cat.my.util.exceptions.BreakFastException;

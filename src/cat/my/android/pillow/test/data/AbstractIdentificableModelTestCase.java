@@ -3,7 +3,6 @@ package cat.my.android.pillow.test.data;
 import org.apache.http.HttpResponse;
 
 import cat.my.android.pillow.IdentificableModel;
-import cat.my.android.pillow.data.sync.AsynchListener;
 import cat.my.android.pillow.data.sync.ISynchDataSource;
 
 public abstract class  AbstractIdentificableModelTestCase<T extends IdentificableModel> extends AbstractInstrumentationTestCase<T>{

@@ -3,17 +3,12 @@ package cat.my.android.pillow.view.forms;
 
 import java.util.Collection;
 
-import cat.my.android.pillow.R;
-
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v7.widget.GridLayout;
-import android.support.v7.widget.Space;
-import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+import cat.my.android.pillow.R;
 
 
 public class TFormView<T> extends GridLayout{

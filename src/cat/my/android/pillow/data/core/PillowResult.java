@@ -1,15 +1,14 @@
 package cat.my.android.pillow.data.core;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import android.content.Context;
 import android.os.Handler;
-
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
-
 import cat.my.android.pillow.PillowError;
 import cat.my.util.exceptions.ToImplementException;
 
@@ -55,6 +54,9 @@ public class PillowResult<T> implements IPillowResult<T>{
 	
 	public synchronized PillowResult<T> addSystemListener(Listener<T> listener){
 		systemListeners.add(listener);
+		if(lock.getCount()==0){
+			callListeners();
+		}
 		return this;
 	}
 	
@@ -94,6 +96,7 @@ public class PillowResult<T> implements IPillowResult<T>{
 			if(errorListener!=null){
 				if(!viewListeners){
 					errorListener.onErrorResponse(error);
+					errorListener=null;
 				}else{
 					Handler mainHandler = new Handler(context.getMainLooper());
 					mainHandler.post(new ErrorListenerRunnable());
@@ -103,13 +106,16 @@ public class PillowResult<T> implements IPillowResult<T>{
 			if(listener!=null){
 				if(!viewListeners){
 					listener.onResponse(result);
+					listener=null;
 				}else{
 					Handler mainHandler = new Handler(context.getMainLooper());
 					mainHandler.post(new ListenerRunnable());
 				}
 			}
-			for(Listener<T> systemListener: systemListeners){
+			for(Iterator<Listener<T>> it=systemListeners.iterator(); it.hasNext();){
+				Listener<T> systemListener = it.next(); 
 				systemListener.onResponse(result);
+				it.remove();
 			}
 		}
 	}
@@ -167,13 +173,19 @@ public class PillowResult<T> implements IPillowResult<T>{
 	private class ListenerRunnable implements Runnable{
 		@Override
 		public void run() {
-			listener.onResponse(result);
+			if(listener!=null){
+				listener.onResponse(result);
+				listener = null;
+			}
 		}
 	}
 	private class ErrorListenerRunnable implements Runnable{
 		@Override
 		public void run() {
-			errorListener.onErrorResponse(error);
+			if(errorListener!=null){
+				errorListener.onErrorResponse(error);
+				errorListener = null;
+			}
 		}	
 	}
 }

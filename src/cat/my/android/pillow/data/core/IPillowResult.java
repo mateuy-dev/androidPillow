@@ -1,6 +1,5 @@
 package cat.my.android.pillow.data.core;
 
-import android.content.Context;
 import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.PillowError;

@@ -15,7 +15,6 @@ import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.data.sync.CommonListeners;
-import cat.my.android.pillow.data.sync.SynchDataSource;
 
 
 

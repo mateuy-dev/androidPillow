@@ -11,13 +11,19 @@ import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.data.sync.CommonListeners;
+import cat.my.android.pillow.view.forms.BelongsToInputData;
 
-public class IdentificableModelSpinnerInputData<T extends IdentificableModel> extends AbstractSpinnerInputData<T>{
+public class IdentificableModelSpinnerInputData<T extends IdentificableModel> extends AbstractSpinnerInputData<T> implements BelongsToInputData<T>{
 	Class<T> parentClass;
 	ArrayAdapter<T> adapter;
 	
-	public IdentificableModelSpinnerInputData(Class<T> parentClass) {
-		this.parentClass = parentClass;
+	public IdentificableModelSpinnerInputData() {
+		
+	}
+	
+	@Override
+	public void setParentClass(Class<T> parentClass) {
+		this.parentClass = parentClass;	
 	}
 
 	@Override

@@ -2,8 +2,6 @@ package cat.my.android.pillow;
 
 import java.util.Collection;
 
-import cat.my.android.pillow.Listeners.ErrorListener;
-import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.data.core.IPillowResult;
 
 public interface IExtendedDataSource<T extends IdentificableModel> extends IDataSource<T>{

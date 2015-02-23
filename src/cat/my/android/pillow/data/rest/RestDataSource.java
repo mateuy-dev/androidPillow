@@ -17,51 +17,54 @@
 package cat.my.android.pillow.data.rest;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.util.Log;
 import cat.my.android.pillow.IDataSource;
 import cat.my.android.pillow.IdentificableModel;
-import cat.my.android.pillow.PillowError;
-import cat.my.android.pillow.Listeners.ErrorListener;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.PillowConfigXml;
+import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.data.core.IPillowResult;
-import cat.my.android.pillow.data.core.PillowResult;
 import cat.my.android.pillow.data.core.PillowResultListener;
+import cat.my.android.pillow.data.db.MultiThreadDbDataSource.OperationRunnable;
 import cat.my.android.pillow.data.rest.ISessionController.NullSessionController;
+import cat.my.android.pillow.data.rest.ISessionController.SessionData;
 import cat.my.android.pillow.data.rest.requests.GsonCollectionRequest;
 import cat.my.android.pillow.data.rest.requests.GsonRequest;
 
 import com.android.volley.NoConnectionError;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.Volley;
 
 public class RestDataSource<T extends IdentificableModel> implements IDataSource<T> {
+	private static ThreadPoolExecutor dbThreadPool = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+	
 	public static final String LOG_ID = Pillow.LOG_ID +" - RestDataSource";
 	public static boolean SIMULATE_OFFLINE_CONNECTIVITY_ON_TESTING = false;
 	
 	Context context;
 	RequestQueue volleyQueue;
-//	ISessionController sessionController;
 	IRestMapping<T> restMapping;
 	
+	ISessionController sessionController;
 	
 	
 	public RestDataSource(IRestMapping<T> restMapping, Context context) {
 		this(restMapping, context, new NullSessionController());
 	}
 	
-	public RestDataSource(IRestMapping<T> restMapping, Context context, ISessionController authenticationData) {
+	public RestDataSource(IRestMapping<T> restMapping, Context context, ISessionController sessionController) {
 		this.restMapping=restMapping;
 		this.volleyQueue = VolleyFactory.newRequestQueue(context);
-		if(authenticationData==null)
-			authenticationData = new NullSessionController();
-//		this.sessionController = authenticationData;
+		if(sessionController==null)
+			sessionController = new NullSessionController();
+		this.sessionController = sessionController;
 		this.context = context;
 	}
 	
@@ -77,7 +80,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 //	 * @return false if authentication is required but not provided
 //	 */
 //	public boolean checkAuthenticationRequired() {
-//		return !serverRequiresAuthentication || authenticationData.isAuthenticated();
+//		return !serverRequiresAuthentication || sessionController.isAuthenticated();
 //	}
 //	public void setServerRequiresAuthentication(boolean serverRequiresAuthentication) {
 //		this.serverRequiresAuthentication = serverRequiresAuthentication;
@@ -99,43 +102,44 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 	}
 	
 	private IPillowResult<Collection<T>> executeListOperation(final Route route, final Map<String, Object> params) {
-		PillowResultListener<Collection<T>> result = new PillowResultListener<Collection<T>>(context);
+		final PillowResultListener<Collection<T>> result = new PillowResultListener<Collection<T>>(context);
 		
 		Log.d(LOG_ID, "Executing operation "+route.method + " "+route.url + " "+params);
 		if(SIMULATE_OFFLINE_CONNECTIVITY_ON_TESTING){
 			return result.setError(new PillowError(new NoConnectionError()));
-		}
-//		Listener<Void> onSessionStarted = new Listener<Void>() {
-//			@Override
-//			public void onResponse(Void response) {
-//				Map<String, Object> map=new HashMap<String, Object>(sessionController.getSession());
-		Map<String, Object> map = new HashMap<String, Object>();
+		}		
+		
+		Listener<SessionData> onSessionStarted = new Listener<SessionData>() {
+			@Override
+			public void onResponse(SessionData sessionData) {
+				Map<String, Object> map = sessionData.getData();
 				if(params!=null){
 					map.putAll(params);
 				}
 				GsonCollectionRequest<T> gsonRequest = new GsonCollectionRequest<T>(restMapping.getSerializer(), route, restMapping.getCollectionType(), map, result, result, getConfig().getDownloadTimeInterval());
 				gsonRequest.setShouldCache(false);
 				volleyQueue.add(gsonRequest);
-//			}
-//		};
-		//we need to check that session has been started. The operation will be executed once the session has started
-		//TODO Enable session again!!
-//		sessionController.init(onSessionStarted, errorListener);
+			}
+		};
+		
+		IPillowResult<SessionData> sessionData = sessionController.getSession();
+		//TODO ADD ERROR CASE
+		sessionData.addSystemListener(onSessionStarted);
 		
 		return result;
 	}
 	
 	private IPillowResult<T> executeOperation(final T model, final Route route, final Map<String, Object> params) {
-		PillowResultListener<T> result = new PillowResultListener<T>(context);
+		final PillowResultListener<T> result = new PillowResultListener<T>(context);
 		Log.d(LOG_ID, "Executing operation "+route.method + " "+route.url + " "+params);
 		if(SIMULATE_OFFLINE_CONNECTIVITY_ON_TESTING){
 			return result.setError(new PillowError(new NoConnectionError()));
 		}
-//		Listener<Void> onSessionStarted = new Listener<Void>() {
-//			@Override
-//			public void onResponse(Void response) {
-//			Map<String, Object> map=new HashMap<String, Object>(sessionController.getSession());
-		Map<String, Object> map = new HashMap<String, Object>();
+		Listener<SessionData> onSessionStarted = new Listener<SessionData>() {
+			@Override
+			public void onResponse(SessionData sessionData) {
+			
+			Map<String, Object> map = sessionData.getData();
 			if(params!=null){
 				map.putAll(params);
 			}
@@ -146,11 +150,18 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 			GsonRequest<T> gsonRequest = new GsonRequest<T>(restMapping.getSerializer(), route, restMapping.getModelClass(), map, result, result, getConfig().getDownloadTimeInterval());
 			gsonRequest.setShouldCache(false);
 			volleyQueue.add(gsonRequest);
-//			}
-//		};
-		//we need to check that session has been started. The operation will be executed once the session has started
-//		sessionController.init(onSessionStarted, errorListener);
-			return result;
+			}
+		};
+		IPillowResult<SessionData> sessionData = sessionController.getSession();
+		//TODO ADD ERROR CASE
+		sessionData.addSystemListener(onSessionStarted);
+		
+		return result;
+	}
+	
+	private <K> IPillowResult<K> execute(OperationRunnable<K> runnable){
+		dbThreadPool.execute(runnable);
+		return runnable.getProxyResult();
 	}
 	
 	@Override

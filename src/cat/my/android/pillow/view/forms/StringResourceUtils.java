@@ -2,10 +2,9 @@ package cat.my.android.pillow.view.forms;
 
 import java.lang.reflect.Field;
 
-import cat.my.android.pillow.Pillow;
-
 import android.content.Context;
 import android.util.Log;
+import cat.my.android.pillow.Pillow;
 
 public class StringResourceUtils {
 	public static String getLabel(Context context, Field field){

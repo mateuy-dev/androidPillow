@@ -13,9 +13,8 @@ import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.util.reflection.ReflectionUtil;
 import cat.my.android.pillow.util.reflection.ValuesTypes.BelongsToOnDelete;
 import cat.my.android.pillow.util.reflection.ValuesTypes.OrderBy;
-import cat.my.android.pillow.util.reflection.ValuesTypes.OrderBy.OrderType;
-import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType.NONE;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType;
+import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType.NONE;
 import cat.my.util.exceptions.BreakFastException;
 import cat.my.util.exceptions.UnimplementedException;
 

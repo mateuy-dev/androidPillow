@@ -3,13 +3,14 @@ package cat.my.android.pillow.view.forms;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import android.content.Context;
-import android.view.View;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.util.reflection.ReflectionUtil;
 import cat.my.util.exceptions.BreakFastException;
@@ -56,11 +57,17 @@ public class FormInputs {
 	
 	public Collection<FormInputRow> getInputs(){
 		initInputs();
-		Collection<FormInputRow> result = new ArrayList<FormInputRow>();
+		List<FormInputRow> result = new ArrayList<FormInputRow>();
 		if(inputNames==null){
 			for(FormInputRow row : inputViewMap.values()){
 				result.add(row);
 			}
+			//sort
+			Collections.sort(result, new Comparator<FormInputRow>() {
+				public int compare(FormInputRow lhs, FormInputRow rhs) {
+					return FormInputs.compare(lhs.getOrder(), rhs.getOrder());
+				};
+			});
 		} else {
 			for(String inputName: inputNames){
 				result.add(getInput(inputName));
@@ -68,6 +75,10 @@ public class FormInputs {
 		}
 		return result;
 	}
+	
+	 public static int compare(int lhs, int rhs) {
+		 return lhs < rhs ? -1 : (lhs == rhs ? 0 : 1);
+	 }
 	
 	private FormInputRow getInput(String fieldName){
 		initInputs();

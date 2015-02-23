@@ -3,8 +3,6 @@ package cat.my.android.pillow.data.sync;
 import java.util.Collection;
 
 import cat.my.android.pillow.IdentificableModel;
-import cat.my.android.pillow.Listeners.ErrorListener;
-import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.data.core.IPillowResult;
 import cat.my.android.pillow.data.db.IDBDataSource;
 import cat.my.android.pillow.data.db.IDbMapping;

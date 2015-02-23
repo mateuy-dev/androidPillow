@@ -4,31 +4,30 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import cat.my.android.pillow.IdentificableModel;
-import cat.my.android.pillow.data.db.IDBDataSource;
-import cat.my.android.pillow.data.sync.CommonListeners;
-import cat.my.android.pillow.view.base.PillowBaseListAdapter;
-import cat.my.util.exceptions.BreakFastException;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ListAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
+import cat.my.android.pillow.IdentificableModel;
+import cat.my.android.pillow.view.base.PillowBaseListAdapter;
+import cat.my.android.pillow.view.forms.BelongsToInputData;
 
-public class IdModelAutoCompleteEditTextData<T extends IdentificableModel> extends AbstractInputData {
+public class BelongsToAutoCompleteEditTextData<T extends IdentificableModel> extends AbstractInputData implements BelongsToInputData<T> {
 	public static final int EMS = 10;
 	T selected = null;
 	Class<T> parentClass;
     MyAdapter adapter;
-	public IdModelAutoCompleteEditTextData(Class<T> parentClass) {
+	public BelongsToAutoCompleteEditTextData() {
 		super();
+	}
+	
+	@Override
+	public void setParentClass(Class<T> parentClass) {
 		this.parentClass = parentClass;
 	}
 	

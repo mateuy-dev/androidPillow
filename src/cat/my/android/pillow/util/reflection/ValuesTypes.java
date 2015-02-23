@@ -6,7 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import cat.my.android.pillow.IdentificableModel;
-import cat.my.android.pillow.view.forms.InputData;
 
 
 public class ValuesTypes {
@@ -16,7 +15,6 @@ public class ValuesTypes {
 	@Target({ElementType.FIELD})
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface ValueType {
-		public interface DEFAULT_INPUT extends InputData{};
 		public interface NONE extends IdentificableModel{};
 		
 		ValueTypeClass type() default ValueTypeClass.DEFAULT;

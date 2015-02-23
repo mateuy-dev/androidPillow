@@ -1,14 +1,9 @@
 package cat.my.android.pillow.util.reflection;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import cat.my.util.exceptions.BreakFastException;
 

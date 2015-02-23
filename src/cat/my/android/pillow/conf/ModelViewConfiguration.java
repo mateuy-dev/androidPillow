@@ -2,7 +2,6 @@ package cat.my.android.pillow.conf;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
-import android.widget.ListAdapter;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.view.base.IModelListAdapter;
 

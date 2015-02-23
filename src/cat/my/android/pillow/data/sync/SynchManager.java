@@ -1,31 +1,22 @@
 package cat.my.android.pillow.data.sync;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import cat.my.android.pillow.AbstractDBHelper;
-import cat.my.android.pillow.Listeners.ErrorListener;
-import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.IDataSource;
 import cat.my.android.pillow.Pillow;
-import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.data.core.IPillowResult;
 import cat.my.android.pillow.data.core.PillowResult;
-import cat.my.android.pillow.data.core.ProxyPillowResult;
+import cat.my.android.pillow.data.core.PillowResultListener;
 import cat.my.android.pillow.data.db.DBUtil;
-
-import cat.my.android.pillow.util.reflection.RelationGraph;
 import cat.my.util.exceptions.UnimplementedException;
 
 public class SynchManager {
@@ -65,6 +56,9 @@ public class SynchManager {
 		db.close();
 	}
 
+	/**
+	 * Used after user loged in
+	 */
 	public IPillowResult<Void> reloadData() {
 		resetTables();
 		return download(true);
@@ -167,14 +161,14 @@ public class SynchManager {
 
 	protected class Operation implements Runnable {
 		Type type;
-		ProxyPillowResult<Void> result;
+		PillowResultListener<Void> result;
 		public Operation(Type type) {
 			super();
 			this.type = type;
-			this.result = new ProxyPillowResult<Void>();
+			this.result = new PillowResultListener<Void>(context);
 		}
 		
-		public ProxyPillowResult<Void> getResult() {
+		public PillowResultListener<Void> getResult() {
 			return result;
 		}
 
@@ -194,7 +188,7 @@ public class SynchManager {
 			default :
 				throw new UnimplementedException();
 			}
-			result.setMainPillowResult(mainPillowResult);
+			mainPillowResult.setListeners(result, result);
 		}
 	}
 }

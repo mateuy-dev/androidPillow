@@ -1,15 +1,6 @@
 package cat.my.android.pillow.view;
 
 
-import cat.my.android.pillow.IdentificableModel;
-import cat.my.android.pillow.Pillow;
-import cat.my.android.pillow.conf.ModelViewConfiguration;
-import cat.my.android.pillow.util.BundleUtils;
-import cat.my.android.pillow.view.forms.views.FormActivity;
-import cat.my.android.pillow.view.forms.views.FormFragment;
-import cat.my.android.pillow.view.forms.views.PillowShowFragment;
-import cat.my.android.pillow.view.list.PillowListFragment;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +8,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import cat.my.android.pillow.IdentificableModel;
+import cat.my.android.pillow.Pillow;
+import cat.my.android.pillow.conf.ModelViewConfiguration;
+import cat.my.android.pillow.util.BundleUtils;
 
 public class NavigationUtil {
 	Fragment fragment;

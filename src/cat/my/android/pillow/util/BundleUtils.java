@@ -1,8 +1,6 @@
 package cat.my.android.pillow.util;
 
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import cat.my.android.pillow.IdentificableModel;
 
 import com.google.gson.Gson;

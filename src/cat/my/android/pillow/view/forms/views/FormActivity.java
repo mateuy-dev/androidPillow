@@ -11,10 +11,10 @@ import android.widget.Button;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.Pillow;
+import cat.my.android.pillow.R;
 import cat.my.android.pillow.data.sync.CommonListeners;
 import cat.my.android.pillow.data.sync.ISynchDataSource;
 import cat.my.android.pillow.util.BundleUtils;
-import cat.my.android.pillow.R;
 import cat.my.util.StringUtil;
 
 public class FormActivity<T extends IdentificableModel>  extends ActionBarActivity  {

@@ -3,10 +3,6 @@ package cat.my.android.pillow.view.forms.inputDatas.display;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import android.content.Context;
-import android.view.View;
-import android.widget.TextView;
-import cat.my.android.pillow.view.forms.inputDatas.AbstractInputData;
 import cat.my.android.pillow.view.forms.inputDatas.CalendarInputData;
 
 public class CalendarDisplay extends TextDisplay{

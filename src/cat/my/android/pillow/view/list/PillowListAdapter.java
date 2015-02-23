@@ -1,14 +1,10 @@
 package cat.my.android.pillow.view.list;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.R;
 import cat.my.android.pillow.view.base.PillowBaseListAdapter;

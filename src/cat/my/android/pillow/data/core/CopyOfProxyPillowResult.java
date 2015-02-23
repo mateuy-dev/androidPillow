@@ -10,7 +10,7 @@ import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.PillowError;
 import cat.my.util.exceptions.ToImplementException;
 
-public class ProxyPillowResult<T> implements IPillowResult<T>{
+public class CopyOfProxyPillowResult<T> implements IPillowResult<T>{
 	CountDownLatch lock;
 	IPillowResult<T> mainPillowResult;
 	Listener<T> listener;
@@ -19,7 +19,7 @@ public class ProxyPillowResult<T> implements IPillowResult<T>{
 	boolean viewListener;
 	List<Listener<T>> systemListeners = new ArrayList<Listener<T>>();
 	
-	public ProxyPillowResult(){
+	public CopyOfProxyPillowResult(){
 		lock = new CountDownLatch(1);
 	}
 	
@@ -37,7 +37,7 @@ public class ProxyPillowResult<T> implements IPillowResult<T>{
 		lock.countDown();
 	}
 	
-	public synchronized ProxyPillowResult<T> addSystemListener(Listener<T> listener){
+	public synchronized CopyOfProxyPillowResult<T> addSystemListener(Listener<T> listener){
 		systemListeners.add(listener);
 		return this;
 	}

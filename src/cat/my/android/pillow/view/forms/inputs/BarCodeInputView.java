@@ -2,7 +2,6 @@ package cat.my.android.pillow.view.forms.inputs;
 
 
 import android.app.Activity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;

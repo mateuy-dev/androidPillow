@@ -3,13 +3,10 @@ package cat.my.android.pillow.data.db;
 import java.util.Collection;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.PillowError;
-import cat.my.android.pillow.Listeners.ErrorListener;
-import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.data.core.IPillowResult;
 import cat.my.android.pillow.data.core.PillowResult;
 import cat.my.android.pillow.data.sync.DeletedEntries;

@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -15,7 +13,6 @@ import cat.my.android.pillow.conf.IModelConfigurations;
 import cat.my.android.pillow.conf.ModelConfiguration;
 import cat.my.android.pillow.conf.ModelConfigurationFactory;
 import cat.my.android.pillow.conf.ModelViewConfiguration;
-import cat.my.android.pillow.data.sync.ISynchDataSource;
 import cat.my.android.pillow.data.sync.SynchManager;
 import cat.my.android.pillow.util.reflection.RelationGraph;
 

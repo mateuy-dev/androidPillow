@@ -20,5 +20,4 @@ public interface ModelConfiguration<T extends IdentificableModel> {
 	
 	public ModelViewConfiguration<T> getViewConfiguration();
 
-	
 }

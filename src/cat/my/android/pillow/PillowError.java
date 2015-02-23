@@ -1,9 +1,5 @@
 package cat.my.android.pillow;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
-
-import com.android.volley.VolleyError;
 
 @SuppressWarnings("serial")
 public class PillowError extends Exception{

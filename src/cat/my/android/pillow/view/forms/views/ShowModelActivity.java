@@ -3,8 +3,8 @@ package cat.my.android.pillow.view.forms.views;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import cat.my.android.pillow.IdentificableModel;
-import cat.my.android.pillow.util.BundleUtils;
 import cat.my.android.pillow.R;
+import cat.my.android.pillow.util.BundleUtils;
 
 public class ShowModelActivity <T extends IdentificableModel>  extends ActionBarActivity  {
 	FormFragment<T> formFragment;

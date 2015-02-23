@@ -1,14 +1,15 @@
 package cat.my.android.pillow.data.rest;
 
+import java.io.File;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.http.AndroidHttpClient;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-
-import cat.my.android.pillow.util.concurrency.FullStackThreadPoolExecutor;
 
 import com.android.volley.ExecutorDelivery;
 import com.android.volley.Network;
@@ -19,12 +20,6 @@ import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HttpClientStack;
 import com.android.volley.toolbox.HttpStack;
 import com.android.volley.toolbox.HurlStack;
-
-import java.io.File;
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class VolleyFactory {
 
