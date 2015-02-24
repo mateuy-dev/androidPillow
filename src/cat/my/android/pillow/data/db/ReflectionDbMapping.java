@@ -87,6 +87,8 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 				value = DBUtil.dateToDb((Date)value);
 			} else if(value instanceof Enum){
 				value = DBUtil.enumToDb((Enum<?>) value);
+			} else if(value instanceof Boolean){
+				value = DBUtil.booleanToDb(value); 
 			}
 			return value;
 		} catch (Exception e) {
@@ -111,6 +113,8 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 					value = cursor.getString(cursor.getColumnIndex(fieldName));
 				} else if(isInt(fieldClass)){
 					value = cursor.getInt(cursor.getColumnIndex(fieldName));
+				}else  if(isBoolean(fieldClass)){
+					value = DBUtil.getBoolean(cursor, cursor.getColumnIndex(fieldName));
 				} else if(Double.class.isAssignableFrom(fieldClass)){
 					value = cursor.getDouble(cursor.getColumnIndex(fieldName));
 				} else if(Long.class.isAssignableFrom(fieldClass)){
@@ -214,6 +218,8 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 			type = DBUtil.STRING_TYPE;
 		} else if(isInt(fieldClass)){
 			type = DBUtil.INT_TYPE;
+		} else if(isBoolean(fieldClass)){
+			type = DBUtil.BOOLEAN_TYPE;
 		} else if(Double.class.isAssignableFrom(fieldClass)){
 			type = DBUtil.DOUBLE_TYPE;
 		} else if(Long.class.isAssignableFrom(fieldClass)){
@@ -352,5 +358,8 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		return Integer.class.isAssignableFrom(fieldClass) || int.class.isAssignableFrom(fieldClass);
 	}
 	
+	public boolean isBoolean(Class<?> fieldClass){
+		return Boolean.class.isAssignableFrom(fieldClass) || boolean.class.isAssignableFrom(fieldClass);
+	}
 
 }

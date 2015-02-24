@@ -83,6 +83,11 @@ public class DBUtil {
 		return dateFormat.format(date);
 	}
 	
+	public static Integer booleanToDb(Object value){
+		if(value==null) return null;
+		return ((Boolean)value) ? DBUtil.BOOLEAN_TRUE : DBUtil.BOOLEAN_FALSE;
+	}
+	
 	/**
 	 * Converts a String obtained from json or DB to date for model usage
 	 * @param date

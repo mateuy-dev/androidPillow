@@ -12,29 +12,46 @@ import cat.my.android.pillow.data.core.IPillowResult;
 import cat.my.android.pillow.data.core.PillowResult;
 import cat.my.android.pillow.data.core.PillowResultListener;
 import cat.my.android.pillow.data.core.PillowResultProxyType;
+import cat.my.android.pillow.data.rest.IRestMapping;
 import cat.my.android.pillow.data.rest.ISessionController;
 import cat.my.android.pillow.data.rest.RailsRestMapping;
 import cat.my.android.pillow.data.rest.RestDataSource;
+import cat.my.util.exceptions.BreakFastException;
 
 import com.android.volley.Request.Method;
+import com.google.gson.Gson;
 
-public abstract class AbstractUserController<T extends IdentificableModel> {
+public class DefUserDataSource<T extends IUser> extends RestDataSource<T>{
 	SharedPreferences sharedPref;
-	private static final String AUTH_TOKEN = "auth_token";
-	RestDataSource<T> userDataSource;
+	private static final String AUTH_TOKEN = "logged_auth_token";
+	private static final String USER_DATA = "logged_user_data";
+	
+//	RestDataSource<T> userDataSource;
 	Context context;
 	
-	public AbstractUserController(Context context, RailsRestMapping<T> restMapping, String preferencesFileKey){
+	public DefUserDataSource(Context context, IRestMapping<T> restMapping){
+		super(restMapping, context);
 		this.context = context;
-		userDataSource = new RestDataSource<T>(restMapping, context);
+		//userDataSource = new RestDataSource<T>(restMapping, context);
+		String preferencesFileKey = Pillow.PREFERENCES_FILE_KEY;
 		sharedPref = context.getSharedPreferences(preferencesFileKey, Context.MODE_PRIVATE);
+		
 	}
 	
 	/**
 	 * Creates a guest user.
 	 * @return
 	 */
-	public abstract T createGuestUser();
+	public T createGuestUser(){
+		T user;
+		try {
+			user = getRestMapping().getModelClass().newInstance();
+		} catch (Exception e) {
+			throw new BreakFastException(e);
+		}
+		user.setGuest(true);
+		return user;
+	}
 	
 	/**
 	 * Should be called just after created.
@@ -44,7 +61,7 @@ public abstract class AbstractUserController<T extends IdentificableModel> {
 	 * @param errorListener
 	 */
 	public IPillowResult<Void> init(){
-		resetInTesting();
+//		resetInTesting();
 		String token = getAuthToken();
 		if(token==null){
 			return new PillowResultProxyType<Void, T>(context, null, signUpAsGuest());
@@ -58,26 +75,35 @@ public abstract class AbstractUserController<T extends IdentificableModel> {
 	 * @return 
 	 */
 	private IPillowResult<T> signUpAsGuest(){
-		final PillowResult<T> result = new PillowResult<T>(context);
+		final PillowResultListener<T> result = new PillowResultListener<T>(context);
 		Listener<T> onCreateListener = new Listener<T>() {
 			@Override
 			public void onResponse(T response) {
-				storeAuthToken(response.getId());
+				storeAuthToken(response);
 				result.setResult(response);
 			}
 		};
-		userDataSource.create(createGuestUser()).addListener(onCreateListener);
+		create(createGuestUser()).setListeners(onCreateListener, result);
 		return result;
 	}
 	
 	/**
-	 * Signs up to the application. It will update server guest user with some log-in data.
+	 * Signs up to the application. (updates user and password for previous guest user )
 	 * @param user
 	 * @return 
 	 */
 	public IPillowResult<T> signUp(T user){
+		final PillowResultListener<T> result = new PillowResultListener<T>(context);
 		user.setId(getAuthToken());
-		return userDataSource.update(user);
+		Listener<T> onSignUpListener = new Listener<T>() {
+			@Override
+			public void onResponse(T response) {
+				storeAuthToken(response);
+				result.setResult(response);
+			}
+		};
+		update(user).setListeners(onSignUpListener, result);
+		return result;
 	}
 	
 	/**
@@ -93,11 +119,11 @@ public abstract class AbstractUserController<T extends IdentificableModel> {
 		Listener<T> onSignInListener = new Listener<T>() {
 			@Override
 			public void onResponse(T response) {
-				storeAuthToken(response.getId());
+				storeAuthToken(response);
 				reloadData().setListeners(result,result);
 			}
 		};
-		userDataSource.executeCollectionOperation(user, Method.POST, "sign_in", null).setListeners(onSignInListener, result);
+		executeCollectionOperation(user, Method.POST, "sign_in", null).setListeners(onSignInListener, result);
 		return result;
 	}
 	
@@ -106,11 +132,11 @@ public abstract class AbstractUserController<T extends IdentificableModel> {
 		Listener<T> onCreateListener = new Listener<T>() {
 			@Override
 			public void onResponse(T response) {
-				storeAuthToken(response.getId());
+				storeAuthToken(response);
 				reloadData().setListeners(result,result);
 			}
 		};
-		userDataSource.create(createGuestUser()).addListener(onCreateListener);
+		create(createGuestUser()).setListeners(onCreateListener, result);
 		return result;
 	}
 	
@@ -119,7 +145,7 @@ public abstract class AbstractUserController<T extends IdentificableModel> {
 	 * Deletes all the user realated data and donwload the new user one. 
 	 * @return 
 	 */
-	public IPillowResult<Void> reloadData(){
+	protected IPillowResult<Void> reloadData(){
 		return Pillow.getInstance().getSynchManager().reloadData();
 	}
 	
@@ -128,29 +154,31 @@ public abstract class AbstractUserController<T extends IdentificableModel> {
 		return context;
 	}
 	
-	private void resetInTesting() {
-		int version = getResetInTestingVersion();
-		int current = sharedPref.getInt("dummy_version", -1);
-		if(current<version){
-			SharedPreferences.Editor editor = sharedPref.edit();
-			editor.remove(AUTH_TOKEN);
-			editor.putInt("dummy_version", version);
-			editor.commit();
-		}
-		
-	}
-	
-	public int getResetInTestingVersion() {
-		return 0;
-	}
+//	private void resetInTesting() {
+//		int version = getResetInTestingVersion();
+//		int current = sharedPref.getInt("dummy_version", -1);
+//		if(current<version){
+//			SharedPreferences.Editor editor = sharedPref.edit();
+//			editor.remove(AUTH_TOKEN);
+//			editor.putInt("dummy_version", version);
+//			editor.commit();
+//		}
+//		
+//	}
+//	
+//	public int getResetInTestingVersion() {
+//		return 0;
+//	}
 
 	/**
 	 * Stores the given auth_token in the shared preferences
 	 * @param id
 	 */
-	private void storeAuthToken(String id) {
+	private void storeAuthToken(T user) {
 		SharedPreferences.Editor editor = sharedPref.edit();
-		editor.putString(AUTH_TOKEN, id);
+		editor.putString(AUTH_TOKEN, user.getId());
+		String userJson = new Gson().toJson(user);
+		editor.putString(USER_DATA, userJson);
 		editor.commit();
 	}
 	
@@ -159,6 +187,13 @@ public abstract class AbstractUserController<T extends IdentificableModel> {
 	 */
 	public String getAuthToken(){
 		return sharedPref.getString(AUTH_TOKEN, null);
+	}
+	
+	public T getLoggedUser(){
+		String userJson = sharedPref.getString(USER_DATA, null);
+		if(userJson==null)
+			return null;
+		return new Gson().fromJson(userJson, getRestMapping().getModelClass());
 	}
 	
 	public ISessionController getSessionController(){
@@ -186,8 +221,6 @@ public abstract class AbstractUserController<T extends IdentificableModel> {
 					result.setResult(new SessionData(session));
 				}
 			};
-			
-			
 			
 			init().setListeners(onInitListener, result);
 			
