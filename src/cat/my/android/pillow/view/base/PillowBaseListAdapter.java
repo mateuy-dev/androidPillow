@@ -8,6 +8,8 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import cat.my.android.pillow.IDataSource;
 import cat.my.android.pillow.IExtendedDataSource;
 import cat.my.android.pillow.IdentificableModel;
@@ -22,13 +24,16 @@ import cat.my.android.pillow.data.sync.CommonListeners;
 
 
 
-public abstract class PillowBaseListAdapter<T extends IdentificableModel> extends BaseAdapter implements IModelListAdapter<T> {
+public abstract class PillowBaseListAdapter<T extends IdentificableModel> extends BaseAdapter implements IModelListAdapter<T>, Filterable {
 	T filter;
 	Context context;
-	protected List<T> models = new ArrayList<T>();
+	List<T> models = new ArrayList<T>();
+	//In case that a filter is used, it contains the models before the filtering was executed
+	List<T> originalModels;
 	IDataSource<T> dataSource;
 	ErrorListener donwloadErrorListener = CommonListeners.defaultErrorListener;
 	ErrorListener refreshListErrorListener = CommonListeners.defaultErrorListener;
+	BasicFilter basicFilter = new BasicFilter();
 
 	public PillowBaseListAdapter(Context context, Class<T> clazz) {
 		super();
@@ -105,4 +110,57 @@ public abstract class PillowBaseListAdapter<T extends IdentificableModel> extend
 		this.filter = filter;
 	}
 
+	@Override
+	public Filter getFilter() {
+		return basicFilter;
+	}
+	
+	/**
+	 * Filters the results using the tostring method.
+	 */
+	private class BasicFilter extends Filter{
+		@Override
+		protected FilterResults performFiltering(CharSequence constraint) {
+			if (originalModels == null && !models.isEmpty()) {
+				originalModels = new ArrayList<T>(models);
+			}
+			
+			FilterResults results = new FilterResults();
+			if (originalModels == null) {
+				results.values = new ArrayList();
+				results.count = 0;
+			} else if  (constraint == null || constraint.length() == 0) {
+				results.values = originalModels;
+				results.count = originalModels.size();
+			} else {
+				List<T> startWith = new ArrayList<T>();
+				List<T> contains = new ArrayList<T>();
+				for (T model : originalModels) {
+					String modelString = model.toString().toLowerCase();
+					String constrainString = constraint.toString().toLowerCase();
+					if (modelString.startsWith(constrainString)) {
+						startWith.add(model);
+					} else  if(modelString.contains(constrainString)){
+						contains.add(model);
+					}
+				}
+				List<T> result = new ArrayList<T>(startWith);
+				result.addAll(contains);
+				results.values = result;
+				results.count = result.size();
+
+			}
+			return results;
+		}
+
+		@Override
+		protected void publishResults(CharSequence constraint, FilterResults results) {
+			if (originalModels == null && !models.isEmpty()) {
+				originalModels = new ArrayList<T>(models);
+			}
+			models.clear();
+			models.addAll((Collection<? extends T>) results.values);
+			notifyDataSetChanged();
+		}
+	}
 }

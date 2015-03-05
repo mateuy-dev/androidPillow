@@ -13,6 +13,7 @@ import android.util.Log;
 import cat.my.android.pillow.AbstractDBHelper;
 import cat.my.android.pillow.IDataSource;
 import cat.my.android.pillow.Pillow;
+import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.data.core.IPillowResult;
 import cat.my.android.pillow.data.core.PillowResult;
 import cat.my.android.pillow.data.core.PillowResultListener;
@@ -122,7 +123,7 @@ public class SynchManager {
 				Log.d(LOG_ID, "Sent Dirty " + dataSource.getClass().getSimpleName());
 			}
 			return PillowResult.newVoidResult(context);
-		} catch (Exception e) {
+		} catch (PillowError e) {
 			return new PillowResult<Void>(context, e);
 		}
 	}
@@ -135,7 +136,7 @@ public class SynchManager {
 			}
 			setLastDownload(new Date());
 			return PillowResult.newVoidResult(context);
-		} catch (Exception e) {
+		} catch (PillowError e) {
 			return new PillowResult<Void>(context, e);
 		}
 	}
@@ -145,7 +146,7 @@ public class SynchManager {
 			realSendDirty().getResult();
 			realDownload().getResult();
 			return PillowResult.newVoidResult(context);
-		} catch (Exception e) {
+		} catch (PillowError e) {
 			return new PillowResult<Void>(context, e);
 		}
 

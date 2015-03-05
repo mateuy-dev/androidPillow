@@ -48,11 +48,10 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		this.authenticationData=authenticationData;
 		this.dbFuncs=dbFuncs;
 		restDataSource = new RestDataSource<T>(restMap, context, authenticationData);
-		SQLiteOpenHelper dbHelper = Pillow.getInstance(context).getDbHelper();
-		deletedEntries = new DeletedEntries<T>(context, restDataSource, dbHelper);
+		deletedEntries = new DeletedEntries<T>(context, restDataSource);
 //		dbSource = new DbDataSource<T>(context, dbFuncs, dbHelper, deletedEntries);
 //		if(Pillow.getInstance(context).getConfig().isDbMultiThread()){
-		dbSource = new MultiThreadDbDataSource<T>(new DbDataSource<T>(context, dbFuncs, dbHelper, deletedEntries));
+		dbSource = new MultiThreadDbDataSource<T>(new DbDataSource<T>(context, dbFuncs, deletedEntries));
 		
 		dbModelController = dbSource.getDbModelController();
 		this.restMap=restMap;
@@ -160,8 +159,8 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 				deletedEntries.synchronize().await();
 				
 				return PillowResult.newVoidResult(context);
-			} catch (Exception e) {
-				return new PillowResult<Void>(context, new PillowError(e));
+			} catch (PillowError e) {
+				return new PillowResult<Void>(context, e);
 			}
 		}
 		

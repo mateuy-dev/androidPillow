@@ -1,4 +1,3 @@
-package cat.my.android.pillow.view.forms.inputDatas;
 //package cat.my.android.pillow.view.forms.inputDatas;
 //
 //import java.util.Collection;
@@ -22,16 +21,17 @@ package cat.my.android.pillow.view.forms.inputDatas;
 //import cat.my.android.pillow.Listeners.ErrorListener;
 //import cat.my.android.pillow.Listeners.Listener;
 //import cat.my.android.pillow.Pillow;
+//import cat.my.android.pillow.view.forms.BelongsToInputData;
 //import cat.my.android.pillow.view.forms.InputData;
 //import cat.my.android.pillow.view.forms.inputs.ModelDialogInputView;
 //import cat.my.android.pillow.data.sync.CommonListeners;
 //import cat.my.android.pillow.data.sync.ISynchDataSource;
 //import cat.my.android.pillow.data.sync.CommonListeners.MultipleTasksListener;
 //
-//public class IdentificableModelDialogInputData<T extends IdentificableModel> implements InputData{
-//	T selectedClass;
+//public class IdentificableModelDialogInputData<T extends IdentificableModel> extends AbstractInputData implements BelongsToInputData<T>{
+//	Class<T> selectedClass;
 //	
-//	public IdentificableModelDialogInputData(T selectedClass) {
+//	public IdentificableModelDialogInputData(Class<T> selectedClass) {
 //		super();
 //		this.selectedClass = selectedClass;
 //	}

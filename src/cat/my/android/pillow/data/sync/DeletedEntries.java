@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import cat.my.android.pillow.IdentificableModel;
+import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.data.core.IPillowResult;
 import cat.my.android.pillow.data.core.MultiTaskVoidResult;
@@ -39,8 +40,8 @@ public class DeletedEntries<T extends IdentificableModel> {
 
 	public static final String WHERE_ID_SELECTION = ID_COLUMN + " == ?";
 
-	public DeletedEntries(Context context, RestDataSource<T> dataSource, SQLiteOpenHelper dbHelper) {
-		this.dbHelper = dbHelper;
+	public DeletedEntries(Context context, RestDataSource<T> dataSource) {
+		this.dbHelper = Pillow.getInstance(context).getDbHelper();
 		this.dataSource = dataSource;
 		this.context= context;
 	}

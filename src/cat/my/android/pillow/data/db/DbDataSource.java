@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import cat.my.android.pillow.IdentificableModel;
+import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.data.core.IPillowResult;
 import cat.my.android.pillow.data.core.PillowResult;
@@ -18,11 +19,11 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 	DBModelController<T> dbModelController;
 	Context context;
 
-	public DbDataSource(Context context, IDbMapping<T> funcs, SQLiteOpenHelper dbHelper, DeletedEntries<T> deletedEntries) {
+	public DbDataSource(Context context, IDbMapping<T> funcs, DeletedEntries<T> deletedEntries) {
 		super();
 		//TODO check dbModelControllerManager -null delete entitites
 		this.funcs=funcs;
-		this.dbHelper = dbHelper;
+		this.dbHelper = Pillow.getInstance(context).getDbHelper();;
 		this.context = context;
 		dbModelController = new DBModelController<T>(dbHelper, funcs, deletedEntries);
 		

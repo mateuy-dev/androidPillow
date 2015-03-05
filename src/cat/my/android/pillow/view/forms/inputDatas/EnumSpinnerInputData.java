@@ -10,10 +10,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import cat.my.android.pillow.view.forms.StringResourceUtils;
 
-public class EnumInputData extends AbstractSpinnerInputData<Enum<?>> {
+public class EnumSpinnerInputData extends AbstractSpinnerInputData<Enum<?>> {
 	Class<?> valueClass;
 
-	public EnumInputData(Class<?> valueClass) {
+	public EnumSpinnerInputData(Class<?> valueClass) {
 		this.valueClass = valueClass;
 	}
 

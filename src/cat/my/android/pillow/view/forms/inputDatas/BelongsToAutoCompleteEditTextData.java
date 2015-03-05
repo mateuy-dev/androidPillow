@@ -51,7 +51,7 @@ public class BelongsToAutoCompleteEditTextData<T extends IdentificableModel> ext
                 selected = (T) adapter.getItem(position);
             }
         });
-        adapter = new MyAdapter<T>(context, parentClass);
+        adapter = new MyAdapter(context, parentClass);
 		autoComplete.setAdapter(adapter);
 		autoComplete.setEms(EMS);
 		autoComplete.setThreshold(1);
@@ -60,65 +60,12 @@ public class BelongsToAutoCompleteEditTextData<T extends IdentificableModel> ext
 		
 	}
 	
-	private class MyAdapter<T extends IdentificableModel> extends PillowBaseListAdapter<T> implements Filterable{
-		List<T> originalModels;
-		
+	private class MyAdapter extends PillowBaseListAdapter<T> {	
 		public MyAdapter(Context context, Class<T> clazz) {
 			super(context, clazz);
 			refreshList();
 		}
-		@Override
-		public Filter getFilter() {
-			return new Filter() {
-				@Override
-				protected FilterResults performFiltering(CharSequence constraint) {
-					if (originalModels == null && !models.isEmpty()) {
-						originalModels = new ArrayList<T>(models);
-					}
-					
-					FilterResults results = new FilterResults();
-					if (originalModels == null || constraint == null || constraint.length() == 0) {
-						results.values = new ArrayList();
-						results.count = 0;
-					} else {
-						
-
-						List<T> startWith = new ArrayList<T>();
-						List<T> contains = new ArrayList<T>();
-						for (T model : originalModels) {
-							String modelString = model.toString().toLowerCase();
-							String constrainString = constraint.toString().toLowerCase();
-							if (modelString.startsWith(constrainString)) {
-								startWith.add(model);
-							} else  if(modelString.contains(constrainString)){
-								contains.add(model);
-							}
-						}
-						List<T> result = new ArrayList<T>(startWith);
-						result.addAll(contains);
-						results.values = result;
-						results.count = result.size();
-
-					}
-					return results;
-				}
-
-				@Override
-				protected void publishResults(CharSequence constraint, FilterResults results) {
-					if (originalModels == null && !models.isEmpty()) {
-						originalModels = new ArrayList<T>(models);
-					}
-					models.clear();
-					models.addAll((Collection<? extends T>) results.values);
-					notifyDataSetChanged();
-				}
-			};
-		}
-
-       public Collection<T> getModels(){
-           return models;
-       }
-
+		
         @Override
 		public View getView(T model, View convertView, ViewGroup parent) {
 			if(convertView==null){

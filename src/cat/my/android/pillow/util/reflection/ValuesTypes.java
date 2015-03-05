@@ -20,6 +20,7 @@ public class ValuesTypes {
 		ValueTypeClass type() default ValueTypeClass.DEFAULT;
 		Class<? extends IdentificableModel> belongsTo() default NONE.class;
 		BelongsToOnDelete belongsToMode() default BelongsToOnDelete.NO_ACTION;
+		Class<?> listType() default NONE.class;
 	}
 	
 	
@@ -30,4 +31,8 @@ public class ValuesTypes {
 		public enum OrderType{ASC, DESC, ASC_NO_COLLATE, DESC_NO_COLLATE}
 		OrderType type() default OrderType.ASC;
 	}
+	
+	@Target({ElementType.TYPE})
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface Embeddable{}
 }

@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import cat.my.android.pillow.util.reflection.ValuesTypes.Embeddable;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType.NONE;
 import cat.my.util.CaseFormat;
@@ -64,5 +65,9 @@ public class ReflectionUtil {
 		} catch (Exception e) {
 			throw new BreakFastException(e);
 		}
+	}
+	
+	public static boolean isEmbeddable(Class<?> clazz){
+		return clazz.getAnnotation(Embeddable.class)!=null;
 	}
 }
