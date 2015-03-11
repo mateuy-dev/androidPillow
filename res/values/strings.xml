@@ -2,12 +2,8 @@
 <resources>
 
     <string name="save">Save</string>
-    <string name="ic_action_new">New</string>
+    
     <string name="ic_action_edit">Edit</string>
     <string name="ic_action_delete">Delete</string>
     
-    <string name="title_activity_main">MainActivity</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-
 </resources>

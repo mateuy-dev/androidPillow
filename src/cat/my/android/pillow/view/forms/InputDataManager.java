@@ -10,6 +10,7 @@ import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType.NONE;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueTypeClass;
 import cat.my.android.pillow.view.forms.inputDatas.BelongsToDialogInputData;
+import cat.my.android.pillow.view.forms.inputDatas.EnumDialogInputView;
 import cat.my.android.pillow.view.forms.inputDatas.TimeInputData;
 import cat.my.android.pillow.view.forms.inputDatas.CalendarInputData;
 import cat.my.android.pillow.view.forms.inputDatas.ColorInput;
@@ -93,7 +94,7 @@ public class InputDataManager{
 		} else if(Integer.class.isAssignableFrom(valueClass) || Integer.TYPE.isAssignableFrom(valueClass)){
 			return new IntEditTextData();
 		} else if(Enum.class.isAssignableFrom(valueClass)){
-			return new EnumSpinnerInputData(valueClass);
+			return new EnumDialogInputView(valueClass);
 		}  else if (Calendar.class.isAssignableFrom(valueClass)){
 			return new CalendarInputData();
 		} else if (Date.class.isAssignableFrom(valueClass)){

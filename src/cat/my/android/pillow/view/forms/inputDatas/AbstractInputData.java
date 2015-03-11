@@ -6,9 +6,11 @@ import cat.my.android.pillow.view.forms.InputData;
 
 public abstract class AbstractInputData implements InputData{
 	View view;
+	Context context;
 	
 	@Override
 	public View getView(Context context){
+		this.context = context;
 		if(view == null){
 			view = createView(context);
 		}
@@ -17,6 +19,10 @@ public abstract class AbstractInputData implements InputData{
 	
 	protected View getView(){
 		return view;
+	}
+	
+	public Context getContext() {
+		return context;
 	}
 
 	protected abstract View createView(Context context);
