@@ -178,6 +178,16 @@ public class CommonListeners {
 		}
 	}
 	
+	/**
+	 * Used when you want to wait for more than one task to finish.
+	 */
+	public static class MultipleTasksViewListener<T> extends MultipleTasksListener<T> implements ViewListener<T>{
+		public MultipleTasksViewListener(int tasks, Listener listener) {
+			super(tasks, listener);
+		}
+
+	}
+	
 	public static class MultipleTasksProxyListener<T, D> extends MultipleTasksListener<D>{
 		T response;
 		public MultipleTasksProxyListener(int tasks, Listener<T> listener, T response) {

@@ -6,6 +6,7 @@ import java.util.Date;
 
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.data.extra.Time;
+import cat.my.android.pillow.util.reflection.ValuesTypes.Embeddable;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType.NONE;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueTypeClass;
@@ -27,6 +28,7 @@ import cat.my.android.pillow.view.reflection.ViewConfig.ViewType;
 import cat.my.android.pillow.view.reflection.ViewConfig.ViewType.DEFAULT_INPUT;
 import cat.my.android.pillow.view.reflection.ViewConfig.ViewType.NONE_INPUT;
 import cat.my.util.exceptions.BreakFastException;
+import cat.my.util.exceptions.ToImplementException;
 import cat.my.util.exceptions.UnimplementedException;
 
 public class InputDataManager{
@@ -86,6 +88,12 @@ public class InputDataManager{
 				//must be an enum!
 				return new EnumListInput(inputTypeAnnotation.listType());
 			}
+		}
+		
+		Embeddable embeddableAnnotation = valueClass.getAnnotation(Embeddable.class);
+		if(embeddableAnnotation!=null){
+			return new TextDisplay();
+			//throw new ToImplementException("Embedded models can't be displayed yet");
 		}
 		
 		

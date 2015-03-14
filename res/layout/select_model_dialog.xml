@@ -7,9 +7,9 @@
     tools:context="cat.my.android.pillow.MainActivity" >
 
 <!-- http://stackoverflow.com/questions/1555109/stop-edittext-from-gaining-focus-at-activity-startup -->    
-    <LinearLayout
+    <!-- LinearLayout
     android:focusable="true" android:focusableInTouchMode="true"
-    android:layout_width="0px" android:layout_height="0px"/>
+    android:layout_width="0px" android:layout_height="0px"/-->
     
     <EditText
         android:id="@+id/search_edit_text"
