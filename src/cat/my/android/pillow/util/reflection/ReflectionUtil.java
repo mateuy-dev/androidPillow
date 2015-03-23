@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import cat.my.android.pillow.util.reflection.ValuesTypes.BelongsToOnDelete;
 import cat.my.android.pillow.util.reflection.ValuesTypes.Embeddable;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType.NONE;
@@ -35,6 +36,11 @@ public class ReflectionUtil {
 		return Modifier.isTransient(field.getModifiers());
 	}
 	
+	public static boolean isBelongsTo(Field field){
+		ValueType valueType = field.getAnnotation(ValueType.class);
+		return valueType!=null && valueType.belongsTo()!=null && valueType.belongsTo()!=NONE.class;
+	}
+	
 	public static List<Class<?>> getBelongsToClasses(Class<?> modelClass){
 		List<Class<?>> result = new ArrayList<Class<?>>();
 		for(Field field : getBelongsToFields(modelClass)){
@@ -47,8 +53,7 @@ public class ReflectionUtil {
 	public static List<Field> getBelongsToFields(Class<?> modelClass){
 		List<Field> result = new ArrayList<Field>();
 		for(Field field: getStoredFields(modelClass)){
-			ValueType valueType = field.getAnnotation(ValueType.class);
-			if(valueType!=null && valueType.belongsTo()!=NONE.class){
+			if(ReflectionUtil.isBelongsTo(field)){
 				result.add(field);
 			}
 		}
@@ -69,5 +74,32 @@ public class ReflectionUtil {
 	
 	public static boolean isEmbeddable(Class<?> clazz){
 		return clazz.getAnnotation(Embeddable.class)!=null;
+	}
+	
+	public static boolean isNull(Field field, Object model) {
+		field.setAccessible(true);
+		try {
+			Object value = field.get(model);
+			if(value==null)
+				return true;
+			Class<?> fieldClass = field.getType();
+			if(int.class.isAssignableFrom(fieldClass)){
+				//TODO check this: we define 0 as a null value for int
+				int intValue = (Integer) value;
+				return intValue==0;
+			}
+			return false;
+			
+		} catch (Exception e) {
+			throw new BreakFastException(e);
+		}
+	}
+
+	public static boolean isInt(Class<?> fieldClass){
+		return Integer.class.isAssignableFrom(fieldClass) || int.class.isAssignableFrom(fieldClass);
+	}
+	
+	public static boolean isBoolean(Class<?> fieldClass){
+		return Boolean.class.isAssignableFrom(fieldClass) || boolean.class.isAssignableFrom(fieldClass);
 	}
 }

@@ -163,9 +163,9 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 			Object value = null;
 			if(String.class.isAssignableFrom(fieldClass)){
 				value = cursor.getString(cursor.getColumnIndex(fieldName));
-			} else if(isInt(fieldClass)){
+			} else if(ReflectionUtil.isInt(fieldClass)){
 				value = cursor.getInt(cursor.getColumnIndex(fieldName));
-			}else  if(isBoolean(fieldClass)){
+			}else  if(ReflectionUtil.isBoolean(fieldClass)){
 				value = DBUtil.getBoolean(cursor, cursor.getColumnIndex(fieldName));
 			} else if(Double.class.isAssignableFrom(fieldClass)){
 				value = cursor.getDouble(cursor.getColumnIndex(fieldName));
@@ -275,9 +275,9 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		Class<?> fieldClass = field.getType();
 		if(String.class.isAssignableFrom(fieldClass)){
 			type = DBUtil.STRING_TYPE;
-		} else if(isInt(fieldClass)){
+		} else if(ReflectionUtil.isInt(fieldClass)){
 			type = DBUtil.INT_TYPE;
-		} else if(isBoolean(fieldClass)){
+		} else if(ReflectionUtil.isBoolean(fieldClass)){
 			type = DBUtil.BOOLEAN_TYPE;
 		} else if(Double.class.isAssignableFrom(fieldClass)){
 			type = DBUtil.DOUBLE_TYPE;
@@ -306,7 +306,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		Field[] fields = ReflectionUtil.getStoredFields(modelClass);
 		for(Field field:fields){
 			Class<?> fieldClass = field.getType();
-			if(!isNull(field, filter)){
+			if(!ReflectionUtil.isNull(field, filter)){
 				Object dbValue = dbValue(field, filter);
 				String name = field.getName();
 				selectionList.add(name + " == ?");
@@ -338,7 +338,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		Field[] fields = ReflectionUtil.getStoredFields(modelClass);
 		for(Field field:fields){
 			ValueType valueType = field.getAnnotation(ValueType.class);
-			if(valueType!=null && valueType.belongsTo()!=null && valueType.belongsTo()!=NONE.class && valueType.belongsToMode()!=BelongsToOnDelete.NO_ACTION){
+			if(ReflectionUtil.isBelongsTo(field) && valueType.belongsToMode()!=BelongsToOnDelete.NO_ACTION){
 				Class<? extends IdentificableModel> referencedClass = valueType.belongsTo();
 				BelongsToOnDelete onDelete = valueType.belongsToMode();
 				IDbMapping<?> referencedDbMapping = Pillow.getInstance().getModelConfiguration(referencedClass).getDbMapping();
@@ -396,31 +396,6 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 //	}
 
 
-	private boolean isNull(Field field, T model) {
-		field.setAccessible(true);
-		try {
-			Object value = field.get(model);
-			if(value==null)
-				return true;
-			Class<?> fieldClass = field.getType();
-			if(int.class.isAssignableFrom(fieldClass)){
-				//TODO check this: we define 0 as a null value for int
-				int intValue = (Integer) value;
-				return intValue==0;
-			}
-			return false;
-			
-		} catch (Exception e) {
-			throw new BreakFastException(e);
-		}
-	}
-
-	public boolean isInt(Class<?> fieldClass){
-		return Integer.class.isAssignableFrom(fieldClass) || int.class.isAssignableFrom(fieldClass);
-	}
 	
-	public boolean isBoolean(Class<?> fieldClass){
-		return Boolean.class.isAssignableFrom(fieldClass) || boolean.class.isAssignableFrom(fieldClass);
-	}
 
 }

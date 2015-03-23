@@ -6,6 +6,7 @@ import java.util.Date;
 
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.data.extra.Time;
+import cat.my.android.pillow.util.reflection.ReflectionUtil;
 import cat.my.android.pillow.util.reflection.ValuesTypes.Embeddable;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType.NONE;
@@ -41,7 +42,7 @@ public class InputDataManager{
 		if(!editable){
 			if (Calendar.class.isAssignableFrom(valueClass)){
 				return new CalendarDisplay();
-			} else if(inputTypeAnnotation!=null && inputTypeAnnotation.belongsTo() !=null){
+			} else if(ReflectionUtil.isBelongsTo(field)){
 				Class<? extends IdentificableModel> parentClass = inputTypeAnnotation.belongsTo();
 				BelongsToInputData inputData = new BelongsToTextDisplay<IdentificableModel>();
 				inputData.setParentClass(parentClass);
@@ -60,7 +61,7 @@ public class InputDataManager{
 			} else {
 				try {
 					InputData inputData = inputType.newInstance();
-					if(inputTypeAnnotation.belongsTo() !=null){
+					if(ReflectionUtil.isBelongsTo(field)){
 						Class<? extends IdentificableModel> parentClass = inputTypeAnnotation.belongsTo();
 						((BelongsToInputData)inputData).setParentClass(parentClass);
 					}
@@ -77,7 +78,7 @@ public class InputDataManager{
 				if(valueType == ValueTypeClass.COLOR){
 					return new ColorInput();
 				}
-			} else if(inputTypeAnnotation.belongsTo() !=null && inputTypeAnnotation.belongsTo()!=NONE.class){
+			} else if(ReflectionUtil.isBelongsTo(field)){
 				//The field is a belogsTo attribute (foreign key)
 				Class<? extends IdentificableModel> parentClass = inputTypeAnnotation.belongsTo();
 //				return new IdentificableModelSpinnerInputData(parentClass);

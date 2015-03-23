@@ -47,6 +47,10 @@ public class DBModelController<T extends IdentificableModel> {
 		this.mapper = mapper;
 		this.deletedEntries = deletedEntries;
 	}
+	
+	public SQLiteOpenHelper getDbHelper() {
+		return dbHelper;
+	}
 
 	public int getCount(){
 		return getColumnIntegerValue(null, null);

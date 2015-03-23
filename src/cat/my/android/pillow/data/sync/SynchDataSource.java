@@ -96,7 +96,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		Listener<T> createdOnDbListener = new Listener<T>(){
 			@Override
 			public void onResponse(T response) {
-				sendDirty();
+				sendDirty().addErrorListener(CommonListeners.defaultErrorListener);
 				//Listener<T> myListener = new SetAsNotDirityListener();
 				//restDataSource.create(model).setListeners(myListener, CommonListeners.getDefaultThreadedErrorListener());
 			}
@@ -115,7 +115,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		Listener<T> updatedOnDbListener = new Listener<T>(){
 			@Override
 			public void onResponse(T response) {
-				sendDirty();
+				sendDirty().addErrorListener(CommonListeners.defaultErrorListener);;
 				//Listener<T> myListener = new SetAsNotDirityListener();
 				//restDataSource.update(model).setListeners(myListener, CommonListeners.getDefaultThreadedErrorListener());
 			}
@@ -130,7 +130,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		Listener<Void> deletedOnDbListener = new Listener<Void>(){
 			@Override
 			public void onResponse(Void response) {
-				sendDirty();
+				sendDirty().addErrorListener(CommonListeners.defaultErrorListener);;
 //				deletedEntries.setAllreadyDeleted(model).setListeners(CommonListeners.dummyListener, CommonListeners.getDefaultThreadedErrorListener());
 			}
 		};

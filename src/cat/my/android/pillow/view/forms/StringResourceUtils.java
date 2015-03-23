@@ -8,12 +8,18 @@ import cat.my.android.pillow.Pillow;
 
 public class StringResourceUtils {
 	public static String getLabel(Context context, Field field){
-		String stringId = field.getDeclaringClass().getSimpleName()+"_"+field.getName();
-		String label = getLabel(context, stringId);
-		if(label == null)
-			label = field.getName();
-		return label;
+        Class modelClass = field.getDeclaringClass();
+        String fieldName = field.getName();
+		return getLabel(context, modelClass, fieldName);
 	}
+    
+    public static String getLabel(Context context, Class modelClass, String fieldName){
+        String stringId = modelClass.getSimpleName()+"_"+fieldName;
+        String label = getLabel(context, stringId);
+        if(label == null)
+            label = fieldName;
+        return label;
+    }
 	
 	public static String getLabel(Context context, Enum<?> value){
 		if(value==null) return "";
