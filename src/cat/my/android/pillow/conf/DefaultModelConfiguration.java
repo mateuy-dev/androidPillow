@@ -11,6 +11,8 @@ import cat.my.android.pillow.data.db.ReflectionDbMapping;
 import cat.my.android.pillow.data.rest.IRestMapping;
 import cat.my.android.pillow.data.rest.RailsRestMapping;
 import cat.my.android.pillow.data.sync.SynchDataSource;
+import cat.my.android.pillow.data.validator.DefaultValidator;
+import cat.my.android.pillow.data.validator.IValidator;
 
 import com.google.gson.reflect.TypeToken;
 
@@ -24,6 +26,7 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 	IDataSource<T> dataSource;
 	ModelViewConfiguration<T> viewConfiguration;
 	String url;
+	IValidator<T> validator;
 	
 	public DefaultModelConfiguration(Context context, Class<T> modelClass, TypeToken<Collection<T>> collectionTypeToken, String url) {
 		super();
@@ -52,6 +55,10 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 	public void setViewConfiguration(ModelViewConfiguration<T> viewConfiguration) {
 		this.viewConfiguration = viewConfiguration;
 	}
+	
+	public void setValidator(IValidator<T> validator) {
+		this.validator = validator;
+	}
 
 	protected IDataSource<T> createDefaultDataSource() {
 		return new SynchDataSource<T>(getDbMapping(), getRestMapping(), getContext());
@@ -67,6 +74,10 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 
 	protected ModelViewConfiguration<T> createDefaultViewConfiguration() {
 		return new DefaultModelViewConfiguration<T>(modelClass);
+	}
+	
+	protected IValidator<T> createDefaultValidator() {
+		return new DefaultValidator<T>(modelClass);
 	}
 	
 	private String getUrl() {
@@ -101,6 +112,15 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 			viewConfiguration = createDefaultViewConfiguration();
 		return viewConfiguration;
 	}
+	
+	@Override
+	public IValidator<T> getValidator() {
+		if(validator==null){
+			validator = createDefaultValidator();
+		}
+		return validator;
+	}
+	
 	
 
 	@Override

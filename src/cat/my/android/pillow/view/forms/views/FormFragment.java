@@ -1,19 +1,28 @@
 package cat.my.android.pillow.view.forms.views;
 
 
+import java.util.List;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.Toast;
 import cat.my.android.pillow.IDataSource;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.Listeners.ViewListener;
 import cat.my.android.pillow.Pillow;
+import cat.my.android.pillow.R;
 import cat.my.android.pillow.data.sync.CommonListeners;
+import cat.my.android.pillow.data.validator.IValidator;
+import cat.my.android.pillow.data.validator.IValidator.IValidationError;
+import cat.my.android.pillow.data.validator.ValidationErrorUtil;
 import cat.my.android.pillow.util.BundleUtils;
 import cat.my.android.pillow.view.forms.TFormView;
+import cat.my.android.util.MetricUtil;
 import cat.my.util.exceptions.BreakFastException;
 
 public class FormFragment<T extends IdentificableModel>  extends Fragment{
@@ -22,6 +31,7 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 	String modelId;
 	TFormView<T> formView;
 	IDataSource<T> dataSource;
+	Class<T> modelClass;
 	
 	
 
@@ -34,17 +44,19 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 		Bundle bundle = getArguments();
 		final String[] atts = BundleUtils.getShownAtts(bundle);
 		modelId = BundleUtils.getId(bundle);
-		Class<T> clazz = BundleUtils.getModelClass(bundle);
+		modelClass = BundleUtils.getModelClass(bundle);
 		boolean editMode = bundle.getBoolean(EDIT_MODE_PARAM, true);
 		
 		formView = new TFormView<T>(getActivity(), editMode);
+		formView.setBackgroundDrawable(getResources().getDrawable(R.drawable.rounded_background));
+		int margin = MetricUtil.dipToPixels(getActivity(), 20);
+		((FrameLayout.LayoutParams)formView.getLayoutParams()).topMargin= margin;
 		
-		
-		dataSource = Pillow.getInstance(getActivity()).getDataSource(clazz);
+		dataSource = Pillow.getInstance(getActivity()).getDataSource(modelClass);
 		
 		try {
 			T idModel = null;
-			idModel = clazz.newInstance();
+			idModel = modelClass.newInstance();
 			if (modelId != null) {
 				//update, we should look for current values
 				idModel.setId(modelId);
@@ -69,8 +81,12 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 		return formView;
 	}
 	
+	
+	/**
+	 * @return The model, or null if the model is invalid
+	 */
 	public T getModel(){
-		return formView.getModel();
+		return formView.getModel(true);
 	}
 	
 	public String getModelId() {

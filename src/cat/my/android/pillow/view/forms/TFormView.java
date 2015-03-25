@@ -2,13 +2,19 @@ package cat.my.android.pillow.view.forms;
 
 
 import java.util.Collection;
+import java.util.List;
 
 import android.content.Context;
 import android.support.v7.widget.GridLayout;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.Toast;
+import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.R;
+import cat.my.android.pillow.data.validator.IValidator;
+import cat.my.android.pillow.data.validator.ValidationErrorUtil;
+import cat.my.android.pillow.data.validator.IValidator.IValidationError;
 
 
 public class TFormView<T> extends GridLayout{
@@ -37,6 +43,29 @@ public class TFormView<T> extends GridLayout{
 //		setOrientation(VERTICAL);
 	}
 
+	/**
+	 * Returns the model displayed in the fragment.
+	 * If validate is set to true, it will check for model validation. If valid will be returned. If not valid null will be returned and errors will be displayed
+	 * @param validate if the model must be validated
+	 * @return the model or null if validate is true and invalid
+	 */
+	public T getModel(boolean validate){
+		T model = getModel();
+		if(validate){
+			Class modelClass = model.getClass();
+			IValidator<T> validator = Pillow.getInstance(getContext()).getModelConfiguration(modelClass).getValidator();
+			List<IValidationError> errors = validator.validate(model);
+			if(!errors.isEmpty()){
+	            //Error found for now we toast the first one. This could be improved
+	            IValidator.IValidationError error = errors.get(0);
+	            String string = ValidationErrorUtil.getStringError(getContext(), modelClass, error);
+	            Toast.makeText(getContext(), string, Toast.LENGTH_LONG).show();
+	            return null;
+	        }
+		}
+		return model;
+	}
+	
 	public T getModel() {
 		updateModelFromForm();
 		return model;
@@ -45,7 +74,7 @@ public class TFormView<T> extends GridLayout{
 	public void setModel(T model){
 		setModel(model,null);
 	}
-	
+		
 	public void setModel(T model, String[] inputNames) {
 		this.model = model;
 		formInputs = new FormInputs(model, getContext(), editable);

@@ -43,8 +43,18 @@ public class DefaultValidator<T> implements IValidator<T>{
 				//NotEmpty validation
 				NotEmpty notEmpty = field.getAnnotation(NotEmpty.class);
 				if(notEmpty!=null){
-					Collection<?> value = (Collection<?>) field.get(model);
-					if(value==null || value.isEmpty()){
+					boolean notEmptyError = false;
+					Object value = field.get(model);
+					if(value instanceof Collection<?>){
+						Collection<?> collection = (Collection<?>) value;
+						notEmptyError = (collection==null || collection.isEmpty());
+					} else if(value instanceof String){
+						String string = (String) value;
+						notEmptyError = string==null || string.length()==0;
+					} else {
+						throw new UnimplementedException();
+					}
+					if(notEmptyError){
 						errors.add(new ValidationError(field, notEmpty));
 						continue;
 					}

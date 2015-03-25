@@ -6,6 +6,7 @@ import cat.my.android.pillow.IDataSource;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.data.db.IDbMapping;
 import cat.my.android.pillow.data.rest.IRestMapping;
+import cat.my.android.pillow.data.validator.IValidator;
 
 public interface ModelConfiguration<T extends IdentificableModel> {
 	public Class<T> getModelClass();
@@ -19,5 +20,7 @@ public interface ModelConfiguration<T extends IdentificableModel> {
 	public IDataSource<T> getDataSource();
 	
 	public ModelViewConfiguration<T> getViewConfiguration();
+	
+	public IValidator<T> getValidator();
 
 }

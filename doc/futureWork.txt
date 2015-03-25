@@ -31,3 +31,8 @@ option 1 - dirty but may work:
 2. On start compare for each table
 3. If changed, create new table, add old data, delete old table and rename.
 Foreign keys may not work but we don't have foreign keys right now...
+
+Validators
+-----------------------
+Increase validators
+Add validators to storage and views

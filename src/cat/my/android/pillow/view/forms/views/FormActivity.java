@@ -51,6 +51,10 @@ public class FormActivity<T extends IdentificableModel>  extends ActionBarActivi
 			@Override
 			public void onClick(View v) {
 				T model = formFragment.getModel();
+				if(model==null){
+					//validation errors displayed. Do nothing.
+					return;
+				}
 				ISynchDataSource<T> dataSource = (ISynchDataSource<T>) Pillow.getInstance(FormActivity.this).getDataSource(model.getClass());
 				if(StringUtil.isBlanck(model.getId())){
 					dataSource.create(model).setListeners(getOnSaveListener(), CommonListeners.defaultErrorListener);
