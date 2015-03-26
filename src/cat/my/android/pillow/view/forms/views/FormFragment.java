@@ -48,9 +48,6 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 		boolean editMode = bundle.getBoolean(EDIT_MODE_PARAM, true);
 		
 		formView = new TFormView<T>(getActivity(), editMode);
-		formView.setBackgroundDrawable(getResources().getDrawable(R.drawable.rounded_background));
-		int margin = MetricUtil.dipToPixels(getActivity(), 20);
-		((FrameLayout.LayoutParams)formView.getLayoutParams()).topMargin= margin;
 		
 		dataSource = Pillow.getInstance(getActivity()).getDataSource(modelClass);
 		

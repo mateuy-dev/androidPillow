@@ -24,6 +24,7 @@ import cat.my.android.pillow.view.forms.inputDatas.IdentificableModelSpinnerInpu
 import cat.my.android.pillow.view.forms.inputDatas.IntEditTextData;
 import cat.my.android.pillow.view.forms.inputDatas.display.BelongsToTextDisplay;
 import cat.my.android.pillow.view.forms.inputDatas.display.CalendarDisplay;
+import cat.my.android.pillow.view.forms.inputDatas.display.EnumDisplay;
 import cat.my.android.pillow.view.forms.inputDatas.display.TextDisplay;
 import cat.my.android.pillow.view.reflection.ViewConfig.ViewType;
 import cat.my.android.pillow.view.reflection.ViewConfig.ViewType.DEFAULT_INPUT;
@@ -40,13 +41,15 @@ public class InputDataManager{
 		ValueType inputTypeAnnotation = (ValueType) field.getAnnotation(ValueType.class);
 		
 		if(!editable){
-			if (Calendar.class.isAssignableFrom(valueClass)){
+			if (Calendar.class.isAssignableFrom(valueClass) || Date.class.isAssignableFrom(valueClass)){
 				return new CalendarDisplay();
 			} else if(ReflectionUtil.isBelongsTo(field)){
 				Class<? extends IdentificableModel> parentClass = inputTypeAnnotation.belongsTo();
 				BelongsToInputData inputData = new BelongsToTextDisplay<IdentificableModel>();
 				inputData.setParentClass(parentClass);
 				return inputData;
+			} else if(Enum.class.isAssignableFrom(valueClass)){
+				return new EnumDisplay();
 			} else {
 				return new TextDisplay();
 			}

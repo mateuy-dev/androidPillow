@@ -65,4 +65,8 @@ public class FormInputRow{
 		public int getOrder() {
 			return order;
 		}
+		
+		public InputData getInputData() {
+			return inputData;
+		}
 	}

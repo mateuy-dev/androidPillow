@@ -12,7 +12,12 @@ import java.util.Map.Entry;
 
 import android.content.Context;
 import cat.my.android.pillow.IdentificableModel;
+import cat.my.android.pillow.Pillow;
+import cat.my.android.pillow.data.validator.GenericComparator;
+import cat.my.android.pillow.data.validator.GreaterThanValidator;
+import cat.my.android.pillow.data.validator.annotations.GreaterThan;
 import cat.my.android.pillow.util.reflection.ReflectionUtil;
+import cat.my.android.pillow.view.forms.InputData.ValueChangedListener;
 import cat.my.util.exceptions.BreakFastException;
 
 public class FormInputs {
@@ -35,19 +40,46 @@ public class FormInputs {
 	}
 	
 	private void initInputs() {
-		if(inputViewMap!=null)
-			return;
-		
-		inputViewMap = new HashMap<Field, FormInputRow>();
-		for(Field field: ReflectionUtil.getStoredFields(model.getClass())){
-			try {
-				if(acceptInput(field)){
-					field.setAccessible(true);
-					inputViewMap.put(field, new FormInputRow(context, field, model, editable));
-				}
-			} catch (Exception e) {
-				throw new BreakFastException(e);
+		try {
+			Class<?> modelClass = model.getClass();
+			Map<Field, GreaterThan> greaterThans= new HashMap<Field, GreaterThan>();
+			if(inputViewMap!=null)
+				return;
+			inputViewMap = new HashMap<Field, FormInputRow>();
+			for(Field field: ReflectionUtil.getStoredFields(modelClass)){
+					if(acceptInput(field)){
+						field.setAccessible(true);
+						inputViewMap.put(field, new FormInputRow(context, field, model, editable));
+						
+						GreaterThan greaterThan = field.getAnnotation(GreaterThan.class);
+						if(greaterThan!=null){
+							greaterThans.put(field, greaterThan);
+						}
+					}
+				
 			}
+			
+			//Greater than fires and listeners: update value if null when greater than is set
+			for(Entry<Field, GreaterThan> entry:greaterThans.entrySet()){
+				FormInputRow originInputRow = inputViewMap.get(entry.getKey());
+				final InputData originInputData = originInputRow.getInputData();
+				final GreaterThan greaterThan = entry.getValue();
+				String greaterThanAtt = greaterThan.attribute();
+				Field greaterThanField = modelClass.getDeclaredField(greaterThanAtt);
+				FormInputRow greaterThanInputRow = inputViewMap.get(greaterThanField);
+				if(greaterThanInputRow!=null){
+					greaterThanInputRow.getInputData().addOnValueChangedListener(new ValueChangedListener() {
+						@Override
+						public void onValueChanged(Object value) {
+							Object originValue = originInputData.getValue();
+							if(originValue==null || !GreaterThanValidator.isValid(originValue, value, greaterThan))
+								originInputData.setValue(value);
+						}
+					});
+				}
+			}
+		} catch (Exception e) {
+			throw new BreakFastException(e);
 		}
 	}
 	

@@ -1,10 +1,13 @@
 package cat.my.android.pillow.view.forms;
 
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import android.content.Context;
 import android.util.Log;
 import cat.my.android.pillow.Pillow;
+import cat.my.android.pillow.view.forms.inputDatas.CalendarInputData;
 
 public class StringResourceUtils {
 	public static String getLabel(Context context, Field field){
@@ -30,7 +33,7 @@ public class StringResourceUtils {
 		return label;
 	}
 	
-	private static String getLabel(Context context, String stringId){
+	public static String getLabel(Context context, String stringId){
 		int id = context.getResources().getIdentifier(stringId, "string", context.getPackageName());
 		String label = null; 
 		if(id!=0)
@@ -41,4 +44,8 @@ public class StringResourceUtils {
 		return label;
 	}
 
+	public static String getLabel(Context context, Date date, boolean dateTime){
+		SimpleDateFormat dateFormat = new SimpleDateFormat(CalendarInputData.DATE_STRING_FORMAT);
+		return dateFormat.format(date);
+	}
 }

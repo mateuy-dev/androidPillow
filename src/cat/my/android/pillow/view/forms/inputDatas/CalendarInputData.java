@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import cat.my.android.pillow.view.forms.InputData.ValueChangedListener;
 import cat.my.util.exceptions.BreakFastException;
 
 public class CalendarInputData extends AbstractInputData {
@@ -73,7 +74,21 @@ public class CalendarInputData extends AbstractInputData {
 				}, year, monthOfYear, dayOfMonth).show();
 			}
 		});
-
 		return editText;
+	}
+	
+	@Override
+	protected EditText getView() {
+		return (EditText) super.getView();
+	}
+	
+	@Override
+	public void addOnValueChangedListener(final ValueChangedListener listener) {
+		getView().addTextChangedListener(new DefaultTextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				listener.onValueChanged(getValue());
+			}
+		});
 	}
 }

@@ -15,6 +15,7 @@ import cat.my.android.pillow.R;
 import cat.my.android.pillow.data.validator.IValidator;
 import cat.my.android.pillow.data.validator.ValidationErrorUtil;
 import cat.my.android.pillow.data.validator.IValidator.IValidationError;
+import cat.my.android.util.MetricUtil;
 
 
 public class TFormView<T> extends GridLayout{
@@ -36,10 +37,18 @@ public class TFormView<T> extends GridLayout{
 	    setFocusableInTouchMode(true);
 	    
 		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL);
+		int margin = MetricUtil.dipToPixels(getContext(), 20);
+		params.topMargin= margin;
 		int marginHorizontal = getContext().getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
 		int marginVertical = getContext().getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin);
 		setPadding(marginHorizontal, marginVertical, marginHorizontal, marginVertical);
 		setLayoutParams(params);
+		
+		
+		
+		setBackgroundDrawable(getResources().getDrawable(R.drawable.rounded_background));
+		
+		
 //		setOrientation(VERTICAL);
 	}
 

@@ -2,6 +2,8 @@ package cat.my.android.pillow.view.forms.inputDatas;
 
 import cat.my.util.StringUtil;
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.widget.EditText;
@@ -43,5 +45,15 @@ public class IntEditTextData extends AbstractInputData {
 	
 	protected EditText getView(){
 		return (EditText) super.getView();
+	}
+	
+	@Override
+	public void addOnValueChangedListener(final ValueChangedListener listener) {
+		getView().addTextChangedListener(new DefaultTextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				listener.onValueChanged(getValue());
+			}
+		});
 	}
 }

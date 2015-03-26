@@ -8,7 +8,7 @@ import android.content.Context;
 import android.view.View;
 import cat.my.android.pillow.view.forms.InputData;
 
-public class DateInputData implements InputData {
+public class DateInputData implements InputData{
 	CalendarInputData calendarInput = new CalendarInputData();
 
 	@Override
@@ -26,6 +26,7 @@ public class DateInputData implements InputData {
 		} else {
 			Calendar calendar = new GregorianCalendar();
 			calendar.setTime((Date)value);
+			
 			calendarInput.setValue(calendar);
 		}
 	}
@@ -35,4 +36,15 @@ public class DateInputData implements InputData {
 		return calendarInput.getView(context);
 	}
 	
+	@Override
+	public void addOnValueChangedListener(final ValueChangedListener listener) {
+		ValueChangedListener proxyListener = new ValueChangedListener() {
+			@Override
+			public void onValueChanged(Object value) {
+				Calendar calendar = (Calendar) value;
+				listener.onValueChanged(calendar.getTime());
+			}
+		};
+		calendarInput.addOnValueChangedListener(proxyListener);
+	}
 }

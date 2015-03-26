@@ -20,4 +20,10 @@ public interface InputData {
 	public void setValue(Object value);
 
 	public View getView(Context context);
+	
+	public void addOnValueChangedListener(ValueChangedListener listener);
+	
+	public interface ValueChangedListener{
+		public void onValueChanged(Object value);
+	}
 }

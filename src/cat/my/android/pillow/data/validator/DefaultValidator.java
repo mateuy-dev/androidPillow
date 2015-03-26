@@ -19,6 +19,14 @@ import cat.my.util.exceptions.UnimplementedException;
 
 public class DefaultValidator<T> implements IValidator<T>{
 	Class<T> modelClass;
+	GenericComparator comparator = new GenericComparator();
+	
+	GreaterThanValidator<T> greaterThanValidator  = new GreaterThanValidator<T>();
+	NotNullValidator<T> notNullValidator = new NotNullValidator<T>();
+	NotEmptyValidator<T> notEmptyValidator = new NotEmptyValidator<T>();
+	MaxValidator<T> maxValidator = new MaxValidator<T>();
+	MinValidator<T> minValidator = new MinValidator<T>();
+	
 	
 	public DefaultValidator(Class<T> modelClass) {
 		this.modelClass = modelClass;
@@ -32,64 +40,30 @@ public class DefaultValidator<T> implements IValidator<T>{
 				field.setAccessible(true);
 				
 				//NotNull validation
-				NotNull notNull = field.getAnnotation(NotNull.class);
-				if(notNull!=null){
-					if(field.get(model)==null){
-						errors.add(new ValidationError(field, notNull));
-						continue;
-					}
+				IValidationError notNullError = notNullValidator.validate(model, field);
+				if(notNullError!=null){
+					errors.add(notNullError);
+					continue;
 				}
 				
 				//NotEmpty validation
-				NotEmpty notEmpty = field.getAnnotation(NotEmpty.class);
-				if(notEmpty!=null){
-					boolean notEmptyError = false;
-					Object value = field.get(model);
-					if(value instanceof Collection<?>){
-						Collection<?> collection = (Collection<?>) value;
-						notEmptyError = (collection==null || collection.isEmpty());
-					} else if(value instanceof String){
-						String string = (String) value;
-						notEmptyError = string==null || string.length()==0;
-					} else {
-						throw new UnimplementedException();
-					}
-					if(notEmptyError){
-						errors.add(new ValidationError(field, notEmpty));
-						continue;
-					}
+				IValidationError notEmptyError = notEmptyValidator.validate(model, field);
+				if(notEmptyError!=null){
+					errors.add(notEmptyError);
+					continue;
 				}
 				
 				//Max validation
-				Max maxAnnotation = field.getAnnotation(Max.class);
-				if(maxAnnotation!=null){
-					Object value = field.get(model);
-					if(comparator.compare(value, maxAnnotation.value()) >0){
-						errors.add(new ValidationError(field, maxAnnotation));
-					}
-				}
+				IValidationError error = maxValidator.validate(model, field);
+				addIfNotNull(errors, error);
+				
 				//Min validation
-				Min minAnnotation = field.getAnnotation(Min.class);
-				if(minAnnotation!=null){
-					Object value = field.get(model);
-					if(comparator.compare(value, maxAnnotation.value()) < 0){
-						errors.add(new ValidationError(field, minAnnotation));
-					}
-				}
+				error = minValidator.validate(model, field);
+				addIfNotNull(errors, error);
 				
 				//GreaterThan validation
-				GreaterThan greatterAnnotation = field.getAnnotation(GreaterThan.class);
-				if(greatterAnnotation!=null){
-					Object value = field.get(model);
-					String compareAtt = greatterAnnotation.attribute();
-					Field compareField = modelClass.getDeclaredField(compareAtt);
-					compareField.setAccessible(true);
-					Object compareValue = compareField.get(model);
-					int comparizon = comparator.compare(value, compareValue);
-					if(comparizon < 0 || (!greatterAnnotation.acceptEqual() && comparizon==0)){
-						errors.add(new ValidationError(field, greatterAnnotation));
-					}
-				}
+				error = greaterThanValidator.validate(model, field);
+				addIfNotNull(errors,error);
 			}
 			return errors;
 		} catch (Exception e) {
@@ -97,27 +71,10 @@ public class DefaultValidator<T> implements IValidator<T>{
 		}
 	}
 
-	GenericComparator comparator = new GenericComparator();
-	public class GenericComparator implements Comparator<Object>{
-
-		@Override
-		public int compare(Object o1, Object o2) {
-			if (o1 instanceof Integer){
-				Integer i1 = (Integer) o1;
-				Integer i2 = (Integer) o2;
-				return i1-i2;
-			}
-			if(o1 instanceof Date){
-				Date date1 = (Date) o1;
-				Date date2 = (Date) o2;
-				return (int) (date1.getTime() - date2.getTime());
-			}
-			if(o1 instanceof Calendar){
-				Calendar cal1 = (Calendar) o1;
-				Calendar cal2 = (Calendar) o2;
-				return cal1.compareTo(cal2);
-			}
-			throw new UnimplementedException();
+	
+	public static <Q> void addIfNotNull(List<Q> list, Q item){
+		if(item!=null){
+			list.add(item);
 		}
 	}
 	
