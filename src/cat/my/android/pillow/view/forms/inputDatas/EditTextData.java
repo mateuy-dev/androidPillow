@@ -1,12 +1,13 @@
 package cat.my.android.pillow.view.forms.inputDatas;
 
+
 import android.content.Context;
 import android.view.View;
 import android.widget.EditText;
 
 public class EditTextData extends AbstractInputData {
 	public static final int EMS = 10;
-	
+
 	@Override
 	public String getValue() {
 		return getView().getText().toString();

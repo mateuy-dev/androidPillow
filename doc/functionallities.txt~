@@ -7,7 +7,7 @@ Data
 Views
 ------------------------
 *When saved, if not valid, error is dipslayed as a toast, and not moved from the form
-*If an attribute X has a validation GreaterThan Y when Y is set, if X is null will be set to Y value*
+*If an attribute X has a validation GreaterThan Y when Y is set, if X is null will be set to Y value
 	*InputData has addOnValueChangedListener, only implemented in: DateInput, IntInput
 
 

@@ -12,6 +12,8 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.R;
+import cat.my.android.pillow.conf.ModelConfiguration;
+import cat.my.android.pillow.data.validator.DefaultValidator;
 import cat.my.android.pillow.data.validator.IValidator;
 import cat.my.android.pillow.data.validator.ValidationErrorUtil;
 import cat.my.android.pillow.data.validator.IValidator.IValidationError;
@@ -62,7 +64,13 @@ public class TFormView<T> extends GridLayout{
 		T model = getModel();
 		if(validate){
 			Class modelClass = model.getClass();
-			IValidator<T> validator = Pillow.getInstance(getContext()).getModelConfiguration(modelClass).getValidator();
+			ModelConfiguration modelConf = Pillow.getInstance(getContext()).getModelConfiguration(modelClass);
+			IValidator<T> validator;
+			if(modelConf!=null)
+				validator = modelConf.getValidator();
+			else
+				validator = new DefaultValidator<T>(modelClass);
+			
 			List<IValidationError> errors = validator.validate(model);
 			if(!errors.isEmpty()){
 	            //Error found for now we toast the first one. This could be improved
