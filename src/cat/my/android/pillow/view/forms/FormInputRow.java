@@ -1,11 +1,15 @@
 package cat.my.android.pillow.view.forms;
 
+import android.content.Context;
+import android.graphics.Typeface;
+import android.util.TypedValue;
+import android.view.View;
+import android.widget.TextView;
+
 import java.lang.reflect.Field;
 import java.util.List;
 
-import android.content.Context;
-import android.view.View;
-import android.widget.TextView;
+import cat.my.android.pillow.R;
 import cat.my.android.pillow.view.reflection.ViewConfig.ViewType;
 import cat.my.util.exceptions.BreakFastException;
 
@@ -47,6 +51,13 @@ public class FormInputRow{
 			label = new TextView(context);
 			String labelText = StringResourceUtils.getLabel(context, field);
 			label.setText(labelText);
+            label.setTypeface(null, Typeface.BOLD);
+
+
+            TypedValue value = new TypedValue();
+            context.getTheme().resolveAttribute(R.attr.colorPrimary,value, false);
+            int color = value.data;
+            label.setTextColor(context.getResources().getColor(color));
 		}
 		
 		

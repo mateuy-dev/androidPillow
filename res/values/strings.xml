@@ -12,5 +12,6 @@
     <string name="error_min">%1$s must be bigger than %2$s</string>
     <string name="error_greater_than">%1$s must be greater than %2$s</string>
     
+    <string name="add_another_one">add another one</string>
     
 </resources>

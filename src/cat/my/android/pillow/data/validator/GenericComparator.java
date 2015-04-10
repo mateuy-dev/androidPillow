@@ -18,7 +18,9 @@ public class GenericComparator implements Comparator<Object>{
 			if(o1 instanceof Date){
 				Date date1 = (Date) o1;
 				Date date2 = (Date) o2;
-				return (int) (date1.getTime() - date2.getTime());
+				long time1 = date1.getTime();
+				long time2 = date2.getTime();
+				return time1 < time2 ? -1 : (time1 == time2 ? 0 : 1);
 			}
 			if(o1 instanceof Calendar){
 				Calendar cal1 = (Calendar) o1;

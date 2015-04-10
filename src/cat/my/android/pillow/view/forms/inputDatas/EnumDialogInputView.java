@@ -1,19 +1,17 @@
 package cat.my.android.pillow.view.forms.inputDatas;
 
-import java.util.HashMap;
-
-import java.util.Map;
-
-
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-
 import android.view.View;
-
 import android.widget.EditText;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import cat.my.android.pillow.view.forms.StringResourceUtils;
 
 
@@ -56,20 +54,22 @@ public class EnumDialogInputView extends AbstractInputData {
 
 	public AlertDialog createDialog(){
 		final Map<String, Enum<?>> values = new HashMap<String, Enum<?>>();
+        final List<String> stringValues = new ArrayList<String>();
 		for (Object constant : valueClass.getEnumConstants()) {
 			Enum<?> value = (Enum<?>) constant;
 			String label = StringResourceUtils.getLabel(getContext(), value);
 			values.put(label, value);
+            stringValues.add(label);
 		}
-		final String[] stringValues = values.keySet().toArray(new String[] {});
+
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 		builder// .setTitle("no title for now")
-		.setItems(stringValues, new Dialog.OnClickListener() {
+		.setItems(stringValues.toArray(new String[]{}), new Dialog.OnClickListener() {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				String selectedString = stringValues[which];
+				String selectedString = stringValues.get(which);
 				Enum<?> value = values.get(selectedString);
 				setValue(value);
 			}
