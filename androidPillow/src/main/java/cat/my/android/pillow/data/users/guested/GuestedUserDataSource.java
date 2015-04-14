@@ -1,4 +1,4 @@
-package cat.my.android.pillow.data.users;
+package cat.my.android.pillow.data.users.guested;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -30,32 +30,42 @@ import cat.my.util.exceptions.BreakFastException;
  *
  * @param <T>
  */
-public class GuestedUserDataSource<T extends GuestedUser> extends RestDataSource<T> implements IAuthenticationController{
+public class GuestedUserDataSource<T extends IGuestedUser> extends RestDataSource<T> implements IAuthenticationController{
 	SharedPreferences sharedPref;
 	private static final String AUTH_TOKEN = "logged_auth_token";
 	private static final String USER_DATA = "logged_user_data";
+    private static final String LOGGED_VERSION = "logged_version";
     private static final String AUTH_TOKEN_SESSION_PARAM = "auth_token";
 	
 //	RestDataSource<T> userDataSource;
 	Context context;
+    Class<T> userClass;
+    int version = 0;
+
+    public GuestedUserDataSource(Context context, IRestMapping<T> restMapping){
+        this(context, restMapping, 0);
+    }
 	
-	public GuestedUserDataSource(Context context, IRestMapping<T> restMapping){
+	public GuestedUserDataSource(Context context, IRestMapping<T> restMapping, int version){
 		super(restMapping, context);
 		this.context = context;
 		//userDataSource = new RestDataSource<T>(restMapping, context);
 		String preferencesFileKey = Pillow.PREFERENCES_FILE_KEY;
 		sharedPref = context.getSharedPreferences(preferencesFileKey, Context.MODE_PRIVATE);
-		
+        userClass= getRestMapping().getModelClass();
+
+        this.version=version;
+        checkAuthenticationVersion();
 	}
 	
 	/**
 	 * Creates a guest user.
 	 * @return
 	 */
-	public T createGuestUser(){
+	private T createGuestUser(){
 		T user;
 		try {
-			user = getRestMapping().getModelClass().newInstance();
+			user = userClass.newInstance();
 		} catch (Exception e) {
 			throw new BreakFastException(e);
 		}
@@ -101,7 +111,7 @@ public class GuestedUserDataSource<T extends GuestedUser> extends RestDataSource
 	 */
 	public IPillowResult<T> signUp(T user){
 		final PillowResultListener<T> result = new PillowResultListener<T>(context);
-		user.setId(getAuthToken());
+		user.setAuthToken(getAuthToken());
 		Listener<T> onSignUpListener = new Listener<T>() {
 			@Override
 			public void onResponse(T response) {
@@ -109,7 +119,7 @@ public class GuestedUserDataSource<T extends GuestedUser> extends RestDataSource
 				result.setResult(response);
 			}
 		};
-		update(user).setListeners(onSignUpListener, result);
+        executeCollectionOperation(user, Method.POST, "sign_up", null).setListeners(onSignUpListener, result);
 		return result;
 	}
 	
@@ -161,21 +171,22 @@ public class GuestedUserDataSource<T extends GuestedUser> extends RestDataSource
 		return context;
 	}
 	
-//	private void resetInTesting() {
-//		int version = getResetInTestingVersion();
-//		int current = sharedPref.getInt("dummy_version", -1);
-//		if(current<version){
-//			SharedPreferences.Editor editor = sharedPref.edit();
-//			editor.remove(AUTH_TOKEN);
-//			editor.putInt("dummy_version", version);
-//			editor.commit();
-//		}
-//		
-//	}
-//	
-//	public int getResetInTestingVersion() {
-//		return 0;
-//	}
+	private void checkAuthenticationVersion() {
+		int version = getAuthenticationVersion();
+		int current = sharedPref.getInt(LOGGED_VERSION, 0);
+		if(current<version){
+			SharedPreferences.Editor editor = sharedPref.edit();
+			editor.remove(AUTH_TOKEN);
+            editor.remove(USER_DATA);
+			editor.putInt(LOGGED_VERSION, version);
+			editor.commit();
+		}
+	}
+
+
+	protected int getAuthenticationVersion() {
+		return version;
+	}
 
 	/**
 	 * Stores the given auth_token in the shared preferences
@@ -183,7 +194,7 @@ public class GuestedUserDataSource<T extends GuestedUser> extends RestDataSource
 	 */
 	private void storeAuthToken(T user) {
 		SharedPreferences.Editor editor = sharedPref.edit();
-		editor.putString(AUTH_TOKEN, user.getId());
+		editor.putString(AUTH_TOKEN, user.getAuthToken());
 		String userJson = new Gson().toJson(user);
 		editor.putString(USER_DATA, userJson);
 		editor.commit();
