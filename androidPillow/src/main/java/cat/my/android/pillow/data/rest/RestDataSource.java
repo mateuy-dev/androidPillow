@@ -16,14 +16,19 @@
  */
 package cat.my.android.pillow.data.rest;
 
+import android.content.Context;
+import android.util.Log;
+
+import com.android.volley.NoConnectionError;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import android.content.Context;
-import android.util.Log;
 import cat.my.android.pillow.IDataSource;
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.Listener;
@@ -33,14 +38,10 @@ import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.data.core.IPillowResult;
 import cat.my.android.pillow.data.core.PillowResultListener;
 import cat.my.android.pillow.data.db.MultiThreadDbDataSource.OperationRunnable;
-import cat.my.android.pillow.data.rest.ISessionController.NullSessionController;
-import cat.my.android.pillow.data.rest.ISessionController.SessionData;
+import cat.my.android.pillow.data.rest.IAuthenticationController.NullAuthenticationController;
+import cat.my.android.pillow.data.rest.IAuthenticationController.AuthenticationData;
 import cat.my.android.pillow.data.rest.requests.GsonCollectionRequest;
 import cat.my.android.pillow.data.rest.requests.GsonRequest;
-
-import com.android.volley.NoConnectionError;
-import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
 
 public class RestDataSource<T extends IdentificableModel> implements IDataSource<T> {
 	private static ThreadPoolExecutor dbThreadPool = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
@@ -52,19 +53,19 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 	RequestQueue volleyQueue;
 	IRestMapping<T> restMapping;
 	
-	ISessionController sessionController;
+	IAuthenticationController authenticationController;
 	
 	
 	public RestDataSource(IRestMapping<T> restMapping, Context context) {
-		this(restMapping, context, new NullSessionController());
+		this(restMapping, context, new NullAuthenticationController());
 	}
 	
-	public RestDataSource(IRestMapping<T> restMapping, Context context, ISessionController sessionController) {
+	public RestDataSource(IRestMapping<T> restMapping, Context context, IAuthenticationController authenticationController) {
 		this.restMapping=restMapping;
 		this.volleyQueue = VolleyFactory.newRequestQueue(context);
-		if(sessionController==null)
-			sessionController = new NullSessionController();
-		this.sessionController = sessionController;
+		if(authenticationController==null)
+			authenticationController = new NullAuthenticationController();
+		this.authenticationController = authenticationController;
 		this.context = context;
 	}
 	
@@ -80,7 +81,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 //	 * @return false if authentication is required but not provided
 //	 */
 //	public boolean checkAuthenticationRequired() {
-//		return !serverRequiresAuthentication || sessionController.isAuthenticated();
+//		return !serverRequiresAuthentication || authenticationController.isAuthenticated();
 //	}
 //	public void setServerRequiresAuthentication(boolean serverRequiresAuthentication) {
 //		this.serverRequiresAuthentication = serverRequiresAuthentication;
@@ -109,9 +110,9 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 			return result.setError(new PillowError(new NoConnectionError()));
 		}		
 		
-		Listener<SessionData> onSessionStarted = new Listener<SessionData>() {
+		Listener<AuthenticationData> onSessionStarted = new Listener<AuthenticationData>() {
 			@Override
-			public void onResponse(SessionData sessionData) {
+			public void onResponse(AuthenticationData sessionData) {
 				Map<String, Object> map = sessionData.getData();
 				if(params!=null){
 					map.putAll(params);
@@ -122,7 +123,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 			}
 		};
 		
-		IPillowResult<SessionData> sessionData = sessionController.getSession();
+		IPillowResult<AuthenticationData> sessionData = authenticationController.getAuthentication();
 		sessionData.setListeners(onSessionStarted, result);
 		
 		return result;
@@ -131,13 +132,13 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 	private IPillowResult<T> executeOperation(final T model, final Route route, final Map<String, Object> params) {
 		final PillowResultListener<T> result = new PillowResultListener<T>(context);
 		Log.d(LOG_ID, "Executing operation "+route.method + " "+route.url + " "+params);
+
 		if(SIMULATE_OFFLINE_CONNECTIVITY_ON_TESTING){
 			return result.setError(new PillowError(new NoConnectionError()));
 		}
-		Listener<SessionData> onSessionStarted = new Listener<SessionData>() {
+		Listener<AuthenticationData> onSessionStarted = new Listener<AuthenticationData>() {
 			@Override
-			public void onResponse(SessionData sessionData) {
-			
+			public void onResponse(AuthenticationData sessionData) {
 			Map<String, Object> map = sessionData.getData();
 			if(params!=null){
 				map.putAll(params);
@@ -151,7 +152,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 			volleyQueue.add(gsonRequest);
 			}
 		};
-		IPillowResult<SessionData> sessionData = sessionController.getSession();
+		IPillowResult<AuthenticationData> sessionData = authenticationController.getAuthentication();
 		sessionData.setListeners(onSessionStarted, result);
 		
 		return result;

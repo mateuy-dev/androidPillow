@@ -5,7 +5,6 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import cat.my.android.pillow.util.reflection.ValuesTypes.BelongsToOnDelete;
 import cat.my.android.pillow.util.reflection.ValuesTypes.Embeddable;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType;
 import cat.my.android.pillow.util.reflection.ValuesTypes.ValueType.NONE;
@@ -102,4 +101,14 @@ public class ReflectionUtil {
 	public static boolean isBoolean(Class<?> fieldClass){
 		return Boolean.class.isAssignableFrom(fieldClass) || boolean.class.isAssignableFrom(fieldClass);
 	}
+
+    public static void setValue(Object model, String attribute, Object value)  {
+        try {
+            Field field = model.getClass().getField(attribute);
+            field.setAccessible(true);
+            field.set(model, value);
+        } catch (Exception e){
+            throw new BreakFastException(e);
+        }
+    }
 }

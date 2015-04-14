@@ -72,7 +72,6 @@ public class TFormView<T> extends GridLayout{
         if(validator==null){
             Class modelClass = model.getClass();
             ModelConfiguration modelConf = Pillow.getInstance(getContext()).getModelConfiguration(modelClass);
-            IValidator<T> validator;
             if(modelConf!=null)
                 validator = modelConf.getValidator();
             else

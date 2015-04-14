@@ -3,16 +3,14 @@ package cat.my.android.pillow.data.sync;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteOpenHelper;
+
 import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.Listener;
-import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.PillowError;
 import cat.my.android.pillow.data.core.IPillowResult;
 import cat.my.android.pillow.data.core.PillowResult;
@@ -24,7 +22,7 @@ import cat.my.android.pillow.data.db.IDbMapping;
 import cat.my.android.pillow.data.db.MultiThreadDbDataSource;
 import cat.my.android.pillow.data.db.MultiThreadDbDataSource.OperationRunnable;
 import cat.my.android.pillow.data.rest.IRestMapping;
-import cat.my.android.pillow.data.rest.ISessionController;
+import cat.my.android.pillow.data.rest.IAuthenticationController;
 import cat.my.android.pillow.data.rest.RestDataSource;
 
 public class SynchDataSource<T extends IdentificableModel> implements ISynchDataSource<T>{
@@ -32,7 +30,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 	
 	
 	RestDataSource<T> restDataSource;
-	ISessionController authenticationData;
+	IAuthenticationController authenticationData;
 	DeletedEntries<T> deletedEntries;
 	IDBDataSourceForSynch<T> dbSource;
 	DBModelController<T> dbModelController;
@@ -43,7 +41,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 	//ensures that no more than one syncrhonization process is beeing done at the same time
 	Object synchronizationLock;
 	
-	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context, ISessionController authenticationData) {
+	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context, IAuthenticationController authenticationData) {
 		this.context=context;
 		this.authenticationData=authenticationData;
 		this.dbFuncs=dbFuncs;

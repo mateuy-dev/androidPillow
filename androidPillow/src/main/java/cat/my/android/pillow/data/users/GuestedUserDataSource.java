@@ -1,35 +1,45 @@
 package cat.my.android.pillow.data.users;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import com.android.volley.Request.Method;
+import com.google.gson.Gson;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import cat.my.android.pillow.IdentificableModel;
 import cat.my.android.pillow.Listeners.Listener;
 import cat.my.android.pillow.Pillow;
 import cat.my.android.pillow.data.core.IPillowResult;
 import cat.my.android.pillow.data.core.PillowResult;
 import cat.my.android.pillow.data.core.PillowResultListener;
 import cat.my.android.pillow.data.core.PillowResultProxyType;
+import cat.my.android.pillow.data.rest.IAuthenticationController;
 import cat.my.android.pillow.data.rest.IRestMapping;
-import cat.my.android.pillow.data.rest.ISessionController;
-import cat.my.android.pillow.data.rest.RailsRestMapping;
 import cat.my.android.pillow.data.rest.RestDataSource;
 import cat.my.util.exceptions.BreakFastException;
 
-import com.android.volley.Request.Method;
-import com.google.gson.Gson;
-
-public class DefUserDataSource<T extends IUser> extends RestDataSource<T>{
+/**
+ * DataSource for a User that enables guest users. #GuestedUserDataSource.getAuthentication returns the authenticationController
+ * The authentication works the following:
+ *
+ * 1. If nothing done it will try to create a guest user (signUpAsGuest).
+ * 2. It it registers, the guest account will be 'upgraded' to registered signUp
+ * 3. If signed in, the guest user will be discarted
+ *
+ * @param <T>
+ */
+public class GuestedUserDataSource<T extends GuestedUser> extends RestDataSource<T> implements IAuthenticationController{
 	SharedPreferences sharedPref;
 	private static final String AUTH_TOKEN = "logged_auth_token";
 	private static final String USER_DATA = "logged_user_data";
+    private static final String AUTH_TOKEN_SESSION_PARAM = "auth_token";
 	
 //	RestDataSource<T> userDataSource;
 	Context context;
 	
-	public DefUserDataSource(Context context, IRestMapping<T> restMapping){
+	public GuestedUserDataSource(Context context, IRestMapping<T> restMapping){
 		super(restMapping, context);
 		this.context = context;
 		//userDataSource = new RestDataSource<T>(restMapping, context);
@@ -56,9 +66,6 @@ public class DefUserDataSource<T extends IUser> extends RestDataSource<T>{
 	/**
 	 * Should be called just after created.
 	 * It connects to the server and authenticates (if authentication stored) or creates a guest user
-	 * 
-	 * @param listener
-	 * @param errorListener
 	 */
 	public IPillowResult<Void> init(){
 //		resetInTesting();
@@ -172,7 +179,7 @@ public class DefUserDataSource<T extends IUser> extends RestDataSource<T>{
 
 	/**
 	 * Stores the given auth_token in the shared preferences
-	 * @param id
+	 * @param user
 	 */
 	private void storeAuthToken(T user) {
 		SharedPreferences.Editor editor = sharedPref.edit();
@@ -195,36 +202,26 @@ public class DefUserDataSource<T extends IUser> extends RestDataSource<T>{
 			return null;
 		return new Gson().fromJson(userJson, getRestMapping().getModelClass());
 	}
-	
-	public ISessionController getSessionController(){
-		return new UserSessionController();
-	}
-	
-	/**
-	 * Implementation of IAuthenticationData using the controller
-	 */
-	private class UserSessionController implements ISessionController{
-		
-		
-		@Override
-		public IPillowResult<SessionData> getSession() {
-			final PillowResultListener<SessionData> result = new PillowResultListener<SessionData>(context);
-			
-			Listener<Void> onInitListener = new Listener<Void>() {
+
+	@Override
+	public IPillowResult<AuthenticationData> getAuthentication() {
+		final PillowResultListener<AuthenticationData> result = new PillowResultListener<AuthenticationData>(context);
+
+		Listener<Void> onInitListener = new Listener<Void>() {
 				@Override
 				public void onResponse(Void response) {
-					Map<String, Object> session = new HashMap<String, Object>();
-					String authToken = getAuthToken();
-					if(authToken!=null){
-						session.put(AUTH_TOKEN, authToken);
-					}
-					result.setResult(new SessionData(session));
+				Map<String, Object> session = new HashMap<String, Object>();
+				String authToken = getAuthToken();
+				if(authToken!=null){
+					session.put(AUTH_TOKEN_SESSION_PARAM, authToken);
 				}
+				result.setResult(new AuthenticationData(session));
+			}
 			};
-			
-			init().setListeners(onInitListener, result);
-			
-			return result;
-		}
+
+		init().setListeners(onInitListener, result);
+
+		return result;
 	}
+
 }
