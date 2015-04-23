@@ -12,16 +12,22 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="20dp"
-        android:gravity="center_horizontal"
-        tools:text="You are logged as guest" />
+        android:gravity="center"
+        tools:text="You are logged as guest"
+        android:layout_weight="1" />
 
+
+    <View
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:layout_weight="3" />
 
     <Button
         android:layout_marginTop="20dp"
         android:id="@+id/signin_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/sign_in"/>
+        android:text="@string/sign_in" />
     <Button 
         android:id="@+id/signup_button"
         android:layout_width="match_parent"
@@ -32,6 +38,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/sign_out"/>
-    
 
+    <View
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:layout_weight="1" />
 </LinearLayout>

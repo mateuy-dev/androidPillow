@@ -1,9 +1,7 @@
 apply plugin: 'com.android.library'
-//apply plugin: 'com.github.dcendents.android-maven'
-//apply plugin: 'com.jfrog.bintray'
-
-// This is the library version used when deploying the artifact
-version = "0.0.1"
+/*apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: "com.jfrog.bintray"
+*/
 
 
 android {
@@ -13,21 +11,29 @@ android {
     defaultConfig {
         minSdkVersion 8
         targetSdkVersion 22
-/*        versionCode 1
-        versionName version*/
+        versionCode 1
+        versionName "0.0.1"
     }
 
     buildTypes {
-//        release {
-//            minifyEnabled false
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-//        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
     }
 }
 
+dependencies {
+    compile 'com.mcxiaoke.volley:library:1.+'
+    compile 'com.shamanland:fab:0.0.8'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.android.support:gridlayout-v7:21.0.3'
+}
 /*
 def siteUrl = "http://www.androidpillow.com"
-group = "<maven group id>"
+def gitUrl = 'https://github.com/mateuyabar/androidPillow.git'
+group = "com.mateuyabar.androidPillow"
 install {
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters
@@ -37,6 +43,7 @@ install {
 
                 // Add your description here
                 name 'Android Pillow'
+                description = 'Android Pillow'
                 url siteUrl
 
                 // Set your license
@@ -48,29 +55,23 @@ install {
                 }
                 developers {
                     developer {
-                        //id '<your user ID>'
-                        name 'mateuyabar'
+                        id 'mateuyabar'
+                        name 'Mateu Yabar'
                         email 'mateuyabar@mateuyabar.com'
                     }
                 }
                 scm {
+                    connection gitUrl
+                    developerConnection gitUrl
                     url siteUrl
-
                 }
             }
         }
     }
-}*/
-
-dependencies {
-    compile 'com.mcxiaoke.volley:library:1.+'
-    compile 'com.shamanland:fab:0.0.8'
-    compile 'com.google.code.gson:gson:2.2.4'
-    compile 'com.android.support:appcompat-v7:22.0.0'
-    compile 'com.android.support:gridlayout-v7:21.0.3'
 }
 
-/*
+
+
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     classifier = 'sources'
@@ -88,5 +89,37 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
     archives javadocJar
     archives sourcesJar
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+// https://github.com/bintray/gradle-bintray-plugin
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    configurations = ['archives']
+    pkg {
+        repo = "maven"
+        // it is the name that appears in bintray when logged
+        name = "androidupdatechecker"
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]
+        publish = true
+        version {
+            gpg {
+                sign = true //Determines whether to GPG sign the files. The default is false
+                passphrase = properties.getProperty("bintray.gpg.password") //Optional. The passphrase for GPG signing'
+            }
+//            mavenCentralSync {
+//                sync = true //Optional (true by default). Determines whether to sync the version to Maven Central.
+//                user = properties.getProperty("bintray.oss.user") //OSS user token
+//                password = properties.getProperty("bintray.oss.password") //OSS user password
+//                close = '1' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+//            }
+        }
+    }
 }
 */

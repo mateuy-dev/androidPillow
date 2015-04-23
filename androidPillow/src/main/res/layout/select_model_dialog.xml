@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="cat.my.android.pillow.MainActivity" >
+    tools:context="com.mateuyabar.android.pillow.MainActivity" >
 
 <!-- http://stackoverflow.com/questions/1555109/stop-edittext-from-gaining-focus-at-activity-startup -->    
     <!-- LinearLayout

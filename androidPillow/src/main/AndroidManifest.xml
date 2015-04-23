@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cat.my.android.pillow"
+    package="com.mateuyabar.android.pillow"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -9,7 +9,7 @@
         android:targetSdkVersion="22" />
 
     <application>
-        <activity android:name=".view.forms.views.FormActivity" >
+        <activity android:name="com.mateuyabar.android.pillow.view.forms.views.FormActivity" >
         </activity>
     </application>
 
