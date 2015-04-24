@@ -1,12 +1,15 @@
 package com.mateuyabar.android.pillow.data.db;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+
+import com.mateuyabar.util.exceptions.UnimplementedException;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
-
-import android.database.Cursor;
 
 public class DBUtil {
 	public static final String COMMA_SEP = ",";
@@ -149,5 +152,48 @@ public class DBUtil {
 	public static String createUUID() {
 		return UUID.randomUUID().toString();
 	}
+
+    public static Object dbValue(Object value) {
+        if(value instanceof Calendar){
+            value = DBUtil.calendarToDb((Calendar)value);
+        } else if(value instanceof Date){
+            value = DBUtil.dateToDb((Date)value);
+        } else if(value instanceof Enum){
+            value = DBUtil.enumToDb((Enum<?>) value);
+        } else if(value instanceof Boolean){
+            value = DBUtil.booleanToDb(value);
+        }
+        return value;
+    }
+
+    /**
+     * Helper method to allow to put a value of type Object to ContentValues. It also allows to store complex methods (like embeddable models)
+     * @param values
+     * @param key
+     * @param value
+     */
+    public static void put(ContentValues values, String key, Object value) {
+        if(value==null) return;
+
+        if(value instanceof String)
+            values.put(key, (String) value);
+        else if(value instanceof Byte)
+            values.put(key, (Byte) value);
+        else if(value instanceof Short)
+            values.put(key, (Short) value);
+        else if(value instanceof Integer) //Integer.TYPE
+            values.put(key, (Integer) value);
+        else if(value instanceof Long)
+            values.put(key, (Long) value);
+        else if(value instanceof Double)
+            values.put(key, (Double) value);
+        else if(value instanceof Boolean)
+            values.put(key, (Boolean) value);
+        else if(value instanceof byte[])
+            values.put(key, (byte[]) value);
+        else  {
+            throw new UnimplementedException("can't save value of type" + value.getClass());
+        }
+    }
 	
 }

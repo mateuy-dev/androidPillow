@@ -1,13 +1,8 @@
 package com.mateuyabar.android.pillow.data.db;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
 import android.content.ContentValues;
 import android.database.Cursor;
+
 import com.mateuyabar.android.pillow.IdentificableModel;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.util.reflection.ReflectionUtil;
@@ -16,6 +11,12 @@ import com.mateuyabar.android.pillow.util.reflection.ValuesTypes.OrderBy;
 import com.mateuyabar.android.pillow.util.reflection.ValuesTypes.ValueType;
 import com.mateuyabar.util.exceptions.BreakFastException;
 import com.mateuyabar.util.exceptions.UnimplementedException;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMapping<T>{
 	private static final String EMBEDDED_MODEL_ATTRIBUTE_SEPARATOR = "_";
@@ -73,68 +74,34 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 
 	@Override
 	public void addModelContentValues(T model, ContentValues values) {
-		for(Field field: ReflectionUtil.getStoredFields(model.getClass())){
-			put(values, field.getName(), dbValue(field, model));
-		}
-	}
-	
-	private void addEmbedModelContentValues(Object embeddedModel, String prefix, ContentValues values) {
-		for(Field field: ReflectionUtil.getStoredFields(embeddedModel.getClass())){
-			put(values, prefix+field.getName(), dbValue(field, embeddedModel));
-		}
+        addModelContentValues(model, values, "");
 	}
 
-	private Object dbValue(Field field, Object model) {
-		try {
-			field.setAccessible(true);
-			Object value = field.get(model);
-			if(value instanceof Calendar){
-				value = DBUtil.calendarToDb((Calendar)value);
-			} else if(value instanceof Date){
-				value = DBUtil.dateToDb((Date)value);
-			} else if(value instanceof Enum){
-				value = DBUtil.enumToDb((Enum<?>) value);
-			} else if(value instanceof Boolean){
-				value = DBUtil.booleanToDb(value); 
-			}
-			return value;
-		} catch (Exception e) {
-			throw new BreakFastException(e);
-		}
-	}
-	
+    public void addModelContentValues(Object model, ContentValues values, String prefix) {
+        for(Field field: ReflectionUtil.getStoredFields(model.getClass())){
+            String key = prefix+field.getName();
+            Object value  = dbValue(field, model);
 
-	/**
-	 * Helper method to allow to put a value of type Object to ContentValues. It also allows to store complex methods (like embeddable models)
-	 * @param values
-	 * @param key
-	 * @param value
-	 */
-	private void put(ContentValues values, String key, Object value) {
-		if(value==null) return;
-		
-		if(value instanceof String)
-			values.put(key, (String) value);
-		else if(value instanceof Byte)
-			values.put(key, (Byte) value);
-		else if(value instanceof Short)
-			values.put(key, (Short) value);
-		else if(value instanceof Integer) //Integer.TYPE 
-			values.put(key, (Integer) value);
-		else if(value instanceof Long)
-			values.put(key, (Long) value);
-		else if(value instanceof Double)
-			values.put(key, (Double) value);
-		else if(value instanceof Boolean)
-			values.put(key, (Boolean) value);
-		else if(value instanceof byte[])
-			values.put(key, (byte[]) value);
-		else if(ReflectionUtil.isEmbeddable(value.getClass())){
-			addEmbedModelContentValues(value, key+EMBEDDED_MODEL_ATTRIBUTE_SEPARATOR, values);
-		} else {
-			throw new UnimplementedException("can't save value of type" + value.getClass());
-		}
-	}
+            if(ReflectionUtil.isEmbeddable(value.getClass())){
+                addModelContentValues(value, values, key + EMBEDDED_MODEL_ATTRIBUTE_SEPARATOR);
+            } else {
+                DBUtil.put(values, key, value);
+            }
+        }
+    }
+
+
+
+    private Object dbValue(Field field, Object model) {
+        try {
+            field.setAccessible(true);
+            Object value = field.get(model);
+            return DBUtil.dbValue(value);
+        } catch (Exception e) {
+            throw new BreakFastException(e);
+        }
+    }
+
 	
 	@Override
 	public T createModel(Cursor cursor, String id) {
@@ -153,42 +120,48 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 		return fillModel(cursor, model, "");
 		
 	}
+
+
+    public <T> T getValue(Cursor cursor, String fieldName, Class<T> fieldClass){
+        Object value = null;
+        if(String.class.isAssignableFrom(fieldClass)){
+            value = cursor.getString(cursor.getColumnIndex(fieldName));
+        } else if(ReflectionUtil.isInt(fieldClass)){
+            value = cursor.getInt(cursor.getColumnIndex(fieldName));
+        }else  if(ReflectionUtil.isBoolean(fieldClass)){
+            value = DBUtil.getBoolean(cursor, cursor.getColumnIndex(fieldName));
+        } else if(Double.class.isAssignableFrom(fieldClass)){
+            value = cursor.getDouble(cursor.getColumnIndex(fieldName));
+        } else if(Long.class.isAssignableFrom(fieldClass)){
+            value = cursor.getLong(cursor.getColumnIndex(fieldName));
+        } else if(Calendar.class.isAssignableFrom(fieldClass)){
+            value = DBUtil.getCalendar(cursor, cursor.getColumnIndex(fieldName));
+        } else if(Date.class.isAssignableFrom(fieldClass)){
+            value = DBUtil.getDate(cursor, cursor.getColumnIndex(fieldName));
+        } else if(Enum.class.isAssignableFrom(fieldClass)){
+            Object[] enumValues = (Object[]) fieldClass.getEnumConstants();//EventType.values()
+            value = DBUtil.dbToEnum(cursor, cursor.getColumnIndex(fieldName), enumValues);
+        } else if(ReflectionUtil.isEmbeddable(fieldClass)){
+            //Embeddable model
+            Object embedModel;
+            try {
+                embedModel = fieldClass.newInstance();
+            } catch (Exception e) {
+                throw new BreakFastException();
+            }
+            fillModel(cursor, embedModel, fieldName+EMBEDDED_MODEL_ATTRIBUTE_SEPARATOR);
+            value = embedModel;
+        } else {
+            throw new UnimplementedException();
+        }
+        return (T) value;
+    }
 	
 	private <K> K fillModel(Cursor cursor, K model, String field_prefix){
 		for(Field field: ReflectionUtil.getStoredFields(model.getClass())){
 			String fieldName = field_prefix + field.getName();
 			Class<?> fieldClass = field.getType();
-			Object value = null;
-			if(String.class.isAssignableFrom(fieldClass)){
-				value = cursor.getString(cursor.getColumnIndex(fieldName));
-			} else if(ReflectionUtil.isInt(fieldClass)){
-				value = cursor.getInt(cursor.getColumnIndex(fieldName));
-			}else  if(ReflectionUtil.isBoolean(fieldClass)){
-				value = DBUtil.getBoolean(cursor, cursor.getColumnIndex(fieldName));
-			} else if(Double.class.isAssignableFrom(fieldClass)){
-				value = cursor.getDouble(cursor.getColumnIndex(fieldName));
-			} else if(Long.class.isAssignableFrom(fieldClass)){
-				value = cursor.getLong(cursor.getColumnIndex(fieldName));
-			} else if(Calendar.class.isAssignableFrom(fieldClass)){
-				value = DBUtil.getCalendar(cursor, cursor.getColumnIndex(fieldName));
-			} else if(Date.class.isAssignableFrom(fieldClass)){
-				value = DBUtil.getDate(cursor, cursor.getColumnIndex(fieldName));
-			} else if(Enum.class.isAssignableFrom(fieldClass)){
-				Object[] enumValues = (Object[]) fieldClass.getEnumConstants();//EventType.values()
-				value = DBUtil.dbToEnum(cursor, cursor.getColumnIndex(fieldName), enumValues);
-			} else if(ReflectionUtil.isEmbeddable(fieldClass)){
-				//Embeddable model
-				Object embedModel;
-				try {
-					embedModel = fieldClass.newInstance();
-				} catch (Exception e) {
-					throw new BreakFastException();
-				}
-				fillModel(cursor, embedModel, fieldName+EMBEDDED_MODEL_ATTRIBUTE_SEPARATOR);
-				value = embedModel;
-			} else {
-				throw new UnimplementedException();
-			}
+			Object value = getValue(cursor, fieldName, fieldClass);
 			field.setAccessible(true);
 			try {
 				field.set(model, value);
@@ -201,10 +174,6 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 	
 	
 
-
-	
-	
-	@Override
 	public synchronized String[] getModelAttributesForProjection() {
 		//TODO refactor and take id out.
 		if(projectionAttributes!=null)
@@ -235,7 +204,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 	}
 
 	
-	@Override
+
 	public synchronized String[][] getAttributes() {
 		if(atts!=null)
 			return atts;
