@@ -8,13 +8,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import com.mateuyabar.android.pillow.IDataSource;
 import com.mateuyabar.android.pillow.IdentificableModel;
 import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.Listeners.ViewListener;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.R;
 import com.mateuyabar.android.pillow.data.sync.CommonListeners;
-import com.mateuyabar.android.pillow.data.sync.ISynchDataSource;
 import com.mateuyabar.android.pillow.util.BundleUtils;
 import com.mateuyabar.util.StringUtil;
 
@@ -55,7 +56,7 @@ public class FormActivity<T extends IdentificableModel>  extends ActionBarActivi
 					//validation errors displayed. Do nothing.
 					return;
 				}
-				ISynchDataSource<T> dataSource = (ISynchDataSource<T>) Pillow.getInstance(FormActivity.this).getDataSource(model.getClass());
+                IDataSource<T> dataSource = (IDataSource<T>) Pillow.getInstance(FormActivity.this).getDataSource(model.getClass());
 				if(StringUtil.isBlanck(model.getId())){
 					dataSource.create(model).setListeners(getOnSaveListener(), CommonListeners.defaultErrorListener);
 				} else {
