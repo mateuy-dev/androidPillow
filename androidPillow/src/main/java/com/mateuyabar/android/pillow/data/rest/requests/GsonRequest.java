@@ -1,35 +1,35 @@
-/**
- * Copyright Mateu Yábar (http://mateuyabar.com)
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/*
+ * Copyright (c) Mateu Yabar Valles (http://mateuyabar.com)
  *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
  */
 package com.mateuyabar.android.pillow.data.rest.requests;
 
  
-import java.io.UnsupportedEncodingException;
-import java.util.Map;
-
-import com.mateuyabar.android.pillow.Listeners.ErrorListener;
-import com.mateuyabar.android.pillow.Listeners.Listener;
-import com.mateuyabar.android.pillow.data.rest.Route;
-
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.mateuyabar.android.pillow.Listeners.ErrorListener;
+import com.mateuyabar.android.pillow.Listeners.Listener;
+import com.mateuyabar.android.pillow.data.rest.Route;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
  
 
 public class GsonRequest<T> extends AbstractGsonRequest<T> {

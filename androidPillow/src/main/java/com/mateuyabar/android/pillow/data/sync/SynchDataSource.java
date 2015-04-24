@@ -1,11 +1,22 @@
-package com.mateuyabar.android.pillow.data.sync;
+/*
+ * Copyright (c) Mateu Yabar Valles (http://mateuyabar.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ */
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+package com.mateuyabar.android.pillow.data.sync;
 
 import android.content.Context;
 
@@ -21,9 +32,16 @@ import com.mateuyabar.android.pillow.data.db.IDBDataSourceForSynch;
 import com.mateuyabar.android.pillow.data.db.IDbMapping;
 import com.mateuyabar.android.pillow.data.db.MultiThreadDbDataSource;
 import com.mateuyabar.android.pillow.data.db.MultiThreadDbDataSource.OperationRunnable;
-import com.mateuyabar.android.pillow.data.rest.IRestMapping;
 import com.mateuyabar.android.pillow.data.rest.IAuthenticationController;
+import com.mateuyabar.android.pillow.data.rest.IRestMapping;
 import com.mateuyabar.android.pillow.data.rest.RestDataSource;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class SynchDataSource<T extends IdentificableModel> implements ISynchDataSource<T>{
 	private static ThreadPoolExecutor operationthreadPool = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());

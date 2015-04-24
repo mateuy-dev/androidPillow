@@ -1,15 +1,28 @@
-package com.mateuyabar.android.pillow.data.sync;
+/*
+ * Copyright (c) Mateu Yabar Valles (http://mateuyabar.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ */
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+package com.mateuyabar.android.pillow.data.sync;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
 import com.mateuyabar.android.pillow.AbstractDBHelper;
 import com.mateuyabar.android.pillow.IDataSource;
 import com.mateuyabar.android.pillow.Pillow;
@@ -19,6 +32,12 @@ import com.mateuyabar.android.pillow.data.core.PillowResult;
 import com.mateuyabar.android.pillow.data.core.PillowResultListener;
 import com.mateuyabar.android.pillow.data.db.DBUtil;
 import com.mateuyabar.util.exceptions.UnimplementedException;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class SynchManager {
 	public static final String LOG_ID = Pillow.LOG_ID + " SynchManager";

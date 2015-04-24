@@ -1,8 +1,22 @@
-package com.mateuyabar.android.pillow.view.forms;
+/*
+ * Copyright (c) Mateu Yabar Valles (http://mateuyabar.com)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ */
 
-import java.lang.reflect.Field;
-import java.util.Calendar;
-import java.util.Date;
+package com.mateuyabar.android.pillow.view.forms;
 
 import com.mateuyabar.android.pillow.IdentificableModel;
 import com.mateuyabar.android.pillow.data.extra.Time;
@@ -12,14 +26,14 @@ import com.mateuyabar.android.pillow.util.reflection.ValuesTypes.ValueType;
 import com.mateuyabar.android.pillow.util.reflection.ValuesTypes.ValueType.NONE;
 import com.mateuyabar.android.pillow.util.reflection.ValuesTypes.ValueTypeClass;
 import com.mateuyabar.android.pillow.view.forms.inputDatas.BelongsToDialogInputData;
-import com.mateuyabar.android.pillow.view.forms.inputDatas.EnumDialogInputView;
-import com.mateuyabar.android.pillow.view.forms.inputDatas.TimeInputData;
 import com.mateuyabar.android.pillow.view.forms.inputDatas.CalendarInputData;
 import com.mateuyabar.android.pillow.view.forms.inputDatas.ColorInput;
 import com.mateuyabar.android.pillow.view.forms.inputDatas.DateInputData;
 import com.mateuyabar.android.pillow.view.forms.inputDatas.EditTextData;
+import com.mateuyabar.android.pillow.view.forms.inputDatas.EnumDialogInputView;
 import com.mateuyabar.android.pillow.view.forms.inputDatas.EnumListInput;
 import com.mateuyabar.android.pillow.view.forms.inputDatas.IntEditTextData;
+import com.mateuyabar.android.pillow.view.forms.inputDatas.TimeInputData;
 import com.mateuyabar.android.pillow.view.forms.inputDatas.display.BelongsToTextDisplay;
 import com.mateuyabar.android.pillow.view.forms.inputDatas.display.CalendarDisplay;
 import com.mateuyabar.android.pillow.view.forms.inputDatas.display.EnumDisplay;
@@ -29,6 +43,10 @@ import com.mateuyabar.android.pillow.view.reflection.ViewConfig.ViewType.DEFAULT
 import com.mateuyabar.android.pillow.view.reflection.ViewConfig.ViewType.NONE_INPUT;
 import com.mateuyabar.util.exceptions.BreakFastException;
 import com.mateuyabar.util.exceptions.UnimplementedException;
+
+import java.lang.reflect.Field;
+import java.util.Calendar;
+import java.util.Date;
 
 public class InputDataManager{
 	@SuppressWarnings("unchecked")
