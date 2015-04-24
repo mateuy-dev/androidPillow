@@ -9,7 +9,8 @@ If you need to use Pillow in other projects contact me.
 
 License
 =========
-    GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
+    Copyright 2015 Mateu Yábar Valles.
 
+    GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
     See license file for details.
 
