@@ -42,7 +42,7 @@ public class SynchOnConnectionChangeReceiver extends BroadcastReceiver {
 		ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		
 		if(connectivityManager.getActiveNetworkInfo()!=null && connectivityManager.getActiveNetworkInfo().isConnected()){
-			syncManager.synchronize(false).setListeners(null, CommonListeners.getDefaultThreadedErrorListener());
+			syncManager.synchronize(false).addListeners(null, CommonListeners.getDefaultThreadedErrorListener());
 		}
 		
 		

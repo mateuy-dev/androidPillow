@@ -8,6 +8,8 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="22" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application>
         <activity android:name="com.mateuyabar.android.pillow.view.forms.views.FormActivity" >
         </activity>

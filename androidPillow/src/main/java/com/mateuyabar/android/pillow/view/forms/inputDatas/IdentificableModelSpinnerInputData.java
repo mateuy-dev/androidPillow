@@ -81,7 +81,7 @@ public class IdentificableModelSpinnerInputData<T extends IdentificableModel> ex
 	 */
 	protected void loadData(Context context, Listener<Collection<T>> listener, ErrorListener errorListener) {
 		IDataSource<T> dataSource = Pillow.getInstance(context).getDataSource(parentClass);
-		dataSource.index().setListeners(listener, errorListener);
+		dataSource.index().addListeners(listener, errorListener);
 	}
 
 	ViewListener<Collection<T>> onLoadListener = new ViewListener<Collection<T>>(){

@@ -24,7 +24,6 @@ import com.android.volley.NoConnectionError;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.mateuyabar.android.pillow.IDataSource;
-import com.mateuyabar.android.pillow.IdentificableModel;
 import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.PillowConfigXml;
@@ -43,7 +42,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class RestDataSource<T extends IdentificableModel> implements IDataSource<T> {
+public class RestDataSource<T> implements IDataSource<T> {
 	private static ThreadPoolExecutor dbThreadPool = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 	
 	public static final String LOG_ID = Pillow.LOG_ID +" - RestDataSource";
@@ -102,8 +101,8 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 		return executeOperation(model, route, params);
 	}
 	
-	private IPillowResult<Collection<T>> executeListOperation(final Route route, final Map<String, Object> params) {
-		final PillowResultListener<Collection<T>> result = new PillowResultListener<Collection<T>>(context);
+	protected IPillowResult<Collection<T>> executeListOperation(final Route route, final Map<String, Object> params) {
+		final PillowResultListener<Collection<T>> result = new PillowResultListener<Collection<T>>();
 		
 		Log.d(LOG_ID, "Executing operation "+route.method + " "+route.url + " "+params);
 		if(SIMULATE_OFFLINE_CONNECTIVITY_ON_TESTING){
@@ -124,13 +123,13 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 		};
 		
 		IPillowResult<AuthenticationData> sessionData = authenticationController.getAuthentication();
-		sessionData.setListeners(onSessionStarted, result);
+		sessionData.addListeners(onSessionStarted, result);
 		
 		return result;
 	}
-	
-	private IPillowResult<T> executeOperation(final T model, final Route route, final Map<String, Object> params) {
-		final PillowResultListener<T> result = new PillowResultListener<T>(context);
+
+    protected IPillowResult<T> executeOperation(final T model, final Route route, final Map<String, Object> params) {
+		final PillowResultListener<T> result = new PillowResultListener<T>();
 		Log.d(LOG_ID, "Executing operation "+route.method + " "+route.url + " "+params);
 
 		if(SIMULATE_OFFLINE_CONNECTIVITY_ON_TESTING){
@@ -153,7 +152,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 			}
 		};
 		IPillowResult<AuthenticationData> sessionData = authenticationController.getAuthentication();
-		sessionData.setListeners(onSessionStarted, result);
+		sessionData.addListeners(onSessionStarted, result);
 		
 		return result;
 	}
@@ -162,7 +161,7 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 		dbThreadPool.execute(runnable);
 		return runnable.getProxyResult();
 	}
-	
+
 	@Override
 	public IPillowResult<Collection<T>> index() {
 		Route route = restMapping.getIndexPath();
@@ -211,5 +210,15 @@ public class RestDataSource<T extends IdentificableModel> implements IDataSource
 	public static class AuthenticationRequiredException extends VolleyError{
 		
 	}
-	
+
+
+/*
+    public IPillowResult<List<IPillowResult<T>>> cursoredIndex(){
+
+    }*/
+
+
+    public Context getContext() {
+        return context;
+    }
 }

@@ -66,12 +66,12 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 			if (modelId != null) {
 				//update, we should look for current values
 				idModel.setId(modelId);
-				dataSource.show(idModel).setListeners(new ViewListener<T>() {
-					@Override
-					public void onResponse(T model) {
-						formView.setModel(model, atts);
-					}
-				}, CommonListeners.defaultErrorListener);
+				dataSource.show(idModel).addListeners(new ViewListener<T>() {
+                    @Override
+                    public void onResponse(T model) {
+                        formView.setModel(model, atts);
+                    }
+                }, CommonListeners.defaultErrorListener);
 			} else {
 				//we check if there is a model in the bundle, other wise we use the empty model
 				T bundleModel = BundleUtils.getModel(bundle);

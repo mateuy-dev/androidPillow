@@ -20,7 +20,6 @@
 package com.mateuyabar.android.pillow.data.core;
 
 
-import android.content.Context;
 import com.mateuyabar.android.pillow.Listeners.ErrorListener;
 import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.PillowError;
@@ -28,12 +27,12 @@ import com.mateuyabar.android.pillow.PillowError;
 public class PillowResultProxyType<T, K>  extends PillowResult<T> implements  Listener<K>, ErrorListener{
 	IPillowResult<K> subOperation;
 	T result;
-	public PillowResultProxyType(Context context, T result, IPillowResult<K> subOperation){
-		super(context);
+	public PillowResultProxyType(T result, IPillowResult<K> subOperation){
+		super();
 		this.subOperation=subOperation;
 		this.result = result;
 		
-		subOperation.setListeners(this, this);
+		subOperation.addListeners(this, this);
 	}
 
 	@Override

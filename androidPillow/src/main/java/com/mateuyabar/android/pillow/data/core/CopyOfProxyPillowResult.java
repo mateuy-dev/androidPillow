@@ -29,7 +29,7 @@
 //			if(viewListener)
 //				mainPillowResult.setViewListeners(listener, errorListener);
 //			else
-//				mainPillowResult.setListeners(listener, errorListener);
+//				mainPillowResult.addListeners(listener, errorListener);
 //		}
 //		for(Listener<T> listener: systemListeners){
 //			mainPillowResult.addSystemListener(listener);
@@ -52,9 +52,9 @@
 //	}
 //
 //	@Override
-//	public T getResult() throws PillowError {
+//	public T get() throws PillowError {
 //		await();
-//		return mainPillowResult.getResult();
+//		return mainPillowResult.get();
 //	}
 //	
 //	@Override
@@ -69,17 +69,17 @@
 //	
 //	
 //	@Override
-//	public IPillowResult<T> setListeners(Listener<T> listener, ErrorListener errorListener) {
-//		return setListeners(listener, errorListener, false);
+//	public IPillowResult<T> addListeners(Listener<T> listener, ErrorListener errorListener) {
+//		return addListeners(listener, errorListener, false);
 //	}
 //
 //	@Override
 //	public synchronized  IPillowResult<T> setViewListeners(Listener<T> listener, ErrorListener errorListener) {
-//		return setListeners(listener, errorListener, true);
+//		return addListeners(listener, errorListener, true);
 //	}
 //	
 //	
-//	public IPillowResult<T> setListeners(Listener<T> listener, ErrorListener errorListener, boolean viewListener) {
+//	public IPillowResult<T> addListeners(Listener<T> listener, ErrorListener errorListener, boolean viewListener) {
 //		if(this.listener!=null || this.errorListener!=null)
 //			throw new ToImplementException("should be a list of exceptions");
 //		this.viewListener = viewListener;

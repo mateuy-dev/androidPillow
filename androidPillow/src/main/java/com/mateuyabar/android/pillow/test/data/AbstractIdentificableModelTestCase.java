@@ -53,7 +53,7 @@ public abstract class  AbstractIdentificableModelTestCase<T extends Identificabl
 		
 		updateModel(createdPost);
 //		createdPost.setTitle("new Title");
-		T updatedPost = controller.update(createdPost).getResult();
+		T updatedPost = controller.update(createdPost).get();
 		assertSame(createdPost, updatedPost);
 		
 		//check update
@@ -61,10 +61,10 @@ public abstract class  AbstractIdentificableModelTestCase<T extends Identificabl
 		checkServerVersionSameAs(updatedPost);
 
 		//delete post
-		controller.destroy(createdPost).getResult();
+		controller.destroy(createdPost).get();
 		
 		//check deleted locally
-		T showPost = controller.show(createdPost).getResult();
+		T showPost = controller.show(createdPost).get();
 		assertNull(showPost);
 		
 		//check deleted remotelly

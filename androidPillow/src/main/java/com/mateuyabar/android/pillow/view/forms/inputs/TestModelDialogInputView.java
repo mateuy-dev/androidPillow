@@ -25,7 +25,7 @@
 //		try {
 //			toSearch = selectedClass.newInstance();
 //			toSearch.setId(modelId);
-//			dataSource.show(toSearch).setListeners(new ViewListener<T>() {
+//			dataSource.show(toSearch).addListeners(new ViewListener<T>() {
 //				@Override
 //				public void onResponse(T response) {
 //					selected = response;

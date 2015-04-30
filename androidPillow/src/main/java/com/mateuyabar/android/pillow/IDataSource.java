@@ -24,7 +24,7 @@ import com.mateuyabar.android.pillow.data.core.IPillowResult;
 
 
 
-public interface IDataSource <T extends IdentificableModel>{
+public interface IDataSource <T>{
 	/**
 	 * Returns all the instances
 	 * @param listener to be executed when the instances have been retrieved

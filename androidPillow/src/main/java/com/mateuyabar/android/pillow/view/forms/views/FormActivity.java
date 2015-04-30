@@ -76,9 +76,9 @@ public class FormActivity<T extends IdentificableModel>  extends ActionBarActivi
 				}
                 IDataSource<T> dataSource = (IDataSource<T>) Pillow.getInstance(FormActivity.this).getDataSource(model.getClass());
 				if(StringUtil.isBlanck(model.getId())){
-					dataSource.create(model).setListeners(getOnSaveListener(), CommonListeners.defaultErrorListener);
+					dataSource.create(model).addListeners(getOnSaveListener(), CommonListeners.defaultErrorListener);
 				} else {
-					dataSource.update(model).setListeners(getOnSaveListener(), CommonListeners.defaultErrorListener);
+					dataSource.update(model).addListeners(getOnSaveListener(), CommonListeners.defaultErrorListener);
 				}
 			}
 			

@@ -90,7 +90,7 @@ public abstract class AbstractGuestedUserFragment<T extends IdentificableModel &
 			public void onClick(View v) {
                 T user = getUser();
                 if(user!=null)
-				    userController.signIn(user).setListeners(new LogListener(context, "signed in"), CommonListeners.defaultErrorListener);
+				    userController.signIn(user).addListeners(new LogListener(context, "signed in"), CommonListeners.defaultErrorListener);
 			}
 		});
 		
@@ -100,7 +100,7 @@ public abstract class AbstractGuestedUserFragment<T extends IdentificableModel &
 			public void onClick(View v) {
                 T user = getUser();
                 if(user!=null)
-				    userController.signUp(user).setListeners(new LogListener(context, "signed up"), CommonListeners.defaultErrorListener);
+				    userController.signUp(user).addListeners(new LogListener(context, "signed up"), CommonListeners.defaultErrorListener);
 			}
 		});
 
@@ -108,11 +108,11 @@ public abstract class AbstractGuestedUserFragment<T extends IdentificableModel &
 		signOutButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				userController.signOut().setListeners(new LogListener(context, "signed out"), CommonListeners.defaultErrorListener);
+				userController.signOut().addListeners(new LogListener(context, "signed out"), CommonListeners.defaultErrorListener);
 			}
 		});
 
-        userController.init().setListeners(new Listeners.ViewListener<Void>() {
+        userController.init().addListeners(new Listeners.ViewListener<Void>() {
             @Override
             public void onResponse(Void response) {
                 refreshView();

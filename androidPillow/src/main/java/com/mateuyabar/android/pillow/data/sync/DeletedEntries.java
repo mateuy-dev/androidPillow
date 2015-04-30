@@ -86,7 +86,7 @@ public class DeletedEntries<T extends IdentificableModel> {
 	
 	public IPillowResult<Void> setAllreadyDeleted(T model){
 		final String id = model.getId();
-		final PillowResultListener<Void> result = new PillowResultListener<Void>(context);
+		final PillowResultListener<Void> result = new PillowResultListener<Void>();
 		Listener<Void> onServerDeletedListener = new Listener<Void>(){
 			@Override
 			public void onResponse(Void response) {
@@ -94,7 +94,7 @@ public class DeletedEntries<T extends IdentificableModel> {
 				result.setResult(null);
 			}
 		};
-		dataSource.destroy(model).setListeners(onServerDeletedListener, result);
+		dataSource.destroy(model).addListeners(onServerDeletedListener, result);
 		
 		return result;
 	}
@@ -105,7 +105,7 @@ public class DeletedEntries<T extends IdentificableModel> {
 	}
 	
 	public IPillowResult<Void> synchronize(){
-		MultiTaskVoidResult result = new MultiTaskVoidResult(context);
+		MultiTaskVoidResult result = new MultiTaskVoidResult();
 		Cursor cursor = getCursor();
 		while(cursor.moveToNext()){
 			String id = CursorUtil.getString(cursor, ID_COLUMN);

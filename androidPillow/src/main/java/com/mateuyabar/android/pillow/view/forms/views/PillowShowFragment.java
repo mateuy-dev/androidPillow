@@ -70,12 +70,12 @@ public class PillowShowFragment<T extends IdentificableModel> extends Fragment{
 			throw new BreakFastException(e);
 		}
 		idModel.setId(modelId);
-		dataSource.show(idModel).setListeners(new ViewListener<T>() {
-			@Override
-			public void onResponse(T model) {
-				updateView(model);
-			}
-		}, CommonListeners.defaultErrorListener);
+		dataSource.show(idModel).addListeners(new ViewListener<T>() {
+            @Override
+            public void onResponse(T model) {
+                updateView(model);
+            }
+        }, CommonListeners.defaultErrorListener);
 	}
 	
 	protected void updateView(T model) {
@@ -141,12 +141,12 @@ public class PillowShowFragment<T extends IdentificableModel> extends Fragment{
 		builder.setTitle("Delete").setMessage("are you sure...?").setPositiveButton("OK", new OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				getDataSource().destroy(getModel()).setListeners(new ViewListener<Void>() {
-					@Override
-					public void onResponse(Void response) {
-						new NavigationUtil(PillowShowFragment.this).displayListModel(getModel().getClass());
-					}
-				}, CommonListeners.defaultErrorListener);
+				getDataSource().destroy(getModel()).addListeners(new ViewListener<Void>() {
+                    @Override
+                    public void onResponse(Void response) {
+                        new NavigationUtil(PillowShowFragment.this).displayListModel(getModel().getClass());
+                    }
+                }, CommonListeners.defaultErrorListener);
 			}
 		}).setNegativeButton("cancel", new OnClickListener() {
 			@Override

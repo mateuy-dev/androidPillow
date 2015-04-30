@@ -100,9 +100,9 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends RestDataSourc
 //		resetInTesting();
 		String token = getAuthToken();
 		if(token==null){
-			return new PillowResultProxyType<Void, T>(context, null, signUpAsGuest());
+			return new PillowResultProxyType<Void, T>(null, signUpAsGuest());
 		} else {
-			return PillowResult.newVoidResult(context);
+			return PillowResult.newVoidResult();
 		}
 	}
 	
@@ -111,7 +111,7 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends RestDataSourc
 	 * @return 
 	 */
 	private IPillowResult<T> signUpAsGuest(){
-		final PillowResultListener<T> result = new PillowResultListener<T>(context);
+		final PillowResultListener<T> result = new PillowResultListener<T>();
 		Listener<T> onCreateListener = new Listener<T>() {
 			@Override
 			public void onResponse(T response) {
@@ -119,7 +119,7 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends RestDataSourc
 				result.setResult(response);
 			}
 		};
-		create(createGuestUser()).setListeners(onCreateListener, result);
+		create(createGuestUser()).addListeners(onCreateListener, result);
 		return result;
 	}
 	
@@ -129,7 +129,7 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends RestDataSourc
 	 * @return 
 	 */
 	public IPillowResult<T> signUp(final T user){
-		final PillowResultListener<T> result = new PillowResultListener<T>(context);
+		final PillowResultListener<T> result = new PillowResultListener<T>();
 
 		final Listener<T> onSignUpListener = new Listener<T>() {
 			@Override
@@ -142,12 +142,12 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends RestDataSourc
             @Override
             public void onResponse(Void response) {
                 user.setAuthToken(getAuthToken());
-                executeCollectionOperation(user, Method.POST, "sign_up", null).setListeners(onSignUpListener, result);
+                executeCollectionOperation(user, Method.POST, "sign_up", null).addListeners(onSignUpListener, result);
             }
         };
 
         //we need to check that a guest user has been already created
-        init().setListeners(onInitListener, result);
+        init().addListeners(onInitListener, result);
 
 		return result;
 	}
@@ -160,29 +160,29 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends RestDataSourc
 	 * @return 
 	 */
 	public PillowResultListener<Void> signIn(T user){
-		final PillowResultListener<Void> result = new PillowResultListener<Void>(context);
+		final PillowResultListener<Void> result = new PillowResultListener<Void>();
 		
 		Listener<T> onSignInListener = new Listener<T>() {
 			@Override
 			public void onResponse(T response) {
 				storeAuthToken(response);
-				reloadData().setListeners(result,result);
+				reloadData().addListeners(result, result);
 			}
 		};
-		executeCollectionOperation(user, Method.POST, "sign_in", null).setListeners(onSignInListener, result);
+		executeCollectionOperation(user, Method.POST, "sign_in", null).addListeners(onSignInListener, result);
 		return result;
 	}
 	
 	public PillowResult<Void> signOut() {
-		final PillowResultListener<Void> result = new PillowResultListener<Void>(context);
+		final PillowResultListener<Void> result = new PillowResultListener<Void>();
 		Listener<T> onCreateListener = new Listener<T>() {
 			@Override
 			public void onResponse(T response) {
 				storeAuthToken(response);
-				reloadData().setListeners(result,result);
+				reloadData().addListeners(result, result);
 			}
 		};
-		create(createGuestUser()).setListeners(onCreateListener, result);
+		create(createGuestUser()).addListeners(onCreateListener, result);
 		return result;
 	}
 	
@@ -245,7 +245,7 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends RestDataSourc
 
 	@Override
 	public IPillowResult<AuthenticationData> getAuthentication() {
-		final PillowResultListener<AuthenticationData> result = new PillowResultListener<AuthenticationData>(context);
+		final PillowResultListener<AuthenticationData> result = new PillowResultListener<AuthenticationData>();
 
 		Listener<Void> onInitListener = new Listener<Void>() {
 				@Override
@@ -259,7 +259,7 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends RestDataSourc
 			}
 			};
 
-		init().setListeners(onInitListener, result);
+		init().addListeners(onInitListener, result);
 
 		return result;
 	}

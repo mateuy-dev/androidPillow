@@ -19,8 +19,8 @@
 
 package com.mateuyabar.android.pillow.data.core;
 
-import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 
 import com.mateuyabar.android.pillow.Listeners.ErrorListener;
 import com.mateuyabar.android.pillow.Listeners.Listener;
@@ -39,10 +39,9 @@ public class PillowResult<T> implements IPillowResult<T>{
 	PillowError error;
 	List<Listener<T>> listeners = new ArrayList<Listener<T>>();
 	List<ErrorListener> errorListeners = new ArrayList<ErrorListener>();
-	Context context;
+
 	
-	public PillowResult(Context context){
-		this.context = context;
+	public PillowResult(){
 		lock = new CountDownLatch(1);
 	}
 	
@@ -50,9 +49,9 @@ public class PillowResult<T> implements IPillowResult<T>{
 	 * Used by async methods
 	 * @param result
 	 */
-	public PillowResult(Context context, T result){
+	public PillowResult(T result){
 		//No waiting
-		this.context = context;
+//		this.context = context;
 		this.result = result;
 		lock = new CountDownLatch(0);
 	}
@@ -60,22 +59,22 @@ public class PillowResult<T> implements IPillowResult<T>{
 	/**
 	 * Used by async methods
 	 */
-	public PillowResult(Context context, PillowError error){
+	public PillowResult(PillowError error){
 		//No waiting
-		this.context = context;
+//		this.context = context;
 		this.error = error;
 		lock = new CountDownLatch(0);
 	}
 	
-	public PillowResult(Context context, Exception exception){
-		this(context, new PillowError(exception));
+	public PillowResult(Exception exception){
+		this(new PillowError(exception));
 	}
 	
 	/**
 	 * Listener set is synchonized
 	 */
 	@Override
-	public synchronized PillowResult<T> setListeners(Listener<T> listener, ErrorListener errorListener){
+	public synchronized PillowResult<T> addListeners(Listener<T> listener, ErrorListener errorListener){
 		if(listener!=null)
 			listeners.add(listener);
 		
@@ -90,10 +89,10 @@ public class PillowResult<T> implements IPillowResult<T>{
 	}
 	
 	public IPillowResult<T> addListener(Listener<T> listener){
-		return setListeners(listener, null);
+		return addListeners(listener, null);
 	}
 	public IPillowResult<T> addErrorListener(ErrorListener errorListener){
-		return setListeners(null, errorListener);
+		return addListeners(null, errorListener);
 	}
 
 	
@@ -109,7 +108,7 @@ public class PillowResult<T> implements IPillowResult<T>{
 				if(!(errorListener instanceof ViewErrorListener)){
 					errorListener.onErrorResponse(error);
 				}else{
-					Handler mainHandler = new Handler(context.getMainLooper());
+					Handler mainHandler = new Handler(Looper.getMainLooper());
 					mainHandler.post(new ErrorListenerRunnable(errorListener));
 				}
 				it.remove();
@@ -121,7 +120,7 @@ public class PillowResult<T> implements IPillowResult<T>{
 					listener.onResponse(result);
 					listener=null;
 				}else{
-					Handler mainHandler = new Handler(context.getMainLooper());
+					Handler mainHandler = new Handler(Looper.getMainLooper());
 					mainHandler.post(new ListenerRunnable(listener));
 				}
 				it.remove();
@@ -162,7 +161,7 @@ public class PillowResult<T> implements IPillowResult<T>{
 	}
 
 	@Override
-	public T getResult() throws PillowError {
+	public T get() throws PillowError {
 		controlledAwait();
 		if(error!=null)
 			throw error;
@@ -175,8 +174,8 @@ public class PillowResult<T> implements IPillowResult<T>{
 		return error;
 	}
 	
-	public static PillowResult<Void> newVoidResult(Context context){
-		return new PillowResult<Void>(context, (Void) null);
+	public static PillowResult<Void> newVoidResult(){
+		return new PillowResult<Void>((Void) null);
 	}
 
 	private class ListenerRunnable implements Runnable{

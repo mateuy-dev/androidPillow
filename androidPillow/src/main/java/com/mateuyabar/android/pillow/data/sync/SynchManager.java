@@ -123,7 +123,7 @@ public class SynchManager {
 
 	public IPillowResult<Void> download(boolean force) {
 		if (!force && getLastDownload() != null && isValidDonwload()) {
-			return PillowResult.newVoidResult(context);
+			return PillowResult.newVoidResult();
 		} else {
 			return executeOperation(new Operation(Type.DOWNLOAD));
 		}
@@ -138,12 +138,12 @@ public class SynchManager {
 		try {
 			for (ISynchDataSource<?> dataSource : getSortedSynchDataSources()) {
 				Log.d(LOG_ID, "Sending Dirty " + dataSource.getClass().getSimpleName());
-				dataSource.sendDirty().getResult();
+				dataSource.sendDirty().get();
 				Log.d(LOG_ID, "Sent Dirty " + dataSource.getClass().getSimpleName());
 			}
-			return PillowResult.newVoidResult(context);
+			return PillowResult.newVoidResult();
 		} catch (PillowError e) {
-			return new PillowResult<Void>(context, e);
+			return new PillowResult<Void>(e);
 		}
 	}
 
@@ -151,22 +151,22 @@ public class SynchManager {
 		try {
 			Date date = new Date();
 			for (ISynchDataSource<?> dataSource : getSortedSynchDataSources()) {
-				dataSource.download().getResult();
+				dataSource.download().get();
 			}
 			setLastDownload(new Date());
-			return PillowResult.newVoidResult(context);
+			return PillowResult.newVoidResult();
 		} catch (PillowError e) {
-			return new PillowResult<Void>(context, e);
+			return new PillowResult<Void>(e);
 		}
 	}
 
 	public IPillowResult<Void> realSynchronize() {
 		try {
-			realSendDirty().getResult();
-			realDownload().getResult();
-			return PillowResult.newVoidResult(context);
+			realSendDirty().get();
+			realDownload().get();
+			return PillowResult.newVoidResult();
 		} catch (PillowError e) {
-			return new PillowResult<Void>(context, e);
+			return new PillowResult<Void>(e);
 		}
 
 	}
@@ -185,7 +185,7 @@ public class SynchManager {
 		public Operation(Type type) {
 			super();
 			this.type = type;
-			this.result = new PillowResultListener<Void>(context);
+			this.result = new PillowResultListener<Void>();
 		}
 		
 		public PillowResultListener<Void> getResult() {
@@ -208,7 +208,7 @@ public class SynchManager {
 			default :
 				throw new UnimplementedException();
 			}
-			mainPillowResult.setListeners(result, result);
+			mainPillowResult.addListeners(result, result);
 		}
 	}
 }

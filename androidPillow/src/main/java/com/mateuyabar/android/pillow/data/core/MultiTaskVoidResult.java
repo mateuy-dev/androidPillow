@@ -19,8 +19,6 @@
 
 package com.mateuyabar.android.pillow.data.core;
 
-import android.content.Context;
-
 import com.mateuyabar.android.pillow.Listeners.ErrorListener;
 import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.PillowError;
@@ -34,13 +32,13 @@ public class MultiTaskVoidResult extends PillowResult<Void> implements Listener,
 	Integer operationsFinished = 0;
 	PillowError error;
 
-	public MultiTaskVoidResult(Context context) {
-		super(context);
+	public MultiTaskVoidResult() {
+		super();
 	}
 	
 	public synchronized void addOperation(IPillowResult<?> operation){
 		subOperations.add(operation);
-		operation.setListeners(this, this);
+		operation.addListeners(this, this);
 	}
 	
 	public synchronized void setLastOperationAdded() {

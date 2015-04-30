@@ -52,14 +52,14 @@ public abstract class AbstractInstrumentationTestCase<T extends IdentificableMod
 
 	
 	protected void checkLocalVersionSameAs(T model) throws Exception{
-		T showModel = getController().show(model).getResult();
+		T showModel = getController().show(model).get();
 		assertNotNull(showModel);
 		assertSame(model, showModel);
 	}
 	
 	protected void checkServerVersionSameAs(T model) throws Exception{
 		sendDirty();
-		T showModel = getController().getRestDataSource().show(model).getResult();
+		T showModel = getController().getRestDataSource().show(model).get();
 		assertNotNull(showModel);
 		assertSame(model, showModel);
 		
@@ -83,12 +83,12 @@ public abstract class AbstractInstrumentationTestCase<T extends IdentificableMod
 	
 	protected void sendDirty() throws Exception{
 //		Thread.currentThread().sleep(2000);
-		getController().sendDirty().getResult();
+		getController().sendDirty().get();
 	}
 	
 	protected IPillowResult<Void> synchornize() throws PillowError{
 		IPillowResult<Void> result = Pillow.getInstance(getContext()).getSynchManager().synchronize(true);
-		result.getResult();
+		result.get();
 		return result;
 	}
 

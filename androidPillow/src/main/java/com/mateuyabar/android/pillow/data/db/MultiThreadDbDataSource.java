@@ -19,7 +19,6 @@
 package com.mateuyabar.android.pillow.data.db;
 
 import com.mateuyabar.android.pillow.IdentificableModel;
-import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.PillowError;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
 import com.mateuyabar.android.pillow.data.core.PillowResultListener;
@@ -44,14 +43,14 @@ public class MultiThreadDbDataSource<T extends IdentificableModel> implements ID
 	public abstract static class OperationRunnable<L> implements Runnable{
 		PillowResultListener<L> proxyResult;
 		public OperationRunnable() {
-			this.proxyResult = new PillowResultListener<L>(Pillow.getInstance().getContext());
+			this.proxyResult = new PillowResultListener<L>();
 		}
 		public PillowResultListener<L> getProxyResult() {
 			return proxyResult;
 		}
 		public void run(){
 			try {
-				createMainPillowResult().setListeners(proxyResult, proxyResult);
+				createMainPillowResult().addListeners(proxyResult, proxyResult);
 			} catch (PillowError e) {
 				proxyResult.setError(e);
 			}

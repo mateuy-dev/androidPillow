@@ -51,26 +51,26 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 	@Override
 	public IPillowResult<Collection<T>> index() {
 		DBModelController<T> db = getDbModelController();
-		return new PillowResult<Collection<T>>(context, db.index());
+		return new PillowResult<Collection<T>>(db.index());
 	}
 	
 	@Override
 	public IPillowResult<Collection<T>> index(T model) {
 		DBModelController<T> db = getDbModelController();
-		return new PillowResult<Collection<T>>(context, db.index(model));
+		return new PillowResult<Collection<T>>(db.index(model));
 	}
 	
 	@Override
 	public IPillowResult<Collection<T>> index(String selection, String[] selectionArgs, String order) {
 		DBModelController<T> db = getDbModelController();
-		return new PillowResult<Collection<T>>(context, db.index(selection, selectionArgs, order));
+		return new PillowResult<Collection<T>>(db.index(selection, selectionArgs, order));
 	}
 
 	@Override
 	public IPillowResult<T> show(T model) {
 		DBModelController<T> db =getDbModelController();
 		T result = db.get(model.getId());
-		return new PillowResult<T>(context, result);
+		return new PillowResult<T>( result);
 	}
 
 	@Override
@@ -79,9 +79,9 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 			DBModelController<T> db = getDbModelController();
 			db.create(model);
 			model = db.get(model.getId());
-			return new PillowResult<T>(context, model);
+			return new PillowResult<T>( model);
 		} catch (SQLiteException exception){
-			return new PillowResult<T>(context, new PillowError(exception));
+			return new PillowResult<T>( new PillowError(exception));
 		}
 	}
 
@@ -92,9 +92,9 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 			dbController.update(model);
 			//refresh model
 			model = dbController.get(model.getId());
-			return new PillowResult<T>(context, model);
+			return new PillowResult<T>(model);
 		} catch (SQLiteException exception){
-			return new PillowResult<T>(context, new PillowError(exception));
+			return new PillowResult<T>(new PillowError(exception));
 		}
 	}
 
@@ -103,9 +103,9 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 		try{
 			DBModelController<T> db =getDbModelController();
 			db.delete(model);
-			return PillowResult.newVoidResult(context);
+			return PillowResult.newVoidResult();
 		} catch (SQLiteException exception){
-			return new PillowResult<Void>(context, new PillowError(exception));
+			return new PillowResult<Void>(new PillowError(exception));
 		}
 	}
 	
@@ -113,7 +113,7 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 	public PillowResult<Integer> count(String selection, String[] selectionArgs) {
 		DBModelController<T> db =getDbModelController();
 		int result = db.getCount(selection, selectionArgs);
-		return new PillowResult<Integer>(context, result);
+		return new PillowResult<Integer>(result);
 	}
 	
 	@Override
@@ -121,7 +121,7 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 		DBModelController<T> db =getDbModelController();
 		db.markAsClean(model);
 		model = db.get(model.getId());
-		return new PillowResult<T>(context, model);
+		return new PillowResult<T>(model);
 	}
 	
 	public DBModelController<T> getDbModelController(){

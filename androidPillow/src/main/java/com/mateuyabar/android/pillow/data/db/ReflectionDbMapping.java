@@ -100,7 +100,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
             String key = prefix+field.getName();
             Object value  = dbValue(field, model);
 
-            if(ReflectionUtil.isEmbeddable(value.getClass())){
+            if(value!=null && ReflectionUtil.isEmbeddable(value.getClass())){
                 addModelContentValues(value, values, key + EMBEDDED_MODEL_ATTRIBUTE_SEPARATOR);
             } else {
                 DBUtil.put(values, key, value);

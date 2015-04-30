@@ -78,13 +78,13 @@ public class ModelDialogInputView <T extends IdentificableModel> extends EditTex
 			try {
 				T toSearch = selectedClass.newInstance();
 				toSearch.setId(modelId);
-				dataSource.show(toSearch).setListeners(new ViewListener<T>() {
-					@Override
-					public void onResponse(T response) {
-						selected = response;
-						setText(response.toString());
-					}
-				}, CommonListeners.defaultErrorListener);
+				dataSource.show(toSearch).addListeners(new ViewListener<T>() {
+                    @Override
+                    public void onResponse(T response) {
+                        selected = response;
+                        setText(response.toString());
+                    }
+                }, CommonListeners.defaultErrorListener);
 			} catch (Exception e) {
 				throw new BreakFastException(e);
 			}

@@ -54,12 +54,12 @@ public class BelongsToTextDisplay<T extends IdentificableModel> extends Abstract
 				T toSearch = parentClass.newInstance();
 				toSearch.setId(modelId);
 				
-				dataSource.show(toSearch).setListeners(new ViewListener<T>() {
-					@Override
-					public void onResponse(T response) {
-						getView().setText(response.toString());
-					}
-				}, CommonListeners.defaultErrorListener);
+				dataSource.show(toSearch).addListeners(new ViewListener<T>() {
+                    @Override
+                    public void onResponse(T response) {
+                        getView().setText(response.toString());
+                    }
+                }, CommonListeners.defaultErrorListener);
 			} catch (Exception e) {
 				throw new BreakFastException(e);
 			}

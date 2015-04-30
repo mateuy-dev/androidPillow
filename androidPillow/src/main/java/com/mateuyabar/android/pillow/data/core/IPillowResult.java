@@ -23,15 +23,56 @@ import com.mateuyabar.android.pillow.Listeners.ErrorListener;
 import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.PillowError;
 
+/**
+ * Represents a result of a computation that may be asynchronous.
+ *
+ * We can obtain the value of it synchronously {@link IPillowResult#get()} (will wait until result is present or asynchronously {@link IPillowResult#addListeners(Listener, ErrorListener)}
+ *
+ * @param <T> Type of the computed result
+ */
 public interface IPillowResult<T>{
 	/*Listener<T> listener;
 	ErrorListener errorListener;*/
-	
+
+    /**
+     * Waits untill the result is obtained
+     * @throws PillowError
+     */
 	public void await() throws PillowError;
-	public T getResult() throws PillowError;
-	public IPillowResult<T> setListeners(Listener<T> listener, ErrorListener errorListener);
+
+    /**
+     * Waits untill the result is obtained and returns it.
+     * @return result
+     * @throws PillowError
+     */
+	public T get() throws PillowError;
+
+    /**
+     * Adds to listeners called when result is computed.
+     * @param listener called when result computed
+     * @param errorListener called when there is an error obtaining the result
+     * @return this
+     */
+	public IPillowResult<T> addListeners(Listener<T> listener, ErrorListener errorListener);
+
+    /**
+     * Adds to listeners called when result is computed.
+     * @param listener called when result computed
+     * @return this
+     */
 	public IPillowResult<T> addListener(Listener<T> listener);
+
+    /**
+     * Adds to listeners called when result is computed.
+     * @param errorListener called when there is an error obtaining the result
+     * @return this
+     */
 	public IPillowResult<T> addErrorListener(ErrorListener errorListener);
+
+    /**
+     * Waits until result is computed.
+     * @return Returns an error found if any.
+     */
 	public PillowError getError();
 	
 	

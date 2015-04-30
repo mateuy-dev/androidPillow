@@ -63,12 +63,16 @@ public abstract class PillowBaseListAdapter<T extends IdentificableModel> extend
 		ViewListener<Collection<T>> listener = new ViewListener<Collection<T>>(){
 			@Override
 			public void onResponse(Collection<T> postsResponse) {
-				models.clear();
-				models.addAll(postsResponse);
+                if(postsResponse instanceof List){
+                    models = (List)postsResponse;
+                } else {
+                    models.clear();
+                    models.addAll(postsResponse);
+                }
 				notifyDataSetChanged();
 			}
 		};
-		dataSourceIndex().setListeners(listener, CommonListeners.defaultErrorListener);
+		dataSourceIndex().addListeners(listener, CommonListeners.defaultErrorListener);
 	}
 	
 //	public void downloadData(){

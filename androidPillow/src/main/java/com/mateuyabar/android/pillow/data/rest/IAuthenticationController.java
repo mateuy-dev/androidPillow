@@ -18,7 +18,6 @@
 
 package com.mateuyabar.android.pillow.data.rest;
 
-import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
 import com.mateuyabar.android.pillow.data.core.PillowResult;
 
@@ -43,7 +42,7 @@ public interface IAuthenticationController {
 	public class NullAuthenticationController implements IAuthenticationController {
 		@Override
 		public IPillowResult<AuthenticationData> getAuthentication() {
-			return new PillowResult<AuthenticationData>(Pillow.getInstance().getContext(), new AuthenticationData());
+			return new PillowResult<AuthenticationData>(new AuthenticationData());
 		}
 	}
 	

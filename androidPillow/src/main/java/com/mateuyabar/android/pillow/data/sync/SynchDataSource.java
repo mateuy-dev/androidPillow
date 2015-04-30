@@ -114,7 +114,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 			public void onResponse(T response) {
 				sendDirty().addErrorListener(CommonListeners.defaultErrorListener);
 				//Listener<T> myListener = new SetAsNotDirityListener();
-				//restDataSource.create(model).setListeners(myListener, CommonListeners.getDefaultThreadedErrorListener());
+				//restDataSource.create(model).addListeners(myListener, CommonListeners.getDefaultThreadedErrorListener());
 			}
 		};
 		
@@ -133,7 +133,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 			public void onResponse(T response) {
 				sendDirty().addErrorListener(CommonListeners.defaultErrorListener);;
 				//Listener<T> myListener = new SetAsNotDirityListener();
-				//restDataSource.update(model).setListeners(myListener, CommonListeners.getDefaultThreadedErrorListener());
+				//restDataSource.update(model).addListeners(myListener, CommonListeners.getDefaultThreadedErrorListener());
 			}
 		};
 		return dbSource.update(model).addListener(updatedOnDbListener);
@@ -147,7 +147,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 			@Override
 			public void onResponse(Void response) {
 				sendDirty().addErrorListener(CommonListeners.defaultErrorListener);;
-//				deletedEntries.setAllreadyDeleted(model).setListeners(CommonListeners.dummyListener, CommonListeners.getDefaultThreadedErrorListener());
+//				deletedEntries.setAllreadyDeleted(model).addListeners(CommonListeners.dummyListener, CommonListeners.getDefaultThreadedErrorListener());
 			}
 		};
 		return dbSource.destroy(model).addListener(deletedOnDbListener);
@@ -163,20 +163,20 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 				DBModelController<T> db = getDbModelController();
 				List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
 				for(T model : createdModels){
-					T created = restDataSource.create(model).getResult();
+					T created = restDataSource.create(model).get();
 					dbSource.setAsNotDirty(created).await();
 				}
 				List<T> updatedModels=db.getDirty(DBModelController.DIRTY_STATUS_UPDATED);
 				for(T model : updatedModels){
-					T updated = restDataSource.update(model).getResult();
+					T updated = restDataSource.update(model).get();
 					dbSource.setAsNotDirty(updated).await();
 				}
 				
 				deletedEntries.synchronize().await();
 				
-				return PillowResult.newVoidResult(context);
+				return PillowResult.newVoidResult();
 			} catch (PillowError e) {
-				return new PillowResult<Void>(context, e);
+				return new PillowResult<Void>(e);
 			}
 		}
 		
@@ -195,7 +195,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 	private class DownloadRunnable extends OperationRunnable<Collection<T>>{
 		@Override
 		protected IPillowResult<Collection<T>> createMainPillowResult() {
-			final PillowResultListener<Collection<T>> result = new PillowResultListener<Collection<T>>(context);
+			final PillowResultListener<Collection<T>> result = new PillowResultListener<Collection<T>>();
 			
 			Listener<Collection<T>> fillDatabaseListener = new Listener<Collection<T>>(){
 				@Override
@@ -209,7 +209,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 					}
 				}
 			};
-			restDataSource.index().setListeners(fillDatabaseListener, result);
+			restDataSource.index().addListeners(fillDatabaseListener, result);
 			return result;
 		}
 	}
