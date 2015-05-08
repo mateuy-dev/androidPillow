@@ -45,20 +45,22 @@ public class FormInputs {
 	Object model;
 	Context context;
 	boolean editable;
-	
-	//Filters
+    Class<?> modelClass;
+    //Filters
 	String[] inputNames;
 	
 	public FormInputs(Object model, Context context, boolean editable) {
 		super();
+        assert model!=null;
 		this.model = model;
 		this.context = context;
 		this.editable = editable;
+        modelClass = model.getClass();
 	}
 	
 	private void initInputs() {
 		try {
-			Class<?> modelClass = model.getClass();
+
 			Map<Field, GreaterThan> greaterThans= new HashMap<Field, GreaterThan>();
 			if(inputViewMap!=null)
 				return;
@@ -132,7 +134,7 @@ public class FormInputs {
 	private FormInputRow getInput(String fieldName){
 		initInputs();
 		try {
-			Field field = model.getClass().getDeclaredField(fieldName);
+			Field field = modelClass.getDeclaredField(fieldName);
 			return inputViewMap.get(field);
 		} catch (NoSuchFieldException e) {
 			return null;

@@ -47,9 +47,7 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-		
-		
-		
+
 		Bundle bundle = getArguments();
 		final String[] atts = BundleUtils.getShownAtts(bundle);
 		modelId = BundleUtils.getId(bundle);
@@ -83,7 +81,8 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 		} catch (Exception e) {
 			throw new BreakFastException(e);
 		}
-		
+
+        //return inflater.inflate(R.layout.form_sample, null);
 		return formView;
 	}
 	

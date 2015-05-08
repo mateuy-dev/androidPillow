@@ -39,12 +39,13 @@ import java.util.Collection;
 import java.util.List;
 
 
-public class TFormView<T> extends GridLayout{
+public class TFormView<T> extends FrameLayout{
 	FormInputs formInputs;
 	T model;
 	boolean editable;
     boolean singleColumn;
     IValidator<T> validator;
+	GridLayout gridLayout;
 
 
 	public TFormView(Context context, boolean editable) {
@@ -55,10 +56,18 @@ public class TFormView<T> extends GridLayout{
 	
 	private void init() {
         //assuming singleCloumn == false
+
+		//The GridLayout padding from java does not work in some Android versions. Android Bug? We create a dummy layout for this...
+		gridLayout = new GridLayout(getContext());
+
+		addView(gridLayout);
+
+
+
 		setSingleColumn(singleColumn);
 		setFocusable(true);
-	    setFocusableInTouchMode(true);
-        configureLayoutParams();
+		setFocusableInTouchMode(true);
+		configureLayoutParams();
         setBackgroundDrawable(getResources().getDrawable(R.drawable.rounded_background));
 	}
 
@@ -66,19 +75,24 @@ public class TFormView<T> extends GridLayout{
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL);
         int margin = MetricUtil.dipToPixels(getContext(), 20);
         params.topMargin= margin;
-        int marginHorizontal = getContext().getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
-        int marginVertical = getContext().getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin);
-        setPadding(marginHorizontal, marginVertical, marginHorizontal, marginVertical);
-        setLayoutParams(params);
+        int marginHorizontal = margin;//getContext().getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin);
+        int marginVertical = margin;//getContext().getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin);
+		setLayoutParams(params);
+
+		//setPadding(marginHorizontal, marginVertical, marginHorizontal, marginVertical);
+		FrameLayout.LayoutParams gridParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL);
+		gridParams.setMargins(marginHorizontal, marginVertical, marginHorizontal, marginVertical);
+		gridLayout.setLayoutParams(gridParams);
+
 
     }
 
     public void setSingleColumn(boolean singleColumn) {
         this.singleColumn = singleColumn;
-        if(singleColumn){
-            setColumnCount(1);
+		if(singleColumn){
+			gridLayout.setColumnCount(1);
         } else {
-            setColumnCount(2);
+			gridLayout.setColumnCount(2);
         }
 
     }
@@ -147,7 +161,7 @@ public class TFormView<T> extends GridLayout{
 	}
 	
 	private void generateForm() {
-		removeAllViews();
+		gridLayout.removeAllViews();
 		Collection<FormInputRow> inputs = formInputs.getInputs();
 		boolean first = true;
 		for(FormInputRow rowInput : inputs){
@@ -170,8 +184,8 @@ public class TFormView<T> extends GridLayout{
             inputParams.setGravity(Gravity.LEFT);
 			input.setLayoutParams(inputParams);
 			
-			addView(label);
-			addView(input);
+			gridLayout.addView(label);
+			gridLayout.addView(input);
 			first = false;
 		}
 	}

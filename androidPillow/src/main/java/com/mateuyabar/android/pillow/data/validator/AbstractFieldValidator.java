@@ -37,7 +37,7 @@ public abstract class AbstractFieldValidator<T, K extends Annotation> implements
 			}
 			return null;
 		} catch(Exception e){
-			throw new BreakFastException();
+			throw new BreakFastException(e);
 		}
 	}
 
