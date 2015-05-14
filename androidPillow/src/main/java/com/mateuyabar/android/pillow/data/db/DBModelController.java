@@ -353,7 +353,7 @@ public class DBModelController<T extends IdentificableModel> {
 		close(db);
 	}
 	
-	private String createUUID() {
+	public static  String createUUID() {
 		return DBUtil.createUUID();
 	}
 

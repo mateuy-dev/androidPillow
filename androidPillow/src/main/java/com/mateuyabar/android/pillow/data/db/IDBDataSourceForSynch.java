@@ -19,9 +19,9 @@
 package com.mateuyabar.android.pillow.data.db;
 
 import com.mateuyabar.android.pillow.IdentificableModel;
-import com.mateuyabar.android.pillow.data.core.IPillowResult;
+import com.mateuyabar.android.pillow.data.sync.ILocalSynchDataSource;
 
-public interface IDBDataSourceForSynch<T extends IdentificableModel> extends IDBDataSource<T>{
-	public IPillowResult<T> setAsNotDirty(T model);
+public interface IDBDataSourceForSynch<T extends IdentificableModel> extends IDBDataSource<T>, ILocalSynchDataSource<T> {
+
 
 }

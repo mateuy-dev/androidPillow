@@ -48,6 +48,8 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 	
 	
 	RestDataSource<T> restDataSource;
+
+
 	IAuthenticationController authenticationData;
 	DeletedEntries<T> deletedEntries;
 	IDBDataSourceForSynch<T> dbSource;
@@ -273,10 +275,11 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 	}
 
 	
-
+	/*
 	public IDbMapping<T> getDbFuncs() {
 		return dbFuncs;
 	}
+	*/
 	@Override
 	public Class<T> getModelClass() {
 		return restMap.getModelClass();

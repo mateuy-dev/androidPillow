@@ -22,4 +22,12 @@ public class StringUtil {
 	public static boolean isBlanck(String s){
 		return s==null || s.length()==0;
 	}
+
+	public static String trim(String string){
+		return string.replace((char) 160, ' ').trim();
+	}
+
+	public static String deleteSpaces(String string){
+		return trim(string).replace(" ", "");
+	}
 }
