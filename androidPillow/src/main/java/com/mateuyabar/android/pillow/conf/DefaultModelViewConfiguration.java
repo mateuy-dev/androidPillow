@@ -21,7 +21,7 @@ package com.mateuyabar.android.pillow.conf;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.view.base.IModelListAdapter;
 import com.mateuyabar.android.pillow.view.forms.views.FormActivity;
 import com.mateuyabar.android.pillow.view.forms.views.PillowShowFragment;

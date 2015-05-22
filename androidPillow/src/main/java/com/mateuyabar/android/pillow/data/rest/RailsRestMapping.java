@@ -27,7 +27,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.db.DBUtil;
 import com.mateuyabar.util.CaseFormat;
 

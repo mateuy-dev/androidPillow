@@ -24,7 +24,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.R;
 
 import java.util.ArrayList;

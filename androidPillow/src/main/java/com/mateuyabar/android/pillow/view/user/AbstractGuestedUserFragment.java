@@ -21,23 +21,22 @@ package com.mateuyabar.android.pillow.view.user;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.mateuyabar.android.pillow.IdentificableModel;
 import com.mateuyabar.android.pillow.Listeners;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.R;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.sync.CommonListeners;
 import com.mateuyabar.android.pillow.data.sync.CommonListeners.DummyToastListener;
-import com.mateuyabar.android.pillow.data.users.guested.IGuestedUser;
 import com.mateuyabar.android.pillow.data.users.guested.GuestedUserDataSource;
+import com.mateuyabar.android.pillow.data.users.guested.IGuestedUser;
 import com.mateuyabar.android.pillow.data.validator.annotations.NotNull;
 import com.mateuyabar.android.pillow.view.forms.TFormView;
 import com.mateuyabar.android.pillow.view.reflection.ViewConfig;
@@ -62,23 +61,27 @@ public abstract class AbstractGuestedUserFragment<T extends IdentificableModel &
 	Button signUpButton, signInButton, signOutButton;
     TFormView<LoginData> formView;
 
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		userController = (GuestedUserDataSource<T>) Pillow.getInstance(getActivity()).getDataSource(userClass);
 	}
+
+    public int getLayoutId(){
+        return R.layout.user_fragment;
+    }
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        LinearLayout rootView = (LinearLayout) inflater.inflate(R.layout.user_fragment, container, false);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(getLayoutId(), container, false);
 
+        FrameLayout userFormLaout = (FrameLayout) rootView.findViewById(R.id.user_form);
         formView = new TFormView<>(getActivity(), true);
         formView.setModel(new LoginData());
-        LinearLayout.LayoutParams params= new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.gravity = Gravity.CENTER_HORIZONTAL;
-        formView.setLayoutParams(params);
-        rootView.addView(formView, 1);
+        userFormLaout.addView(formView);
 
 
 		userTextView = (TextView) rootView.findViewById(R.id.userTextView);
@@ -90,7 +93,7 @@ public abstract class AbstractGuestedUserFragment<T extends IdentificableModel &
 			public void onClick(View v) {
                 T user = getUser();
                 if(user!=null)
-				    userController.signIn(user).addListeners(new LogListener(context, "signed in"), CommonListeners.defaultErrorListener);
+				    userController.signIn(user).addListeners(getOnSignedInListener(), CommonListeners.defaultErrorListener);
 			}
 		});
 		
@@ -100,7 +103,7 @@ public abstract class AbstractGuestedUserFragment<T extends IdentificableModel &
 			public void onClick(View v) {
                 T user = getUser();
                 if(user!=null)
-				    userController.signUp(user).addListeners(new LogListener(context, "signed up"), CommonListeners.defaultErrorListener);
+				    userController.signUp(user).addListeners(getOnSignedUpListener(), CommonListeners.defaultErrorListener);
 			}
 		});
 
@@ -121,7 +124,15 @@ public abstract class AbstractGuestedUserFragment<T extends IdentificableModel &
         refreshView(true); //User not created yet(no internet).
 		return rootView;
 	}
-	
+
+    protected Listeners.Listener<Void> getOnSignedInListener(){
+        return new LogListener(getActivity(), "signed in");
+    }
+
+    protected Listeners.Listener<T> getOnSignedUpListener(){
+        return new LogListener(getActivity(), "signed up");
+    }
+
 	public void refreshView(){
 		T user = userController.getLoggedUser();
         refreshView(user.isGuest());

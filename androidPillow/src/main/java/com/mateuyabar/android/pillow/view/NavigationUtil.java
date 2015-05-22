@@ -26,7 +26,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.conf.ModelViewConfiguration;
 import com.mateuyabar.android.pillow.util.BundleUtils;

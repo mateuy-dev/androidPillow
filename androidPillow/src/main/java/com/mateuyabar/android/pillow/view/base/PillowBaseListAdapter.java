@@ -25,9 +25,9 @@ import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 
-import com.mateuyabar.android.pillow.IDataSource;
-import com.mateuyabar.android.pillow.IExtendedDataSource;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.IDataSource;
+import com.mateuyabar.android.pillow.data.IExtendedDataSource;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.Listeners.ErrorListener;
 import com.mateuyabar.android.pillow.Listeners.ViewListener;
 import com.mateuyabar.android.pillow.Pillow;

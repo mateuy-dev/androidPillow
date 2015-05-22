@@ -23,9 +23,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.db.IDbMapping.IDBSelection;
 import com.mateuyabar.android.pillow.data.sync.DeletedEntries;
+import com.mateuyabar.android.pillow.data.sync.ISynchLocalDataSource;
 import com.mateuyabar.android.util.CursorUtil;
 import com.mateuyabar.util.StringUtil;
 
@@ -40,10 +41,8 @@ public class DBModelController<T extends IdentificableModel> {
 	public static final String COLUMN_NAME_DIRTY = "dirty_row";
 	public static final String COLUMN_UPDATED_AT = "updated_at";
 	public static final String COLUMN_CREATED_AT = "created_at";
-	
-	public static final int DIRTY_STATUS_CLEAN = 0;
-	public static final int DIRTY_STATUS_UPDATED = 1;
-	public static final int DIRTY_STATUS_CREATED = 2;
+
+
 
 	public static final String COLUMN_NAME_ID = "id";
 	public static final String WHERE_ID_SELECTION = COLUMN_NAME_ID + " == ?";
@@ -58,19 +57,22 @@ public class DBModelController<T extends IdentificableModel> {
 	SQLiteOpenHelper dbHelper;
 	IDbMapping<T> mapper;
 	DeletedEntries<T> deletedEntries;
+	Class<T> modelClass;
 
-    public DBModelController(SQLiteOpenHelper dbHelper, IDbMapping<T> mapper) {
-        this(dbHelper, mapper, null);
-    }
-
-	public DBModelController(SQLiteOpenHelper dbHelper, IDbMapping<T> mapper, DeletedEntries<T> deletedEntries) {
+    public DBModelController(Class<T> modelClass, SQLiteOpenHelper dbHelper, IDbMapping<T> mapper) {
 		this.dbHelper= dbHelper;
 		this.mapper = mapper;
-		this.deletedEntries = deletedEntries;
+		//We allways store the deleted entries for synchronization. Small overhead.
+		this.deletedEntries = new DeletedEntries<T>(modelClass, dbHelper);
 	}
+
 	
 	public SQLiteOpenHelper getDbHelper() {
 		return dbHelper;
+	}
+
+	public DeletedEntries<T> getDeletedEntries() {
+		return deletedEntries;
 	}
 
 	public int getCount(){
@@ -201,7 +203,7 @@ public class DBModelController<T extends IdentificableModel> {
 		String[] selectionArgs = { model.getId() };
 		
 		db.delete(getTableName(), selection, selectionArgs);
-		if(dirtyStatus!=DIRTY_STATUS_CREATED && deletedEntries!=null){
+		if(dirtyStatus!= ISynchLocalDataSource.DIRTY_STATUS_CREATED && deletedEntries!=null){
 			//deletedEntries != null so it can be used in no DB entries. This is ungly and may be changed!!!
 			//If the status is created it has not been sent to server yet, so we don't need to delete it.
 			deletedEntries.setToDelete(db, model);
@@ -259,7 +261,7 @@ public class DBModelController<T extends IdentificableModel> {
 			save(db, model, OP_CACHE);
 		
 		//check for models to delete: the ones deleted on the server 
-		String whereClause = COLUMN_NAME_DIRTY + " != "+ DIRTY_STATUS_CREATED + " AND "+ COLUMN_NAME_ID + " NOT IN "+getIdList(models);
+		String whereClause = COLUMN_NAME_DIRTY + " != "+ ISynchLocalDataSource.DIRTY_STATUS_CREATED + " AND "+ COLUMN_NAME_ID + " NOT IN "+getIdList(models);
 		String[] whereArgs = {}; 
 		//TODO if its dirty_update it is a conflict!
 		db.delete(getTableName(), whereClause, whereArgs);
@@ -300,7 +302,7 @@ public class DBModelController<T extends IdentificableModel> {
 			if(model.getId()==null)
 				model.setId(createUUID());
 			mapper.addModelContentValues(model, values);
-			values.put(COLUMN_NAME_DIRTY, DIRTY_STATUS_CREATED);
+			values.put(COLUMN_NAME_DIRTY, ISynchLocalDataSource.DIRTY_STATUS_CREATED);
 			values.put(COLUMN_NAME_ID, model.getId());
 			values.put(COLUMN_CREATED_AT, milis);
 			values.put(COLUMN_UPDATED_AT, milis);
@@ -311,7 +313,7 @@ public class DBModelController<T extends IdentificableModel> {
 				//Existing, we need to update
 				T existing = createModel(db, cursor, false);
 				int dirtyStatus = CursorUtil.getInt(cursor, COLUMN_NAME_DIRTY);
-				if(dirtyStatus == DIRTY_STATUS_CLEAN){
+				if(dirtyStatus == ISynchLocalDataSource.DIRTY_STATUS_CLEAN){
 					model = merge(model, existing);
 					mapper.addModelContentValues(model, values);
 					values.put(COLUMN_UPDATED_AT, milis);
@@ -324,7 +326,7 @@ public class DBModelController<T extends IdentificableModel> {
 				if(deletedEntries!=null && !deletedEntries.isDeleted(model.getId())){
 					//If deleted on the local database we don't want to get it back
 					mapper.addModelContentValues(model, values);
-					values.put(COLUMN_NAME_DIRTY, DIRTY_STATUS_CLEAN);
+					values.put(COLUMN_NAME_DIRTY, ISynchLocalDataSource.DIRTY_STATUS_CLEAN);
 					values.put(COLUMN_NAME_ID, model.getId());
 					values.put(COLUMN_CREATED_AT, milis);
 					values.put(COLUMN_UPDATED_AT, milis);
@@ -337,8 +339,8 @@ public class DBModelController<T extends IdentificableModel> {
 			cursor.moveToNext();
 			int dirtyStatus = CursorUtil.getInt(cursor, COLUMN_NAME_DIRTY);
 			cursor.close();
-			if(dirtyStatus!=DIRTY_STATUS_CREATED)
-				values.put(COLUMN_NAME_DIRTY, DIRTY_STATUS_UPDATED);
+			if(dirtyStatus!= ISynchLocalDataSource.DIRTY_STATUS_CREATED)
+				values.put(COLUMN_NAME_DIRTY, ISynchLocalDataSource.DIRTY_STATUS_UPDATED);
 			mapper.addModelContentValues(model, values);
 			values.put(COLUMN_UPDATED_AT, milis);
 			db.update(getTableName(), values, WHERE_ID_SELECTION, new String[]{model.getId()});
@@ -348,7 +350,7 @@ public class DBModelController<T extends IdentificableModel> {
 	public void markAsClean(T model){
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
-		values.put(COLUMN_NAME_DIRTY, DIRTY_STATUS_CLEAN);
+		values.put(COLUMN_NAME_DIRTY, ISynchLocalDataSource.DIRTY_STATUS_CLEAN);
 		db.update(getTableName(), values, WHERE_ID_SELECTION, new String[]{model.getId()});
 		close(db);
 	}

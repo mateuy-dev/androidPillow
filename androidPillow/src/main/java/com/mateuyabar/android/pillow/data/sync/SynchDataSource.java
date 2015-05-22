@@ -20,18 +20,14 @@ package com.mateuyabar.android.pillow.data.sync;
 
 import android.content.Context;
 
-import com.mateuyabar.android.pillow.IdentificableModel;
 import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.PillowError;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
+import com.mateuyabar.android.pillow.data.core.MultiTaskVoidResult;
 import com.mateuyabar.android.pillow.data.core.PillowResult;
 import com.mateuyabar.android.pillow.data.core.PillowResultListener;
-import com.mateuyabar.android.pillow.data.db.DBModelController;
-import com.mateuyabar.android.pillow.data.db.DbDataSource;
-import com.mateuyabar.android.pillow.data.db.IDBDataSourceForSynch;
-import com.mateuyabar.android.pillow.data.db.IDbMapping;
-import com.mateuyabar.android.pillow.data.db.MultiThreadDbDataSource;
 import com.mateuyabar.android.pillow.data.db.MultiThreadDbDataSource.OperationRunnable;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.rest.IAuthenticationController;
 import com.mateuyabar.android.pillow.data.rest.IRestMapping;
 import com.mateuyabar.android.pillow.data.rest.RestDataSource;
@@ -51,32 +47,34 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 
 
 	IAuthenticationController authenticationData;
-	DeletedEntries<T> deletedEntries;
-	IDBDataSourceForSynch<T> dbSource;
-	DBModelController<T> dbModelController;
-	IDbMapping<T> dbFuncs;
+	//DeletedEntries<T> deletedEntries;
+	ISynchLocalDataSource<T> localDataSource;
+	//ILocalSynchDataSource<T> dbModelController;
+
 	IRestMapping<T> restMap;
 	Context context;
+	Class<T> modelClass;
 	
 	//ensures that no more than one syncrhonization process is beeing done at the same time
 	Object synchronizationLock;
 	
-	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context, IAuthenticationController authenticationData) {
+	public SynchDataSource(Class<T> modelClass, ISynchLocalDataSource<T> localDataSource, IRestMapping<T> restMap, Context context, IAuthenticationController authenticationData) {
+		this.modelClass=modelClass;
 		this.context=context;
 		this.authenticationData=authenticationData;
-		this.dbFuncs=dbFuncs;
+
 		restDataSource = new RestDataSource<T>(restMap, context, authenticationData);
-		deletedEntries = new DeletedEntries<T>(context, restDataSource);
-//		dbSource = new DbDataSource<T>(context, dbFuncs, dbHelper, deletedEntries);
+
+//		localDataSource = new DbDataSource<T>(context, dbFuncs, dbHelper, deletedEntries);
 //		if(Pillow.getInstance(context).getConfig().isDbMultiThread()){
-		dbSource = new MultiThreadDbDataSource<T>(new DbDataSource<T>(context, dbFuncs, deletedEntries));
+		this.localDataSource = localDataSource;
 		
-		dbModelController = dbSource.getDbModelController();
+		//dbModelController = localDataSource.getDbModelController();
 		this.restMap=restMap;
 		
 	}
-	public SynchDataSource(IDbMapping<T> dbFuncs, IRestMapping<T> restMap, Context context) {
-		this(dbFuncs, restMap, context, null);
+	public SynchDataSource(Class<T> modelClass, ISynchLocalDataSource<T> localDataSource, IRestMapping<T> restMap, Context context) {
+		this(modelClass, localDataSource, restMap, context, null);
 	}
 	
 	public RestDataSource<T> getRestDataSource() {
@@ -85,28 +83,17 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 	
 	@Override
 	public IPillowResult<Collection<T>> index() {
-		return dbSource.index();
+		return localDataSource.index();
 	}
 	
-	@Override
-	public IPillowResult<Collection<T>> index(T model) {
-		return dbSource.index(model);
-	}
-	
-	@Override
-	public IPillowResult<Collection<T>> index(String selection, String[] selectionArgs, String order) {
-		return dbSource.index(selection, selectionArgs, order);
-	}
+
 	
 	@Override
 	public IPillowResult<T> show(T model) {
-		return dbSource.show(model);
+		return localDataSource.show(model);
 	}
 	
-	@Override
-	public IPillowResult<Integer> count(String selection, String[] selectionArgs) {
-		return dbSource.count(selection, selectionArgs);
-	}
+
 	
 	@Override
 	public IPillowResult<T> create(final T model) {
@@ -119,8 +106,26 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 				//restDataSource.create(model).addListeners(myListener, CommonListeners.getDefaultThreadedErrorListener());
 			}
 		};
-		
-		return dbSource.create(model).addListener(createdOnDbListener);
+		return localDataSource.create(model).addListener(createdOnDbListener);
+	}
+
+	public IPillowResult<T> createNow(final T model){
+		final PillowResultListener<T> result = new PillowResultListener<>();
+		Listener<T> onCreatedListener = new Listener<T>() {
+			@Override
+			public void onResponse(T response) {
+				cache(response);
+				result.setResult(response);
+			}
+		};
+		restDataSource.create(model).addListeners(onCreatedListener, result);
+		return result;
+	}
+
+	protected void cache(T model){
+		ArrayList<T> data = new ArrayList<>();
+		data.add(model);
+		localDataSource.cacheAll(data);
 	}
 	
 	
@@ -138,7 +143,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 				//restDataSource.update(model).addListeners(myListener, CommonListeners.getDefaultThreadedErrorListener());
 			}
 		};
-		return dbSource.update(model).addListener(updatedOnDbListener);
+		return localDataSource.update(model).addListener(updatedOnDbListener);
 	}
 	
 	@Override
@@ -149,10 +154,9 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 			@Override
 			public void onResponse(Void response) {
 				sendDirty().addErrorListener(CommonListeners.defaultErrorListener);;
-//				deletedEntries.setAllreadyDeleted(model).addListeners(CommonListeners.dummyListener, CommonListeners.getDefaultThreadedErrorListener());
 			}
 		};
-		return dbSource.destroy(model).addListener(deletedOnDbListener);
+		return localDataSource.destroy(model).addListener(deletedOnDbListener);
 		
 	}
 	
@@ -162,19 +166,35 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		@Override
 		protected IPillowResult<Void> createMainPillowResult() {
 			try {
-				DBModelController<T> db = getDbModelController();
-				List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
+
+				List<T> createdModels= localDataSource.getDirty(ISynchLocalDataSource.DIRTY_STATUS_CREATED);
 				for(T model : createdModels){
 					T created = restDataSource.create(model).get();
-					dbSource.setAsNotDirty(created).await();
+					localDataSource.setAsNotDirty(created).await();
 				}
-				List<T> updatedModels=db.getDirty(DBModelController.DIRTY_STATUS_UPDATED);
+				List<T> updatedModels= localDataSource.getDirty(ISynchLocalDataSource.DIRTY_STATUS_UPDATED);
 				for(T model : updatedModels){
 					T updated = restDataSource.update(model).get();
-					dbSource.setAsNotDirty(updated).await();
+					localDataSource.setAsNotDirty(updated).await();
 				}
-				
-				deletedEntries.synchronize().await();
+
+				//Synchronize deleted entries (delete on server the ones deleted on device)
+				MultiTaskVoidResult result = new MultiTaskVoidResult();
+				for(T model: localDataSource.getDeletedModelsIds()){
+					final String id = model.getId();
+					final PillowResultListener<Void> subOperation = new PillowResultListener<Void>();
+					Listener<Void> onServerDeletedListener = new Listener<Void>(){
+						@Override
+						public void onResponse(Void response) {
+							localDataSource.setAsDeleted(id);
+							subOperation.setResult(null);
+						}
+					};
+					restDataSource.destroy(model).addListeners(onServerDeletedListener, result);
+					result.addOperation(subOperation);
+				}
+				result.setLastOperationAdded();
+				result.await();
 				
 				return PillowResult.newVoidResult();
 			} catch (PillowError e) {
@@ -203,8 +223,8 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 				@Override
 				public void onResponse(Collection<T> response) {
 					try{
-						DBModelController<T> db = getDbModelController();
-						db.cacheAll(new ArrayList<T>(response));
+
+						localDataSource.cacheAll(new ArrayList<T>(response));
 						result.setResult(response);
 					} catch(Exception e){
 						result.setError(new PillowError(e));
@@ -226,7 +246,7 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 
 		@Override
 		public void onResponse(T response) {
-			dbSource.setAsNotDirty(response);
+			localDataSource.setAsNotDirty(response);
 		}
 	}
 	
@@ -236,19 +256,19 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		model = db.get(model.getId());
 	}*/
 	
-	@Override
+	/*@Override
 	public DBModelController<T> getDbModelController(){
 		return dbModelController;
-	}
+	}*/
 	
 	public ModelInfo getModelInfo(){
 		ModelInfo result = new ModelInfo();
-		DBModelController<T> db = getDbModelController();
+
 		
-		List<T> createdModels=db.getDirty(DBModelController.DIRTY_STATUS_CREATED);
+		List<T> createdModels= localDataSource.getDirty(ISynchLocalDataSource.DIRTY_STATUS_CREATED);
 		result.setDirtyCreatedNum(createdModels.size());
 		
-		List<T> updatedModels=db.getDirty(DBModelController.DIRTY_STATUS_UPDATED);
+		List<T> updatedModels= localDataSource.getDirty(ISynchLocalDataSource.DIRTY_STATUS_UPDATED);
 		result.setDirtyUpdatedNum(updatedModels.size());
 		return result;
 	}
@@ -274,15 +294,13 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 		
 	}
 
-	
-	/*
-	public IDbMapping<T> getDbFuncs() {
-		return dbFuncs;
+	public ISynchLocalDataSource<T> getLocalDataSource() {
+		return localDataSource;
 	}
-	*/
+
 	@Override
 	public Class<T> getModelClass() {
-		return restMap.getModelClass();
+		return modelClass;
 	}
 	public Context getContext() {
 		return context;

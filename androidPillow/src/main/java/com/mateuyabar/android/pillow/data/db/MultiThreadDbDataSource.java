@@ -18,24 +18,25 @@
 
 package com.mateuyabar.android.pillow.data.db;
 
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.PillowError;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
 import com.mateuyabar.android.pillow.data.core.PillowResultListener;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 
-public class MultiThreadDbDataSource<T extends IdentificableModel> implements IDBDataSourceForSynch<T>{
+public class MultiThreadDbDataSource<T extends IdentificableModel> implements ISynchLocalDbDataSource<T> {
 	private static ThreadPoolExecutor dbThreadPool = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 //	static ThreadPoolExecutor threadPoolExecutor = new FullStackThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
-	IDBDataSourceForSynch<T> dataSource;
+	ISynchLocalDbDataSource<T> dataSource;
 
-	public MultiThreadDbDataSource(IDBDataSourceForSynch<T> dataSource) {
+	public MultiThreadDbDataSource(ISynchLocalDbDataSource<T> dataSource) {
 		super();
 		this.dataSource=dataSource;
 	}
@@ -66,8 +67,9 @@ public class MultiThreadDbDataSource<T extends IdentificableModel> implements ID
 	
 	@Override
 	public IPillowResult<Collection<T>> index() {
-		return execute(new OperationRunnable<Collection<T>>(){
-			@Override public IPillowResult<Collection<T>> createMainPillowResult() {
+		return execute(new OperationRunnable<Collection<T>>() {
+			@Override
+			public IPillowResult<Collection<T>> createMainPillowResult() {
 				return dataSource.index();
 			}
 		});
@@ -133,24 +135,18 @@ public class MultiThreadDbDataSource<T extends IdentificableModel> implements ID
 			}
 		});
 	}
-	
-	
+
+
+
 	@Override
 	public IPillowResult<Integer> count(final String selection, final String[] selectionArgs) {
-		return execute(new OperationRunnable<Integer>(){
+		return execute(new OperationRunnable<Integer>() {
 			@Override
 			protected IPillowResult<Integer> createMainPillowResult() {
 				return dataSource.count(selection, selectionArgs);
 			}
 		});
 	}
-
-	
-	public DBModelController<T> getDbModelController(){
-		return dataSource.getDbModelController();
-	}
-
-	
 
 
 	@Override
@@ -163,4 +159,29 @@ public class MultiThreadDbDataSource<T extends IdentificableModel> implements ID
 		});
 	}
 
+
+	@Override
+	public List<T> getDirty(int dirtyType) {
+		return dataSource.getDirty(dirtyType);
+	}
+
+	@Override
+	public void cacheAll(List<T> models) {
+		dataSource.cacheAll(models);
+	}
+
+	@Override
+	public List<T> getDeletedModelsIds() {
+		return dataSource.getDeletedModelsIds();
+	}
+
+	@Override
+	public void setAsDeleted(String id) {
+		dataSource.setAsDeleted(id);
+	}
+
+	@Override
+	public IDbMapping<T> getDbMapping() {
+		return dataSource.getDbMapping();
+	}
 }

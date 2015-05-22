@@ -27,7 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.util.BundleUtils;
 import com.mateuyabar.android.pillow.util.reflection.ReflectionUtil;

@@ -21,7 +21,7 @@ package com.mateuyabar.android.pillow.view.forms.inputDatas;
 import android.content.Context;
 import android.view.View;
 
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.view.forms.BelongsToInputData;
 import com.mateuyabar.android.pillow.view.forms.inputs.ModelDialogInputView;
 

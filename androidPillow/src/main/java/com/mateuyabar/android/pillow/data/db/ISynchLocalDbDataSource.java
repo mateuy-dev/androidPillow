@@ -16,27 +16,12 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  */
 
-package com.mateuyabar.android.pillow;
+package com.mateuyabar.android.pillow.data.db;
 
-import java.util.Collection;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
+import com.mateuyabar.android.pillow.data.sync.ISynchLocalDataSource;
 
-import com.mateuyabar.android.pillow.data.core.IPillowResult;
+public interface ISynchLocalDbDataSource<T extends IdentificableModel> extends IDBDataSource<T>, ISynchLocalDataSource<T> {
 
 
-
-public interface IDataSource <T>{
-	/**
-	 * Returns all the instances
-	 * @param listener to be executed when the instances have been retrieved
-	 * @param errorListener to be executed in case of error
-	 */
-	public IPillowResult<Collection<T>> index();
-
-	public IPillowResult<T> show(T model);
-	
-	public IPillowResult<T> create(T model);
-	
-	public IPillowResult<T> update(T model);
-	
-	public IPillowResult<Void> destroy(T model);
 }

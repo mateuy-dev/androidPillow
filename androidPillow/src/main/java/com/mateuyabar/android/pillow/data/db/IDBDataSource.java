@@ -18,8 +18,8 @@
 
 package com.mateuyabar.android.pillow.data.db;
 
-import com.mateuyabar.android.pillow.IExtendedDataSource;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.IExtendedDataSource;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
 
 import java.util.Collection;
@@ -27,8 +27,10 @@ import java.util.Collection;
 public interface IDBDataSource<T extends IdentificableModel> extends IExtendedDataSource<T>{
 
 	public IPillowResult<Collection<T>> index(String selection, String[] selectionArgs, String order);
-	public DBModelController<T> getDbModelController();
+	//public DBModelController<T> getDbModelController();
 	public IPillowResult<Integer> count(String selection, String[] selectionArgs);
+
+	public IDbMapping<T> getDbMapping();
 	
 
 }

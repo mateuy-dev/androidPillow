@@ -19,19 +19,19 @@
 package com.mateuyabar.android.pillow.data.users.guested;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.android.volley.Request.Method;
+import com.google.gson.Gson;
 import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.Pillow;
-import com.mateuyabar.android.pillow.PillowError;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
 import com.mateuyabar.android.pillow.data.core.PillowResult;
 import com.mateuyabar.android.pillow.data.core.PillowResultListener;
 import com.mateuyabar.android.pillow.data.core.PillowResultProxyType;
 import com.mateuyabar.android.pillow.data.rest.IAuthenticationController;
 import com.mateuyabar.android.pillow.data.rest.IRestMapping;
-import com.mateuyabar.android.pillow.data.singleinstance.ISynchLocalSingleInstanceDataSource;
-import com.mateuyabar.android.pillow.data.sync.singleinstance.SynchSingleInstanceDataSource;
+import com.mateuyabar.android.pillow.data.rest.RestDataSource;
 import com.mateuyabar.util.exceptions.BreakFastException;
 
 import java.util.HashMap;
@@ -47,16 +47,34 @@ import java.util.Map;
  *
  * @param <T>
  */
-public class GuestedUserDataSource<T extends IGuestedUser> extends SynchSingleInstanceDataSource<T> implements IAuthenticationController{
+public class GuestedUserDataSource_Old<T extends IGuestedUser> extends RestDataSource<T> implements IAuthenticationController{
+	SharedPreferences sharedPref;
+	private static final String AUTH_TOKEN = "logged_auth_token";
+	private static final String USER_DATA = "logged_user_data";
+	private static final String USER_ID = "logged_user_id";
+
+	private static final String LOGGED_VERSION = "logged_version";
 	private static final String AUTH_TOKEN_SESSION_PARAM = "auth_token";
 
+	//	RestDataSource<T> userDataSource;
 	Context context;
+	Class<T> userClass;
+	int version = 0;
 
-	public GuestedUserDataSource(Class<T> modelClass, Context context, ISynchLocalSingleInstanceDataSource<T> dbSource, IRestMapping<T>restMapping) {
-		super(modelClass, dbSource, restMapping, context);
+	public GuestedUserDataSource_Old(Context context, IRestMapping<T> restMapping){
+		this(context, restMapping, 0);
+	}
 
+	public GuestedUserDataSource_Old(Context context, IRestMapping<T> restMapping, int version){
+		super(restMapping, context);
 		this.context = context;
 		//userDataSource = new RestDataSource<T>(restMapping, context);
+		String preferencesFileKey = Pillow.PREFERENCES_FILE_KEY;
+		sharedPref = context.getSharedPreferences(preferencesFileKey, Context.MODE_PRIVATE);
+		userClass= getRestMapping().getModelClass();
+
+		this.version=version;
+		checkAuthenticationVersion();
 	}
 
 	/**
@@ -66,7 +84,7 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends SynchSingleIn
 	private T createGuestUser(){
 		T user;
 		try {
-			user = getModelClass().newInstance();
+			user = userClass.newInstance();
 		} catch (Exception e) {
 			throw new BreakFastException(e);
 		}
@@ -93,11 +111,20 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends SynchSingleIn
 	 * @return
 	 */
 	private IPillowResult<T> signUpAsGuest(){
-		return createNow(createGuestUser());
+		final PillowResultListener<T> result = new PillowResultListener<T>();
+		Listener<T> onCreateListener = new Listener<T>() {
+			@Override
+			public void onResponse(T response) {
+				storeAuthToken(response);
+				result.setResult(response);
+			}
+		};
+		create(createGuestUser()).addListeners(onCreateListener, result);
+		return result;
 	}
 
 	/**
-	 * Signs up to the application. (updates user and password for previous guest user)
+	 * Signs up to the application. (updates user and password for previous guest user )
 	 * @param user
 	 * @return
 	 */
@@ -107,16 +134,15 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends SynchSingleIn
 		final Listener<T> onSignUpListener = new Listener<T>() {
 			@Override
 			public void onResponse(T response) {
-				cache(response);
+				storeAuthToken(response);
 				result.setResult(response);
 			}
 		};
-
 		Listener<Void> onInitListener = new Listener<Void>() {
 			@Override
 			public void onResponse(Void response) {
 				user.setAuthToken(getAuthToken());
-				getRestDataSource().executeCollectionOperation(user, Method.POST, "sign_up", null).addListeners(onSignUpListener, result);
+				executeCollectionOperation(user, Method.POST, "sign_up", null).addListeners(onSignUpListener, result);
 			}
 		};
 
@@ -139,11 +165,11 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends SynchSingleIn
 		Listener<T> onSignInListener = new Listener<T>() {
 			@Override
 			public void onResponse(T response) {
-				cache(response);
+				storeAuthToken(response);
 				reloadData().addListeners(result, result);
 			}
 		};
-		getRestDataSource().executeCollectionOperation(user, Method.POST, "sign_in", null).addListeners(onSignInListener, result);
+		executeCollectionOperation(user, Method.POST, "sign_in", null).addListeners(onSignInListener, result);
 		return result;
 	}
 
@@ -152,10 +178,11 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends SynchSingleIn
 		Listener<T> onCreateListener = new Listener<T>() {
 			@Override
 			public void onResponse(T response) {
+				storeAuthToken(response);
 				reloadData().addListeners(result, result);
 			}
 		};
-		createNow(createGuestUser()).addListeners(onCreateListener, result);
+		create(createGuestUser()).addListeners(onCreateListener, result);
 		return result;
 	}
 
@@ -173,24 +200,47 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends SynchSingleIn
 		return context;
 	}
 
+	private void checkAuthenticationVersion() {
+		int version = getAuthenticationVersion();
+		int current = sharedPref.getInt(LOGGED_VERSION, 0);
+		if(current<version){
+			SharedPreferences.Editor editor = sharedPref.edit();
+			editor.remove(AUTH_TOKEN);
+			editor.remove(USER_DATA);
+			editor.putInt(LOGGED_VERSION, version);
+			editor.commit();
+		}
+	}
+
+
+	protected int getAuthenticationVersion() {
+		return 500;
+	}
+
+	/**
+	 * Stores the given auth_token in the shared preferences
+	 * @param user
+	 */
+	private void storeAuthToken(T user) {
+		SharedPreferences.Editor editor = sharedPref.edit();
+		editor.putString(AUTH_TOKEN, user.getAuthToken());
+		String userJson = new Gson().toJson(user);
+		editor.putString(USER_DATA, userJson);
+		editor.commit();
+	}
 
 	/**
 	 * @return stored auth_token in the shared preferences
 	 */
 	public String getAuthToken(){
-		T user = getLoggedUser();
-		if(user==null)
-			return null;
-		else
-			return getLoggedUser().getAuthToken();
+		return sharedPref.getString(AUTH_TOKEN, null);
 	}
 
 	public T getLoggedUser(){
-		try {
-			return get().get();
-		} catch (PillowError pillowError) {
-			throw new BreakFastException();
-		}
+		String userJson = sharedPref.getString(USER_DATA, null);
+		if(userJson==null)
+			return null;
+		return new Gson().fromJson(userJson, getRestMapping().getModelClass());
 	}
 
 	@Override

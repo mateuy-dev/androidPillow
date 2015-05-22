@@ -25,7 +25,7 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.view.base.PillowBaseListAdapter;
 import com.mateuyabar.android.pillow.view.forms.BelongsToInputData;
 

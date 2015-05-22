@@ -22,29 +22,29 @@ import android.content.Context;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.PillowError;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
 import com.mateuyabar.android.pillow.data.core.PillowResult;
-import com.mateuyabar.android.pillow.data.sync.DeletedEntries;
 
 import java.util.Collection;
+import java.util.List;
 
 
-public class DbDataSource<T extends IdentificableModel> implements IDBDataSourceForSynch<T>{
+public class DbDataSource<T extends IdentificableModel> implements ISynchLocalDbDataSource<T> {
 	SQLiteOpenHelper dbHelper;
-	IDbMapping<T> funcs;
+	IDbMapping<T> dbMapping;
 	DBModelController<T> dbModelController;
 	Context context;
+	Class<T> modelClass;
 
-	public DbDataSource(Context context, IDbMapping<T> funcs, DeletedEntries<T> deletedEntries) {
-		super();
-		//TODO check dbModelControllerManager -null delete entitites
-		this.funcs=funcs;
+	public DbDataSource(Class<T> modelClass, Context context, IDbMapping<T> dbMapping) {
+		this.modelClass = modelClass;
+		this.dbMapping = dbMapping;
 		this.dbHelper = Pillow.getInstance(context).getDbHelper();;
 		this.context = context;
-		dbModelController = new DBModelController<T>(dbHelper, funcs, deletedEntries);
+		dbModelController = new DBModelController<T>(modelClass, dbHelper, dbMapping);
 		
 	}
 
@@ -124,7 +124,7 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 		return new PillowResult<T>(model);
 	}
 	
-	public DBModelController<T> getDbModelController(){
+	private DBModelController<T> getDbModelController(){
 		return dbModelController;
 	}
 
@@ -132,6 +132,31 @@ public class DbDataSource<T extends IdentificableModel> implements IDBDataSource
 		return context;
 	}
 
-	
+	@Override
+	public List<T> getDirty(int dirtyType) {
+		return getDbModelController().getDirty(dirtyType);
+	}
 
+	@Override
+	public void cacheAll(List<T> models) {
+		getDbModelController().cacheAll(models);
+	}
+
+	@Override
+	public List<T> getDeletedModelsIds() {
+		return getDbModelController().getDeletedEntries().getDeletedModelsIds();
+	}
+
+	@Override
+	public void setAsDeleted(String id) {
+		getDbModelController().getDeletedEntries().setAsDeleted(id);
+	}
+
+	public SQLiteOpenHelper getDbHelper() {
+		return dbHelper;
+	}
+
+	public IDbMapping<T> getDbMapping() {
+		return dbMapping;
+	}
 }

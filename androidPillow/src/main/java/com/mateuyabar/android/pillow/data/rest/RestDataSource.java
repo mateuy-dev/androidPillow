@@ -23,7 +23,7 @@ import android.util.Log;
 import com.android.volley.NoConnectionError;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
-import com.mateuyabar.android.pillow.IDataSource;
+import com.mateuyabar.android.pillow.data.IDataSource;
 import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.PillowConfigXml;

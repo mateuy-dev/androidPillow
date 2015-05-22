@@ -20,7 +20,7 @@ package com.mateuyabar.android.pillow.view.forms.views;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.R;
 import com.mateuyabar.android.pillow.util.BundleUtils;
 

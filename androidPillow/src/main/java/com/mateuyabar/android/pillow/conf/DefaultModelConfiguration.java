@@ -20,14 +20,19 @@
 package com.mateuyabar.android.pillow.conf;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.google.gson.reflect.TypeToken;
-import com.mateuyabar.android.pillow.IDataSource;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.IDataSource;
+import com.mateuyabar.android.pillow.data.db.DbDataSource;
 import com.mateuyabar.android.pillow.data.db.IDbMapping;
+import com.mateuyabar.android.pillow.data.db.ISynchLocalDbDataSource;
+import com.mateuyabar.android.pillow.data.db.MultiThreadDbDataSource;
 import com.mateuyabar.android.pillow.data.db.ReflectionDbMapping;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.rest.IRestMapping;
 import com.mateuyabar.android.pillow.data.rest.RailsRestMapping;
+import com.mateuyabar.android.pillow.data.sync.ISynchLocalDataSource;
 import com.mateuyabar.android.pillow.data.sync.SynchDataSource;
 import com.mateuyabar.android.pillow.data.validator.DefaultValidator;
 import com.mateuyabar.android.pillow.data.validator.IValidator;
@@ -46,6 +51,8 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 	ModelViewConfiguration<T> viewConfiguration;
 	String url;
 	IValidator<T> validator;
+	ISynchLocalDataSource<T> localDataSource;
+	SharedPreferences preferences;
 	
 	public DefaultModelConfiguration(Context context, Class<T> modelClass, TypeToken<Collection<T>> collectionTypeToken, String url) {
 		super();
@@ -53,6 +60,10 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 		this.modelClass = modelClass;
 		this.collectionType = collectionTypeToken.getType();
 		this.url = url;
+	}
+
+	public void setPreferences(SharedPreferences preferences) {
+		this.preferences = preferences;
 	}
 
 	public void setDbMapping(IDbMapping<T> dbMapping) {
@@ -79,8 +90,21 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 		this.validator = validator;
 	}
 
+	public void setLocalDataSource(ISynchLocalDataSource<T> localDataSource) {
+		this.localDataSource = localDataSource;
+	}
+
+	protected SharedPreferences createSharedPreferences(){
+		SharedPreferences preferences = context.getSharedPreferences("PILLOW_PREFERENCE_MODELS", Context.MODE_PRIVATE);
+		return preferences;
+	}
+
 	protected IDataSource<T> createDefaultDataSource() {
-		return new SynchDataSource<T>(getDbMapping(), getRestMapping(), getContext());
+		return new SynchDataSource<T>(modelClass, getLocalDataSource(), getRestMapping(), getContext());
+	}
+
+	private ISynchLocalDbDataSource<T> createDefaultLocalDataSource() {
+		return new MultiThreadDbDataSource<T>(new DbDataSource<>(getModelClass(), getContext(), getDbMapping()));
 	}
 
 	protected IRestMapping<T> createDefaultRestMapping() {
@@ -102,6 +126,7 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 	private String getUrl() {
 		return url;
 	}
+
 	
 	@Override
 	public Class<T> getModelClass() {
@@ -140,7 +165,18 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 		return validator;
 	}
 	
-	
+	public ISynchLocalDataSource<T> getLocalDataSource(){
+		if(localDataSource==null){
+			localDataSource = createDefaultLocalDataSource();
+		}
+		return localDataSource;
+	}
+
+	public SharedPreferences getPreferences(){
+		if(preferences==null)
+			preferences = createSharedPreferences();
+		return preferences;
+	}
 
 	@Override
 	public IDataSource<T> getDataSource() {

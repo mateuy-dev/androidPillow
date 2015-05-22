@@ -22,6 +22,8 @@ import android.content.Context;
 
 import com.google.gson.reflect.TypeToken;
 import com.mateuyabar.android.pillow.conf.DefaultModelConfiguration;
+import com.mateuyabar.android.pillow.data.singleinstance.ISynchLocalSingleInstanceDataSource;
+import com.mateuyabar.android.pillow.data.singleinstance.SingleInstanceKeyValueDataSource;
 
 import java.util.Collection;
 
@@ -31,12 +33,18 @@ import java.util.Collection;
 public class UserModelConfiguration extends DefaultModelConfiguration<User> {
     public UserModelConfiguration(Context context, String url) {
         super(context, User.class, new TypeToken<Collection<User>>(){}, url);
-        GuestedUserDataSource<User> userDataSource = new GuestedUserDataSource<User>(context, getRestMapping());
+        setLocalDataSource(new SingleInstanceKeyValueDataSource(User.class, getPreferences()));
+        GuestedUserDataSource<User> userDataSource = new GuestedUserDataSource<User>(User.class, context, getLocalDataSource(), getRestMapping());
         setDataSource(userDataSource);
     }
 
     @Override
     public GuestedUserDataSource<User> getDataSource() {
         return (GuestedUserDataSource<User>) super.getDataSource();
+    }
+
+    @Override
+    public ISynchLocalSingleInstanceDataSource<User> getLocalDataSource() {
+        return (ISynchLocalSingleInstanceDataSource) super.getLocalDataSource();
     }
 }

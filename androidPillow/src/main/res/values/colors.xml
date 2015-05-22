@@ -3,4 +3,8 @@
     <color name="action_bar">#ff0d0d0d</color>
 	<color name="white">#ffffffff</color>
 	<color name="off_white">#99ffffff</color>
+	<color name="blue">#3261ad</color>
+	<color name="light_gray">#d1d2d4</color>
+	<color name="dark_gray">#77787b</color>
+
 </resources>

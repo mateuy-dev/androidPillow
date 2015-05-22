@@ -20,7 +20,7 @@ package com.mateuyabar.android.pillow.view.base;
 
 import android.widget.Filterable;
 import android.widget.ListAdapter;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 
 public interface IModelListAdapter<T extends IdentificableModel> extends ListAdapter, Filterable{
 	public T getItem(int position);

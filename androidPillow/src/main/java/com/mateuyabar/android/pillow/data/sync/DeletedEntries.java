@@ -19,25 +19,22 @@
 package com.mateuyabar.android.pillow.data.sync;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.mateuyabar.android.pillow.IdentificableModel;
-import com.mateuyabar.android.pillow.Pillow;
-import com.mateuyabar.android.pillow.Listeners.Listener;
-import com.mateuyabar.android.pillow.data.core.IPillowResult;
-import com.mateuyabar.android.pillow.data.core.MultiTaskVoidResult;
-import com.mateuyabar.android.pillow.data.core.PillowResultListener;
+
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.db.DBUtil;
-import com.mateuyabar.android.pillow.data.rest.RestDataSource;
 import com.mateuyabar.android.util.CursorUtil;
 import com.mateuyabar.util.exceptions.BreakFastException;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * Keeps track of entries deleted on the database but no yet in the server.
+ * Only use on synchronized items
  *
  */
 public class DeletedEntries<T extends IdentificableModel> {
@@ -53,15 +50,15 @@ public class DeletedEntries<T extends IdentificableModel> {
 			");";
 
 	SQLiteOpenHelper dbHelper;
-	RestDataSource<T> dataSource;
-	Context context;
+	Class<T> modelClass;
+
 
 	public static final String WHERE_ID_SELECTION = ID_COLUMN + " == ?";
 
-	public DeletedEntries(Context context, RestDataSource<T> dataSource) {
-		this.dbHelper = Pillow.getInstance(context).getDbHelper();
-		this.dataSource = dataSource;
-		this.context= context;
+	public DeletedEntries(Class<T> modelClass, SQLiteOpenHelper dbHelper) {
+		this.dbHelper = dbHelper;
+		this.modelClass = modelClass;
+
 	}
 
 	public <T extends IdentificableModel> void setToDelete(SQLiteDatabase db, T model) {
@@ -71,12 +68,6 @@ public class DeletedEntries<T extends IdentificableModel> {
 		db.insert(TABLE, null, values);
 		
 	}
-//	
-//	public <T extends IdentificableModel> void setToDelete(T model) {
-//		SQLiteDatabase db = dbHelper.getWritableDatabase();
-//		setToDelete(db, model);
-//		db.close();
-//	}
 
 	public void setAsDeleted(String id) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -84,44 +75,25 @@ public class DeletedEntries<T extends IdentificableModel> {
 		db.close();
 	}
 	
-	public IPillowResult<Void> setAllreadyDeleted(T model){
-		final String id = model.getId();
-		final PillowResultListener<Void> result = new PillowResultListener<Void>();
-		Listener<Void> onServerDeletedListener = new Listener<Void>(){
-			@Override
-			public void onResponse(Void response) {
-				setAsDeleted(id);
-				result.setResult(null);
-			}
-		};
-		dataSource.destroy(model).addListeners(onServerDeletedListener, result);
-		
-		return result;
-	}
-	
 	public void setAsDeleted(SQLiteDatabase db, String id) {
 		String[] selectionArgs = { id };
 		db.delete(TABLE, WHERE_ID_SELECTION, selectionArgs);
 	}
-	
-	public IPillowResult<Void> synchronize(){
-		MultiTaskVoidResult result = new MultiTaskVoidResult();
+
+	public List<T> getDeletedModelsIds(){
+		List<T> result = new ArrayList<>();
 		Cursor cursor = getCursor();
 		while(cursor.moveToNext()){
-			String id = CursorUtil.getString(cursor, ID_COLUMN);
-			//Not needed, the cursor only selects current classes.
-			//String className = CursorUtil.getString(cursor, CLASS_COLUMN);
 			try {
+				String id = CursorUtil.getString(cursor, ID_COLUMN);
 				Class<T> clazz = getModelClass();
 				T model = clazz.newInstance();
 				model.setId(id);
-				IPillowResult<Void> subOperation = setAllreadyDeleted(model);
-				result.addOperation(subOperation);
+				result.add(model);
 			} catch (Exception e) {
 				throw new BreakFastException(e);
 			}
 		}
-		result.setLastOperationAdded();
 		return result;
 	}
 	
@@ -138,7 +110,7 @@ public class DeletedEntries<T extends IdentificableModel> {
 	}
 	
 	public Class<T> getModelClass(){
-		return dataSource.getRestMapping().getModelClass();
+		return modelClass;
 	}
 
 	public boolean isDeleted(String id) {

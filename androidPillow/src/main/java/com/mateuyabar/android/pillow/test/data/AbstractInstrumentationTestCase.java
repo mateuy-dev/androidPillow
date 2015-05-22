@@ -23,7 +23,7 @@ import android.test.InstrumentationTestCase;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.PillowError;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;

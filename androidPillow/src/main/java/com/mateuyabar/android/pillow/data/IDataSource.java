@@ -16,13 +16,30 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  */
 
-package com.mateuyabar.android.pillow;
-
-import java.util.Collection;
+package com.mateuyabar.android.pillow.data;
 
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
 
-public interface IExtendedDataSource<T extends IdentificableModel> extends IDataSource<T>{
-	public IPillowResult<Collection<T>> index(T filter);
+import java.util.Collection;
 
+
+/**
+ * Contains CRUD operations of model T.
+ *
+ * @param <T>
+ */
+public interface IDataSource <T>{
+	/**
+	 * Returns all the instances
+	 * @return
+	 */
+	public IPillowResult<Collection<T>> index();
+
+	public IPillowResult<T> show(T model);
+	
+	public IPillowResult<T> create(T model);
+	
+	public IPillowResult<T> update(T model);
+	
+	public IPillowResult<Void> destroy(T model);
 }

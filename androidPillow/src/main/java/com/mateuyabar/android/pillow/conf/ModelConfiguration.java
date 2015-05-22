@@ -19,8 +19,8 @@
 
 package com.mateuyabar.android.pillow.conf;
 
-import com.mateuyabar.android.pillow.IDataSource;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.IDataSource;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.db.IDbMapping;
 import com.mateuyabar.android.pillow.data.rest.IRestMapping;
 import com.mateuyabar.android.pillow.data.validator.IValidator;

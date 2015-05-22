@@ -20,7 +20,7 @@ package com.mateuyabar.android.pillow.view.forms;
 
 import android.content.Context;
 
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.validator.GreaterThanValidator;
 import com.mateuyabar.android.pillow.data.validator.annotations.GreaterThan;
 import com.mateuyabar.android.pillow.util.reflection.ReflectionUtil;

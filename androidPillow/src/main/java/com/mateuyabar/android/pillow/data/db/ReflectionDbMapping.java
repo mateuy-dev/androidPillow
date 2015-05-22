@@ -21,7 +21,7 @@ package com.mateuyabar.android.pillow.data.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.util.reflection.ReflectionUtil;
 import com.mateuyabar.android.pillow.util.reflection.ValuesTypes.BelongsToOnDelete;

@@ -24,7 +24,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.mateuyabar.android.pillow.AbstractDBHelper;
-import com.mateuyabar.android.pillow.IDataSource;
+import com.mateuyabar.android.pillow.data.IDataSource;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.PillowError;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
@@ -71,10 +71,15 @@ public class SynchManager {
 	}
 
 	private void resetTables() {
-		SQLiteDatabase db = dbHelper.getWritableDatabase();
-		dbHelper.resetTables(db);
-		db.close();
-	}
+		if(dbHelper!=null) {
+			SQLiteDatabase db = dbHelper.getWritableDatabase();
+			dbHelper.resetTables(db);
+			db.close();
+		}
+		//TODO Key-pair values should also be deleted!
+		Log.w("PILLOW", "Key-pair values should also be deleted!");
+
+}
 
 	/**
 	 * Used after user loged in

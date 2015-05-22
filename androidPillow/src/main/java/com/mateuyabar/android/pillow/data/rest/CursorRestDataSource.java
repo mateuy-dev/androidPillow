@@ -19,7 +19,7 @@ package com.mateuyabar.android.pillow.data.rest;
 
 import android.content.Context;
 
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
 import com.mateuyabar.android.pillow.data.core.PillowResult;
 

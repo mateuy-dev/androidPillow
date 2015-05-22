@@ -18,7 +18,7 @@
 
 package com.mateuyabar.android.pillow.test.data;
 
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.sync.ISynchDataSource;
 
 import org.apache.http.HttpResponse;

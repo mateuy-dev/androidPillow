@@ -18,21 +18,24 @@
 
 package com.mateuyabar.android.pillow;
 
+import android.content.Context;
+
+import com.mateuyabar.android.pillow.conf.IModelConfigurations;
+import com.mateuyabar.android.pillow.conf.ModelConfiguration;
+import com.mateuyabar.android.pillow.conf.ModelConfigurationFactory;
+import com.mateuyabar.android.pillow.conf.ModelViewConfiguration;
+import com.mateuyabar.android.pillow.data.IDataSource;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
+import com.mateuyabar.android.pillow.data.sync.SynchManager;
+import com.mateuyabar.android.pillow.util.reflection.RelationGraph;
+
+import org.xmlpull.v1.XmlPullParserException;
+
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.xmlpull.v1.XmlPullParserException;
-
-import android.content.Context;
-import com.mateuyabar.android.pillow.conf.IModelConfigurations;
-import com.mateuyabar.android.pillow.conf.ModelConfiguration;
-import com.mateuyabar.android.pillow.conf.ModelConfigurationFactory;
-import com.mateuyabar.android.pillow.conf.ModelViewConfiguration;
-import com.mateuyabar.android.pillow.data.sync.SynchManager;
-import com.mateuyabar.android.pillow.util.reflection.RelationGraph;
 
 public class Pillow {
 	public static final String LOG_ID = "pillow";
@@ -85,7 +88,8 @@ public class Pillow {
 	private void init(Context context, int xmlFileResId) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, XmlPullParserException, IOException{
 		this.context=context;
 		config = new PillowConfigXml(context, xmlFileResId);
-		dbHelper = getClassFor(context, config.getDbHelper());
+		if(config.getDbHelper()!=null)
+			dbHelper = getClassFor(context, config.getDbHelper());
 		Class<IModelConfigurations> modelConfigurationsclazz = (Class<IModelConfigurations>) Class.forName(config.getModelConfigurations());
 		IModelConfigurations modelConfigurations = modelConfigurationsclazz.newInstance();
 		modelConfigurationFactory = new ModelConfigurationFactory(context, config, modelConfigurations);

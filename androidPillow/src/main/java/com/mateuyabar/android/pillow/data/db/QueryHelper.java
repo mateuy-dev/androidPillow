@@ -19,7 +19,7 @@
 package com.mateuyabar.android.pillow.data.db;
 
 import android.content.Context;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.Pillow;
 
 public class QueryHelper<T extends IdentificableModel> {

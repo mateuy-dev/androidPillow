@@ -18,7 +18,7 @@
 
 package com.mateuyabar.android.pillow.data.users.guested;
 
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 
 public class User implements IdentificableModel, IGuestedUser {
 	String id;

@@ -16,7 +16,12 @@
         tools:text="You are logged as guest"
         android:layout_weight="1" />
 
-
+    <FrameLayout
+        android:id="@+id/user_form"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+    </FrameLayout>
     <View
         android:layout_width="0px"
         android:layout_height="0px"

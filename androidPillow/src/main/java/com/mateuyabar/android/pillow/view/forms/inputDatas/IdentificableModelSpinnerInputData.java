@@ -22,8 +22,8 @@ import android.content.Context;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.mateuyabar.android.pillow.IDataSource;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.IDataSource;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.Listeners.ErrorListener;
 import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.Listeners.ViewListener;

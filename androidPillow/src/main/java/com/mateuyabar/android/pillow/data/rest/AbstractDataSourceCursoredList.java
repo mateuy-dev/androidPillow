@@ -21,7 +21,7 @@ package com.mateuyabar.android.pillow.data.rest;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.Listeners;
 import com.mateuyabar.android.pillow.PillowError;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;

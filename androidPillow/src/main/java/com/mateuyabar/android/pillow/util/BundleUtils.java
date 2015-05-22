@@ -19,7 +19,7 @@
 package com.mateuyabar.android.pillow.util;
 
 import android.os.Bundle;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 
 import com.google.gson.Gson;
 

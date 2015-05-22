@@ -25,8 +25,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mateuyabar.android.pillow.IDataSource;
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.IDataSource;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.Listeners.ViewListener;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.data.sync.CommonListeners;

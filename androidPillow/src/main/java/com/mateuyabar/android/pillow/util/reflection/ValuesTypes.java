@@ -18,7 +18,7 @@
 
 package com.mateuyabar.android.pillow.util.reflection;
 
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

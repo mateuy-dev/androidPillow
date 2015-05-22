@@ -16,14 +16,14 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  */
 
-package com.mateuyabar.android.pillow;
+package com.mateuyabar.android.pillow.data.models;
 
 /**
  * Base implementation of IdentificableModel
  * It has the Id definition and Equals and hashcode methods using Id.
  * There is no need to use this class, it's just a helper.
  */
-public abstract class AbstractIdentificableModel implements IdentificableModel{
+public abstract class AbstractIdentificableModel implements IdentificableModel {
 	protected String id;
 	@Override
 	public String getId() {

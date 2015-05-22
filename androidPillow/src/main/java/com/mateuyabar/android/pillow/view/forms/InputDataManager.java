@@ -18,7 +18,7 @@
 
 package com.mateuyabar.android.pillow.view.forms;
 
-import com.mateuyabar.android.pillow.IdentificableModel;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.extra.Time;
 import com.mateuyabar.android.pillow.util.reflection.ReflectionUtil;
 import com.mateuyabar.android.pillow.util.reflection.ValuesTypes.Embeddable;
