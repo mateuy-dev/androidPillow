@@ -3,6 +3,7 @@ package com.mateuyabar.android.pillow.data.sync.db;
 import android.content.Context;
 
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
+import com.mateuyabar.android.pillow.data.db.DBModelController;
 import com.mateuyabar.android.pillow.data.db.IDbMapping;
 import com.mateuyabar.android.pillow.data.db.ISynchLocalDbDataSource;
 import com.mateuyabar.android.pillow.data.models.IdentificableModel;
@@ -47,7 +48,10 @@ public class SynchDbDataSource<T extends IdentificableModel> extends SynchDataSo
 
     public ISynchLocalDbDataSource<T> getLocalDataSource() {
         return (ISynchLocalDbDataSource<T>) super.getLocalDataSource();
+    }
 
-
+    @Override
+    public DBModelController<T> getDbModelController() {
+        return getLocalDataSource().getDbModelController();
     }
 }

@@ -27,7 +27,7 @@ import java.util.Collection;
 public interface IDBDataSource<T extends IdentificableModel> extends IExtendedDataSource<T>{
 
 	public IPillowResult<Collection<T>> index(String selection, String[] selectionArgs, String order);
-	//public DBModelController<T> getDbModelController();
+	public DBModelController<T> getDbModelController();
 	public IPillowResult<Integer> count(String selection, String[] selectionArgs);
 
 	public IDbMapping<T> getDbMapping();

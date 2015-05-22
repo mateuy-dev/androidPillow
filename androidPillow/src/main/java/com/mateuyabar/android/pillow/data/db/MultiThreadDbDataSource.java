@@ -184,4 +184,9 @@ public class MultiThreadDbDataSource<T extends IdentificableModel> implements IS
 	public IDbMapping<T> getDbMapping() {
 		return dataSource.getDbMapping();
 	}
+
+	@Override
+	public DBModelController<T> getDbModelController() {
+		return dataSource.getDbModelController();
+	}
 }

@@ -124,7 +124,7 @@ public class DbDataSource<T extends IdentificableModel> implements ISynchLocalDb
 		return new PillowResult<T>(model);
 	}
 	
-	private DBModelController<T> getDbModelController(){
+	public DBModelController<T> getDbModelController(){
 		return dbModelController;
 	}
 
