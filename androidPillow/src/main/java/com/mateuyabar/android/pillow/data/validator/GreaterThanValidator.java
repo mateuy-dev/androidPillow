@@ -47,6 +47,9 @@ public class GreaterThanValidator<T> extends AbstractFieldValidator<T, GreaterTh
 	}
 	
 	public static boolean isValid(Object value, Object compareValue, GreaterThan greatterAnnotation){
+		if(value==null || compareValue==null){
+			return false;
+		}
 		int comparizon = comparator.compare(value, compareValue);
 		if (comparizon < 0 || (!greatterAnnotation.acceptEqual() && comparizon == 0)) {
 			return false;

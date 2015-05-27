@@ -3,10 +3,10 @@ package com.mateuyabar.android.pillow.data.singleinstance;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
-import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
 import com.mateuyabar.android.pillow.data.core.PillowResult;
 import com.mateuyabar.android.pillow.data.db.DBModelController;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.sync.ISynchLocalDataSource;
 import com.mateuyabar.util.exceptions.BreakFastException;
 import com.mateuyabar.util.exceptions.UnimplementedException;
@@ -62,7 +62,7 @@ public class SingleInstanceKeyValueDataSource<T extends IdentificableModel> impl
 
     @Override
     public IPillowResult<T> create(T model) {
-        if(!synchronExists()){
+        if(synchronExists()){
             throw new BreakFastException("can't create another model");
         }
         return save(model, ISynchLocalDataSource.DIRTY_STATUS_CREATED);
@@ -82,6 +82,18 @@ public class SingleInstanceKeyValueDataSource<T extends IdentificableModel> impl
     @Override
     public PillowResult<T> get() {
         return new PillowResult<>(synchronGet());
+    }
+
+    @Override
+    public IPillowResult<T> set(T model) {
+        if(synchronExists()){
+            if(model.getId()==null){
+                model.setId(synchronGet().getId());
+            }
+            return update(model);
+        } else {
+            return create(model);
+        }
     }
 
     @Override
@@ -136,7 +148,7 @@ public class SingleInstanceKeyValueDataSource<T extends IdentificableModel> impl
     }
 
     public boolean synchronExists(){
-        return getJson()==null;
+        return getJson()!=null;
     }
 
     private String getJson(){

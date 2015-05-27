@@ -22,5 +22,6 @@
     <string name="sign_in">Sign In</string>
     <string name="sign_out">Sign Out</string>
     <string name="sign_up">Sign Up</string>
-    
+
+    <string name="no_connection_error">No network connection</string>
 </resources>

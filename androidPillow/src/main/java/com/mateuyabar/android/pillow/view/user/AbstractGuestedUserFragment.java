@@ -37,7 +37,7 @@ import com.mateuyabar.android.pillow.data.sync.CommonListeners;
 import com.mateuyabar.android.pillow.data.sync.CommonListeners.DummyToastListener;
 import com.mateuyabar.android.pillow.data.users.guested.GuestedUserDataSource;
 import com.mateuyabar.android.pillow.data.users.guested.IGuestedUser;
-import com.mateuyabar.android.pillow.data.validator.annotations.NotNull;
+import com.mateuyabar.android.pillow.data.validator.annotations.NotEmpty;
 import com.mateuyabar.android.pillow.view.forms.TFormView;
 import com.mateuyabar.android.pillow.view.reflection.ViewConfig;
 import com.mateuyabar.util.exceptions.BreakFastException;
@@ -85,6 +85,7 @@ public abstract class AbstractGuestedUserFragment<T extends IdentificableModel &
 
 
 		userTextView = (TextView) rootView.findViewById(R.id.userTextView);
+        final Listeners.ErrorListener errorListener = new CommonListeners.ErrorListenerWithNoConnectionToast(getActivity());
 		
 		final Context context = getActivity();
 		signInButton = (Button)rootView.findViewById(R.id.signin_button);
@@ -93,7 +94,7 @@ public abstract class AbstractGuestedUserFragment<T extends IdentificableModel &
 			public void onClick(View v) {
                 T user = getUser();
                 if(user!=null)
-				    userController.signIn(user).addListeners(getOnSignedInListener(), CommonListeners.defaultErrorListener);
+				    userController.signIn(user).addListeners(getOnSignedInListener(),errorListener);
 			}
 		});
 		
@@ -103,7 +104,7 @@ public abstract class AbstractGuestedUserFragment<T extends IdentificableModel &
 			public void onClick(View v) {
                 T user = getUser();
                 if(user!=null)
-				    userController.signUp(user).addListeners(getOnSignedUpListener(), CommonListeners.defaultErrorListener);
+				    userController.signUp(user).addListeners(getOnSignedUpListener(),errorListener);
 			}
 		});
 
@@ -111,7 +112,7 @@ public abstract class AbstractGuestedUserFragment<T extends IdentificableModel &
 		signOutButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				userController.signOut().addListeners(new LogListener(context, "signed out"), CommonListeners.defaultErrorListener);
+				userController.signOut().addListeners(new LogListener(context, "signed out"),errorListener);
 			}
 		});
 
@@ -196,10 +197,10 @@ public abstract class AbstractGuestedUserFragment<T extends IdentificableModel &
 	}
 
     public static class LoginData{
-        @NotNull
+        @NotEmpty
         @ViewConfig.ViewType(order = 0)
         public String email;
-        @NotNull
+        @NotEmpty
         @ViewConfig.ViewType(order = 1)
         public String password;
     }

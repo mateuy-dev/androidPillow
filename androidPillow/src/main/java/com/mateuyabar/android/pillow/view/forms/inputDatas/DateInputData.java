@@ -61,7 +61,8 @@ public class DateInputData implements InputData{
 			@Override
 			public void onValueChanged(Object value) {
 				Calendar calendar = (Calendar) value;
-				listener.onValueChanged(calendar.getTime());
+				Date time = calendar!=null ? calendar.getTime() : null;
+				listener.onValueChanged(time);
 			}
 		};
 		calendarInput.addOnValueChangedListener(proxyListener);

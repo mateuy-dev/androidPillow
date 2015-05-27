@@ -19,10 +19,10 @@
 package com.mateuyabar.android.pillow.view.list;
 
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,11 +31,15 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import com.mateuyabar.android.pillow.data.IDataSource;
-import com.mateuyabar.android.pillow.data.models.IdentificableModel;
+
+import com.mateuyabar.android.pillow.Listeners;
 import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.Pillow;
+import com.mateuyabar.android.pillow.PillowError;
 import com.mateuyabar.android.pillow.R;
+import com.mateuyabar.android.pillow.data.IDataSource;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
+import com.mateuyabar.android.pillow.data.sync.CommonListeners;
 import com.mateuyabar.android.pillow.util.BundleUtils;
 import com.mateuyabar.android.pillow.view.NavigationUtil;
 import com.mateuyabar.android.pillow.view.base.IModelListAdapter;
@@ -78,6 +82,9 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 		
 
 		ListView listview = (ListView) rootView.findViewById(R.id.listview);
+		ImageButton createButton = (ImageButton)rootView.findViewById(R.id.create_model_button);
+		final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
+
 		listAdapter = pillow.getViewConfiguration(clazz).getListAdapter(getActivity());
 		if(filter!=null)
 			listAdapter.setFilter(filter);
@@ -90,9 +97,7 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 				new NavigationUtil(PillowListFragment.this).displayShowModel(model);
 			}
 		});
-		
-		
-		ImageButton createButton = (ImageButton)rootView.findViewById(R.id.create_model_button);
+
 		if(hideButtons){
 			createButton.setVisibility(View.GONE);
 		} else {
@@ -103,6 +108,25 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 				}
 			});
 		}
+
+		swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+			@Override
+			public void onRefresh() {
+				Pillow.getInstance(getActivity()).getSynchManager().download(true).addListeners(new Listeners.ViewListener<Void>() {
+					@Override
+					public void onResponse(Void response) {
+						listAdapter.refreshList();
+						swipeRefreshLayout.setRefreshing(false);
+					}
+				}, new Listeners.ErrorListener() {
+					@Override
+					public void onErrorResponse(PillowError error) {
+						swipeRefreshLayout.setRefreshing(false);
+						new CommonListeners.ErrorListenerWithNoConnectionToast(getActivity()).onErrorResponse(error);
+					}
+				});
+			}
+		});
 		
 		
 		return rootView;

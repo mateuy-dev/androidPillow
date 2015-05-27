@@ -28,6 +28,7 @@ import com.mateuyabar.android.pillow.data.IDataSource;
 import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.sync.SynchManager;
 import com.mateuyabar.android.pillow.util.reflection.RelationGraph;
+import com.mateuyabar.util.exceptions.UnimplementedException;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -129,11 +130,15 @@ public class Pillow {
 	 * Shortcut for getModelConfiguration(modelClass).getDataSource();
 	 */
 	public <T extends IdentificableModel> IDataSource<T> getDataSource(Class<T> modelClass){
-		return getModelConfiguration(modelClass).getDataSource();
+		ModelConfiguration<T> conf = getModelConfiguration(modelClass);
+		if(conf==null)
+			throw new UnimplementedException("Pillow not found for "+modelClass);
+		return conf.getDataSource();
 	}
 	
 	public <T extends IdentificableModel> ModelConfiguration<T> getModelConfiguration(Class<T> modelClass){
-		return modelConfigurationFactory.getModelConfiguration(modelClass);
+		ModelConfiguration<T> result = modelConfigurationFactory.getModelConfiguration(modelClass);
+		return result;
 	}
 	
 	public ModelConfigurationFactory getModelConfigurationFactory() {

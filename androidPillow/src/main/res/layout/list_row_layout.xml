@@ -5,25 +5,26 @@
     android:descendantFocusability="blocksDescendants"
     >
     <!-- android:descendantFocusability="blocksDescendants" enables list selection when buttons inside according to http://stackoverflow.com/questions/11428303/android-cant-click-on-listview-row-with-imagebutton -->
-          
 
-   <ImageView
+
+    <View
+          android:id="@+id/row_icon_color"
+          android:layout_width="?android:attr/listPreferredItemHeight"
+          android:layout_height="?android:attr/listPreferredItemHeight"
+          android:layout_alignParentLeft="true"
+          android:layout_alignParentTop="true"
+          android:background="#ffffff"
+          android:alpha="0.5"
+          />
+
+    <ImageView
             android:id="@+id/row_icon"
             android:layout_width="?android:attr/listPreferredItemHeight"
             android:layout_height="?android:attr/listPreferredItemHeight"
             android:layout_alignParentLeft="true"
         	android:layout_alignParentTop="true"
              /><!-- android:src="@drawable/ic_contact_picture_holo_light" -->
-      <View
-            android:id="@+id/row_icon_color"
-            android:layout_width="?android:attr/listPreferredItemHeight"
-            android:layout_height="?android:attr/listPreferredItemHeight"
-            android:layout_alignParentLeft="true"
-        	android:layout_alignParentTop="true"
-        	android:background="#ffffff"
-        	android:alpha="0.5"
-            />
-    
+
     <TextView
         android:id="@+id/row_main_text"
         android:layout_width="wrap_content"

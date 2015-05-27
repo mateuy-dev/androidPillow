@@ -2,8 +2,10 @@ package com.mateuyabar.android.pillow.data.sync.singleinstance;
 
 import android.content.Context;
 
+import com.mateuyabar.android.pillow.Listeners;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
 import com.mateuyabar.android.pillow.data.core.PillowResult;
+import com.mateuyabar.android.pillow.data.core.PillowResultListener;
 import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.rest.IAuthenticationController;
 import com.mateuyabar.android.pillow.data.rest.IRestMapping;
@@ -32,12 +34,31 @@ public class SynchSingleInstanceDataSource<T extends IdentificableModel> extends
     }
 
     @Override
-    public PillowResult<T> get() {
+    public IPillowResult<T> get() {
         return getLocalDataSource().get();
     }
 
     @Override
-    public PillowResult<Boolean> exists() {
+    public IPillowResult<T> set(final T model) {
+        final PillowResultListener<T> result = new PillowResultListener<>();
+        get().addListeners(new Listeners.Listener<T>() {
+            @Override
+            public void onResponse(T response) {
+                if(response !=null){
+                    if(model.getId()==null){
+                        model.setId(response.getId());
+                    }
+                    update(model).addListeners(result,result);
+                } else {
+                    create(model);
+                }
+            }
+        }, result);
+        return result;
+    }
+
+    @Override
+    public IPillowResult<Boolean> exists() {
         return getLocalDataSource().exists();
     }
 

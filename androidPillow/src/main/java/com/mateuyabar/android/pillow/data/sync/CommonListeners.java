@@ -21,17 +21,19 @@ package com.mateuyabar.android.pillow.data.sync;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.android.volley.NoConnectionError;
+import com.google.gson.Gson;
+import com.mateuyabar.android.pillow.Listeners;
 import com.mateuyabar.android.pillow.Listeners.ErrorListener;
 import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.Listeners.ViewListener;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.PillowError;
+import com.mateuyabar.android.pillow.R;
 import com.mateuyabar.android.pillow.data.core.PillowResult;
+import com.mateuyabar.android.pillow.view.message.DisplayMessages;
 import com.mateuyabar.util.exceptions.BreakFastException;
-
-import com.android.volley.NoConnectionError;
-import com.google.gson.Gson;
 
 public class CommonListeners {
 	public static ErrorListener dummyErrorListener = new ErrorListener() {
@@ -63,6 +65,23 @@ public class CommonListeners {
 			}
 		}
 	};
+
+	public static class ErrorListenerWithNoConnectionToast  implements Listeners.ViewErrorListener {
+		Context context;
+
+		public ErrorListenerWithNoConnectionToast(Context context) {
+			this.context = context;
+		}
+
+		@Override
+		public void onErrorResponse(PillowError error) {
+			if(error.getCause() instanceof NoConnectionError){
+				DisplayMessages.error(context, R.string.no_connection_error);
+			} else {
+				throw new BreakFastException(error.getCause());
+			}
+		}
+	}
 	
 	public static ErrorListener getDefaultThreadedErrorListener(){
 		return new DefaultThreadedErrorListener();
@@ -106,7 +125,7 @@ public class CommonListeners {
 		}
 		@Override
 		public void onResponse(T response) {
-			Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+			DisplayMessages.info(context, text);
 		}
 	}
 		

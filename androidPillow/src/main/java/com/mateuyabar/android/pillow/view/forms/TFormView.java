@@ -24,7 +24,6 @@ import android.support.v7.widget.GridLayout;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.R;
@@ -33,6 +32,7 @@ import com.mateuyabar.android.pillow.data.validator.DefaultValidator;
 import com.mateuyabar.android.pillow.data.validator.IValidator;
 import com.mateuyabar.android.pillow.data.validator.IValidator.IValidationError;
 import com.mateuyabar.android.pillow.data.validator.ValidationErrorUtil;
+import com.mateuyabar.android.pillow.view.message.DisplayMessages;
 import com.mateuyabar.android.util.MetricUtil;
 
 import java.util.Collection;
@@ -100,7 +100,7 @@ public class TFormView<T> extends FrameLayout{
     /**
      * @return validator used. If not specified with a set, the pillow configuration is used or Default validator by default
      */
-    public IValidator<T> getValidator() {
+    private IValidator<T> getValidator() {
         if(validator==null){
             Class modelClass = model.getClass();
             ModelConfiguration modelConf = Pillow.getInstance(getContext()).getModelConfiguration(modelClass);
@@ -137,7 +137,7 @@ public class TFormView<T> extends FrameLayout{
 	            //Error found for now we toast the first one. This could be improved
 	            IValidator.IValidationError error = errors.get(0);
 	            String string = ValidationErrorUtil.getStringError(getContext(), modelClass, error);
-	            Toast.makeText(getContext(), string, Toast.LENGTH_LONG).show();
+				DisplayMessages.error(getContext(), string);
 	            return null;
 	        }
 		}
