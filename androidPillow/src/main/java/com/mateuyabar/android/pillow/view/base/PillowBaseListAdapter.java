@@ -185,4 +185,8 @@ public abstract class PillowBaseListAdapter<T extends IdentificableModel> extend
 			notifyDataSetChanged();
 		}
 	}
+
+	public void setModels(List<T> models) {
+		this.models = models;
+	}
 }

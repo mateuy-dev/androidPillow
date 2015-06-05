@@ -19,11 +19,14 @@
 package com.mateuyabar.android.pillow.view.forms.inputs;
 
 
+import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -45,14 +48,33 @@ public class ModelDialogInputView <T extends IdentificableModel> extends EditTex
 	String selectedId;
 	T selected;
 
-	public ModelDialogInputView(Context context, Class<T> selectedClass) {
+	public ModelDialogInputView(Context context) {
 		super(context);
-		this.selectedClass = selectedClass;
 		init();
 	}
-	
-	protected void init(){
+
+	public ModelDialogInputView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		init();
+	}
+
+	public ModelDialogInputView(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+		init();
+	}
+
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public ModelDialogInputView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+		super(context, attrs, defStyleAttr, defStyleRes);
+		init();
+	}
+
+	public void setModelClass(Class<T> modelClass){
+		this.selectedClass = modelClass;
 		dataSource = Pillow.getInstance(getContext()).getDataSource(selectedClass);
+	}
+
+	protected void init(){
 		setEms(EditTextData.EMS);
 		setFocusable(false);
 		setKeyListener(null);
@@ -64,6 +86,8 @@ public class ModelDialogInputView <T extends IdentificableModel> extends EditTex
 			}
 		});
 	}
+
+
 	
 	private void displaySelectDialog() {
 		new SelectDialog(getContext()).show();
@@ -101,7 +125,7 @@ public class ModelDialogInputView <T extends IdentificableModel> extends EditTex
 		return selectedId;
 	}
 	
-	public class SelectDialog extends Dialog{
+	private class SelectDialog extends Dialog{
 		IModelListAdapter<T> adapter;
 		
 		public SelectDialog(Context context) {

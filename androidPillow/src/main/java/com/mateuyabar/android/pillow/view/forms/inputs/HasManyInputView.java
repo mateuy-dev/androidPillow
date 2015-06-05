@@ -108,7 +108,8 @@ public class HasManyInputView<T extends IdentificableModel> extends LinearLayout
 				}
 			});
 			
-			modelView = new ModelDialogInputView<T>(getContext(), selectedClass);
+			modelView = new ModelDialogInputView<T>(getContext());
+			modelView.setModelClass(selectedClass);
 			addView(modelView, 0);
 			
 			

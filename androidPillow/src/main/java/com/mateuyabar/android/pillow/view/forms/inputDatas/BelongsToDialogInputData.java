@@ -42,7 +42,9 @@ public class BelongsToDialogInputData<T extends IdentificableModel> extends Abst
 
 	@Override
 	protected View createView(Context context) {
-		return new ModelDialogInputView<T>(context, parentClass);
+		ModelDialogInputView<T> result =  new ModelDialogInputView<T>(context);
+		result.setModelClass(parentClass);
+		return result;
 	}
 	
 	@Override

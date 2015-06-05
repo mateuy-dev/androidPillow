@@ -25,6 +25,14 @@ package com.mateuyabar.android.pillow.data.models;
  */
 public abstract class AbstractIdentificableModel implements IdentificableModel {
 	protected String id;
+
+	public AbstractIdentificableModel() {
+	}
+
+	public AbstractIdentificableModel(String id) {
+		this.id = id;
+	}
+
 	@Override
 	public String getId() {
 		return id;
