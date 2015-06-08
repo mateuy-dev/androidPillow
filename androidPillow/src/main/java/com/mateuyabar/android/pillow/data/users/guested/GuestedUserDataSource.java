@@ -82,7 +82,7 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends SynchSingleIn
 //		resetInTesting();
 		String token = getAuthToken();
 		if(token==null){
-			return new PillowResultProxyType<Void, T>(null, signUpAsGuest());
+			return new PillowResultProxyType<Void, T>(null, signUpAsGuestNow());
 		} else {
 			return PillowResult.newVoidResult();
 		}
@@ -93,6 +93,10 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends SynchSingleIn
 	 * @return
 	 */
 	private IPillowResult<T> signUpAsGuest(){
+		return create(createGuestUser());
+	}
+
+	private IPillowResult<T> signUpAsGuestNow(){
 		return createNow(createGuestUser());
 	}
 
@@ -155,7 +159,7 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends SynchSingleIn
 				reloadData().addListeners(result, result);
 			}
 		};
-		createNow(createGuestUser()).addListeners(onCreateListener, result);
+		signUpAsGuest().addListeners(onCreateListener, result);
 		return result;
 	}
 

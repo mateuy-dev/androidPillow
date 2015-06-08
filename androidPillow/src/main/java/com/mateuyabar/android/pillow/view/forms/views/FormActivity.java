@@ -21,28 +21,35 @@ package com.mateuyabar.android.pillow.view.forms.views;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.mateuyabar.android.pillow.data.IDataSource;
-import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.Listeners.ViewListener;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.R;
+import com.mateuyabar.android.pillow.data.IDataSource;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.sync.CommonListeners;
 import com.mateuyabar.android.pillow.util.BundleUtils;
+import com.mateuyabar.android.pillow.view.forms.StringResourceUtils;
 import com.mateuyabar.util.StringUtil;
 
-public class FormActivity<T extends IdentificableModel>  extends ActionBarActivity  {
+public class FormActivity<T extends IdentificableModel>  extends AppCompatActivity {
 	FormFragment<T> formFragment;
-	
+	Class<T> modelClass;
+	String modelId;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
+		modelClass = BundleUtils.getModelClass(getIntent().getExtras());
+		modelId = BundleUtils.getId(getIntent().getExtras());
 	    addCustomActionBar();
 	    setContentView(R.layout.form_activity);
 		if (savedInstanceState == null) {
@@ -57,15 +64,25 @@ public class FormActivity<T extends IdentificableModel>  extends ActionBarActivi
 	    final ViewGroup actionBarLayout = (ViewGroup) getLayoutInflater().inflate(R.layout.form_action_bar, null);
 	    // Set up your ActionBar
 	    final ActionBar actionBar = getSupportActionBar();
-	    actionBar.setDisplayShowHomeEnabled(false);
+
 	    actionBar.setDisplayShowTitleEnabled(false);
 	    actionBar.setDisplayShowCustomEnabled(true);
 	    actionBar.setCustomView(actionBarLayout);
 	   
 //	    final int actionBarColor = getResources().getColor(R.color.action_bar);
 //	    actionBar.setBackgroundDrawable(new ColorDrawable(actionBarColor));
+
+		TextView textView = (TextView)actionBarLayout.findViewById(R.id.action_bar_custom_title);
+		String className = StringResourceUtils.getLabel(this, modelClass);
+		int titleId;
+		if(modelId==null) {
+			titleId = R.string.action_bar_form_title_create;
+		}else {
+			titleId = R.string.action_bar_form_title_update;
+		}
+		textView.setText(getString(titleId, className));
 	    
-	    Button saveButton = (Button) findViewById(R.id.action_bar_save);
+	    Button saveButton = (Button) actionBarLayout.findViewById(R.id.actionbar_save_button);
 	    OnClickListener okClickListener = new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -84,6 +101,14 @@ public class FormActivity<T extends IdentificableModel>  extends ActionBarActivi
 			
 		};
 		saveButton.setOnClickListener(okClickListener);
+
+		ImageView cancelButton = (ImageView) actionBarLayout.findViewById(R.id.actionbar_cancel_button);
+		cancelButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+		});
 	}
 	
 	public Listener<T> getOnSaveListener(){

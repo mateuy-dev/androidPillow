@@ -41,8 +41,7 @@ public class FormFragment<T extends IdentificableModel>  extends Fragment{
 	TFormView<T> formView;
 	IDataSource<T> dataSource;
 	Class<T> modelClass;
-	
-	
+
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

@@ -32,4 +32,5 @@ public interface IGuestedUser extends IdentificableModel{
 
     public String getAuthToken();
     public void setAuthToken(String authToken);
+
 }

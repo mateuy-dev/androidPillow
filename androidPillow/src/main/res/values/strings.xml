@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="save">Save</string>
+    <string name="save">SAVE</string>
     
     <string name="ic_action_edit">Edit</string>
     <string name="ic_action_delete">Delete</string>
+
+    <string name="action_bar_form_title_create">Create %1$s</string>
+    <string name="action_bar_form_title_update">Update %1$s</string>
     
     <string name="error_not_null">%1$s can\'t be empty</string>
     <string name="error_not_empty">%1$s can\'t be empty</string>

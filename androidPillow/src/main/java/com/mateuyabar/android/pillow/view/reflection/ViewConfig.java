@@ -32,8 +32,10 @@ public interface ViewConfig {
 	public @interface ViewType {
 		public interface DEFAULT_INPUT extends InputData{};
 		public interface NONE_INPUT extends InputData{};
+
 		Class<? extends InputData> inputType() default DEFAULT_INPUT.class;
 		int order() default -1;
+		boolean hidden() default false;
 	}
 
 }

@@ -26,6 +26,7 @@ public class User implements IdentificableModel, IGuestedUser {
 	String password;
 	boolean guest;
     String authToken;
+
 	
 	public User() {
 	}

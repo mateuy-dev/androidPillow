@@ -23,6 +23,8 @@ public class SingleInstanceKeyValueDataSource<T extends IdentificableModel> impl
     public static final String MODEL_ATT_SUFIX ="model";
     public static final String DIRTY_ATT_SUFIX ="dirty";
 
+    boolean breakIfTryToCreteMultiple;
+
     Class<T> modelClass;
     SharedPreferences preferences;
     String modelAtt;
@@ -62,7 +64,7 @@ public class SingleInstanceKeyValueDataSource<T extends IdentificableModel> impl
 
     @Override
     public IPillowResult<T> create(T model) {
-        if(synchronExists()){
+        if(synchronExists() && breakIfTryToCreteMultiple){
             throw new BreakFastException("can't create another model");
         }
         return save(model, ISynchLocalDataSource.DIRTY_STATUS_CREATED);

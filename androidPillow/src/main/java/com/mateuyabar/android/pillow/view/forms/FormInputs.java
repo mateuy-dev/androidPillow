@@ -67,6 +67,9 @@ public class FormInputs {
 			inputViewMap = new HashMap<Field, FormInputRow>();
 			for(Field field: ReflectionUtil.getStoredFields(modelClass)){
 					if(acceptInput(field)){
+						if(ReflectionUtil.isHidden(field))
+							continue;
+
 						field.setAccessible(true);
 						inputViewMap.put(field, new FormInputRow(context, field, model, editable));
 						

@@ -21,6 +21,8 @@ package com.mateuyabar.android.pillow.data.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import com.mateuyabar.android.pillow.data.models.IdentificableEnum;
+import com.mateuyabar.util.exceptions.BreakFastException;
 import com.mateuyabar.util.exceptions.UnimplementedException;
 
 import java.text.ParseException;
@@ -159,12 +161,25 @@ public class DBUtil {
 	public static Integer enumToDb(Enum<?> value){
 		if(value==null)
 			return null;
+		if(value instanceof IdentificableEnum){
+			((IdentificableEnum)value).getId();
+		}
 		return value.ordinal();
 	}
 	
-	public static <T> T dbToEnum(Cursor cursor, int columnIndex, T[] values){
+	public static <T> T dbToEnum(Cursor cursor, int columnIndex, Class<T> enumClass){
 		int id = cursor.getInt(columnIndex);
-		return values[id];
+		T[] values = (T[]) enumClass.getEnumConstants();
+		if(enumClass.isAssignableFrom(IdentificableEnum.class)){
+			for(T value:values){
+				if(((IdentificableEnum)value).getId() == id){
+					return value;
+				}
+			}
+		} else {
+			return (T) values[id];
+		}
+		throw new BreakFastException();
 	}
 	
 	public static String createUUID() {

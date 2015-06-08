@@ -26,6 +26,15 @@ import android.widget.EditText;
 public class EditTextData extends AbstractInputData {
 	public static final int EMS = 10;
 
+	Integer inputType;
+
+	public EditTextData() {
+	}
+
+	public EditTextData(int inputType) {
+		this.inputType = inputType;
+	}
+
 	@Override
 	public String getValue() {
 		return getView().getText().toString();
@@ -40,6 +49,9 @@ public class EditTextData extends AbstractInputData {
 	public View createView(Context context) {
 		EditText editText = new EditText(context);
 		editText.setEms(EMS);
+		if(inputType!=null){
+			editText.setInputType(inputType);
+		}
 		return editText;
 		
 	}

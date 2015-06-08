@@ -21,6 +21,7 @@ package com.mateuyabar.android.pillow.view.user;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -39,6 +40,7 @@ import com.mateuyabar.android.pillow.data.users.guested.GuestedUserDataSource;
 import com.mateuyabar.android.pillow.data.users.guested.IGuestedUser;
 import com.mateuyabar.android.pillow.data.validator.annotations.NotEmpty;
 import com.mateuyabar.android.pillow.view.forms.TFormView;
+import com.mateuyabar.android.pillow.view.forms.inputDatas.EditTextData;
 import com.mateuyabar.android.pillow.view.reflection.ViewConfig;
 import com.mateuyabar.util.exceptions.BreakFastException;
 
@@ -201,8 +203,15 @@ public abstract class AbstractGuestedUserFragment<T extends IdentificableModel &
         @ViewConfig.ViewType(order = 0)
         public String email;
         @NotEmpty
-        @ViewConfig.ViewType(order = 1)
+        @ViewConfig.ViewType(order = 1, inputType = PasswordTextData.class)
         public String password;
+    }
+
+
+    public static final class PasswordTextData extends EditTextData{
+        public PasswordTextData() {
+            super(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        }
     }
 
 }

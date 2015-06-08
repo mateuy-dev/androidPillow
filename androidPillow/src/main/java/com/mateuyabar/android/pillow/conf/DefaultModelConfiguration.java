@@ -41,6 +41,8 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 
 public class DefaultModelConfiguration<T extends IdentificableModel> implements ModelConfiguration<T>{
+	public static final String PREFERENCES_KEY = "PillowModelsPreferencesStorage";
+
 	Context context;
 	Class<T> modelClass;
 	IDbMapping<T> dbMapping;
@@ -95,7 +97,7 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 	}
 
 	protected SharedPreferences createSharedPreferences(){
-		SharedPreferences preferences = context.getSharedPreferences("PILLOW_PREFERENCE_MODELS", Context.MODE_PRIVATE);
+		SharedPreferences preferences = context.getSharedPreferences(PREFERENCES_KEY, Context.MODE_PRIVATE);
 		return preferences;
 	}
 

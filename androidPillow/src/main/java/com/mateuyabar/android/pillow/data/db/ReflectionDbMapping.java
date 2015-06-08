@@ -157,8 +157,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
         } else if(Date.class.isAssignableFrom(fieldClass)){
             value = DBUtil.getDate(cursor, cursor.getColumnIndex(fieldName));
         } else if(Enum.class.isAssignableFrom(fieldClass)){
-            Object[] enumValues = (Object[]) fieldClass.getEnumConstants();//EventType.values()
-            value = DBUtil.dbToEnum(cursor, cursor.getColumnIndex(fieldName), enumValues);
+            value = DBUtil.dbToEnum(cursor, cursor.getColumnIndex(fieldName), fieldClass);
         } else if(ReflectionUtil.isEmbeddable(fieldClass)){
             //Embeddable model
             Object embedModel;

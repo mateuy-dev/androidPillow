@@ -21,6 +21,7 @@ package com.mateuyabar.android.pillow.util.reflection;
 import com.mateuyabar.android.pillow.util.reflection.ValuesTypes.Embeddable;
 import com.mateuyabar.android.pillow.util.reflection.ValuesTypes.ValueType;
 import com.mateuyabar.android.pillow.util.reflection.ValuesTypes.ValueType.NONE;
+import com.mateuyabar.android.pillow.view.reflection.ViewConfig;
 import com.mateuyabar.util.CaseFormat;
 import com.mateuyabar.util.exceptions.BreakFastException;
 
@@ -66,7 +67,12 @@ public class ReflectionUtil {
 		}
 		return result;
 	}
-	
+
+	public static boolean isHidden(Field field){
+		ViewConfig.ViewType annotation = field.getAnnotation(ViewConfig.ViewType.class);
+		return annotation!=null && annotation.hidden();
+	}
+
 	public static List<Field> getBelongsToFields(Class<?> modelClass){
 		List<Field> result = new ArrayList<Field>();
 		for(Field field: getStoredFields(modelClass)){
