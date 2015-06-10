@@ -34,11 +34,11 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class PillowResult<T> implements IPillowResult<T>{
-	CountDownLatch lock;
-	T result;
-	PillowError error;
-	List<Listener<T>> listeners = new ArrayList<Listener<T>>();
-	List<ErrorListener> errorListeners = new ArrayList<ErrorListener>();
+	private CountDownLatch lock;
+	private T result;
+	private PillowError error;
+	private List<Listener<T>> listeners = new ArrayList<Listener<T>>();
+	private List<ErrorListener> errorListeners = new ArrayList<ErrorListener>();
 
 	
 	public PillowResult(){

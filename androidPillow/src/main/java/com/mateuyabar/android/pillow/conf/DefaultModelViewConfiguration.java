@@ -27,6 +27,7 @@ import com.mateuyabar.android.pillow.view.forms.views.FormActivity;
 import com.mateuyabar.android.pillow.view.forms.views.PillowShowFragment;
 import com.mateuyabar.android.pillow.view.list.PillowListAdapter;
 import com.mateuyabar.android.pillow.view.list.PillowListFragment;
+import com.mateuyabar.android.pillow.view.list.PillowUsedExpandableListAdapter;
 
 public class DefaultModelViewConfiguration<T extends IdentificableModel> implements ModelViewConfiguration<T>{
 	Class<T> modelClass;
@@ -55,5 +56,8 @@ public class DefaultModelViewConfiguration<T extends IdentificableModel> impleme
 		return new PillowShowFragment<IdentificableModel>();
 	}
 
-	
+	@Override
+	public PillowUsedExpandableListAdapter getUsedExpandableListAdapter(Context context) {
+		return new PillowUsedExpandableListAdapter(context, modelClass);
+	}
 }

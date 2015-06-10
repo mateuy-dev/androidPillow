@@ -52,7 +52,7 @@ public class SynchManager {
 		super();
 		this.dbHelper = dbHelper;
 		this.context = context;
-		sharedPref = context.getSharedPreferences(Pillow.PREFERENCES_FILE_KEY, Context.MODE_PRIVATE);
+		sharedPref = Pillow.getInstance(context).getSharedPreferences();
 	}
 
 	List<ISynchDataSource<?>> sortedSynchDataSources;

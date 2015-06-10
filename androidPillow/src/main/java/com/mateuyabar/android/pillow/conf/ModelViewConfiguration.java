@@ -23,10 +23,17 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.view.base.IModelListAdapter;
+import com.mateuyabar.android.pillow.view.list.PillowUsedExpandableListAdapter;
 
 public interface ModelViewConfiguration<T extends IdentificableModel> {
 	public Class<?> getFormClass();
 	public IModelListAdapter<T> getListAdapter(Context context);
 	public Fragment getListFragment();
 	public Fragment getShowFragment();
+
+	/**
+	 * @param context
+	 * @return list adapter used on ModelDialogInputView
+	 */
+	public PillowUsedExpandableListAdapter getUsedExpandableListAdapter(Context context);
 }

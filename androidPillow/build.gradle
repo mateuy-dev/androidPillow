@@ -29,6 +29,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.android.support:appcompat-v7:22.1.0'
     compile 'com.android.support:gridlayout-v7:22.1.0'
+    //compile 'com.android.support:design:22.2.0'
     compile 'in.srain.cube:grid-view-with-header-footer:1.0.12'
     compile 'com.nispok:snackbar:2.10.+'
 }

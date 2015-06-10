@@ -24,10 +24,10 @@
         
     </EditText>
 
-    <ListView
+    <ExpandableListView
         android:id="@+id/list_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
-        </ListView>
+    </ExpandableListView>
 
 </LinearLayout>

@@ -27,4 +27,7 @@
     <string name="sign_up">Sign Up</string>
 
     <string name="no_connection_error">No network connection</string>
+
+    <string name="recently_used_items">Recently used</string>
+    <string name="all_items">All</string>
 </resources>

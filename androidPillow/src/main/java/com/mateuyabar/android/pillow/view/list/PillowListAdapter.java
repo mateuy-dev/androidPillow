@@ -72,14 +72,14 @@ public class PillowListAdapter<T extends IdentificableModel> extends PillowBaseL
 	}
 
 	
-	protected Object createViewHolder(TextView textView, TextView titleView, ImageView imageView) {
+	public static Object createViewHolder(TextView textView, TextView titleView, ImageView imageView) {
 		return new ViewHolder(textView, titleView, imageView);
 	}
 
 	/**
 	 * ViewHolder
 	 */
-	protected class ViewHolder {
+	public static class ViewHolder {
 		public final TextView textView;
 		public final TextView titleView;
 		public final ImageView imageView;

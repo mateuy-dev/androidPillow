@@ -18,6 +18,7 @@
 
 package com.mateuyabar.android.pillow.util.reflection;
 
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.util.reflection.ValuesTypes.Embeddable;
 import com.mateuyabar.android.pillow.util.reflection.ValuesTypes.ValueType;
 import com.mateuyabar.android.pillow.util.reflection.ValuesTypes.ValueType.NONE;
@@ -135,4 +136,14 @@ public class ReflectionUtil {
             throw new BreakFastException(e);
         }
     }
+
+	public static <T extends IdentificableModel> T createIdModel(Class<T> modelClass, String id){
+		try {
+			T model = modelClass.newInstance();
+			model.setId(id);
+			return model;
+		} catch (Exception e) {
+			throw new BreakFastException(e);
+		}
+	}
 }

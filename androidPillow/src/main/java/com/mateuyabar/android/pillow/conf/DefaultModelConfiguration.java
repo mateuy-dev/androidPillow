@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.reflect.TypeToken;
+import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.data.IDataSource;
 import com.mateuyabar.android.pillow.data.db.DbDataSource;
 import com.mateuyabar.android.pillow.data.db.IDbMapping;
@@ -41,8 +42,6 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 
 public class DefaultModelConfiguration<T extends IdentificableModel> implements ModelConfiguration<T>{
-	public static final String PREFERENCES_KEY = "PillowModelsPreferencesStorage";
-
 	Context context;
 	Class<T> modelClass;
 	IDbMapping<T> dbMapping;
@@ -97,7 +96,7 @@ public class DefaultModelConfiguration<T extends IdentificableModel> implements 
 	}
 
 	protected SharedPreferences createSharedPreferences(){
-		SharedPreferences preferences = context.getSharedPreferences(PREFERENCES_KEY, Context.MODE_PRIVATE);
+		SharedPreferences preferences = Pillow.getInstance(context).getSharedPreferences();
 		return preferences;
 	}
 

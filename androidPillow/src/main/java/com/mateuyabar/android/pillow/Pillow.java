@@ -19,6 +19,7 @@
 package com.mateuyabar.android.pillow;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.mateuyabar.android.pillow.conf.IModelConfigurations;
 import com.mateuyabar.android.pillow.conf.ModelConfiguration;
@@ -40,7 +41,9 @@ import java.util.List;
 
 public class Pillow {
 	public static final String LOG_ID = "pillow";
-	public static final String PREFERENCES_FILE_KEY = "cat_my_android_pillow";
+	public static final String PREFERENCES_FILE_KEY = "com_mateuyabar_android_pillow";
+
+
 	public static int xmlFileResId;
 //	Map<Class<?>, ISynchDataSource<?>> dataSources;
 	PillowConfigXml config;
@@ -77,6 +80,10 @@ public class Pillow {
 //	public Collection<ISynchDataSource<?>> getDataSources() {
 //		return dataSources.values();
 //	}
+
+	public SharedPreferences getSharedPreferences(){
+		return context.getSharedPreferences(PREFERENCES_FILE_KEY, Context.MODE_PRIVATE);
+	}
 
 	public AbstractDBHelper getDbHelper() {
 		return dbHelper;
@@ -150,4 +157,6 @@ public class Pillow {
 	public <T extends IdentificableModel> ModelViewConfiguration<T> getViewConfiguration(Class<T> modelClass){
 		return getModelConfiguration(modelClass).getViewConfiguration();
 	}
+
+
 }

@@ -28,18 +28,18 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.ExpandableListView;
+
+import com.mateuyabar.android.pillow.Listeners.ViewListener;
+import com.mateuyabar.android.pillow.Pillow;
+import com.mateuyabar.android.pillow.R;
 import com.mateuyabar.android.pillow.data.IDataSource;
 import com.mateuyabar.android.pillow.data.models.IdentificableModel;
-import com.mateuyabar.android.pillow.Pillow;
-import com.mateuyabar.android.pillow.Listeners.ViewListener;
-import com.mateuyabar.android.pillow.R;
 import com.mateuyabar.android.pillow.data.sync.CommonListeners;
-import com.mateuyabar.android.pillow.view.base.IModelListAdapter;
 import com.mateuyabar.android.pillow.view.forms.inputDatas.EditTextData;
+import com.mateuyabar.android.pillow.view.list.PillowUsedExpandableListAdapter;
+import com.mateuyabar.android.pillow.view.list.RecentlyUsedModelsController;
 import com.mateuyabar.util.exceptions.BreakFastException;
 
 public class ModelDialogInputView <T extends IdentificableModel> extends EditText{
@@ -126,7 +126,8 @@ public class ModelDialogInputView <T extends IdentificableModel> extends EditTex
 	}
 	
 	private class SelectDialog extends Dialog{
-		IModelListAdapter<T> adapter;
+		//IModelListAdapter<T> adapter;
+		PillowUsedExpandableListAdapter<T> adapter;
 		
 		public SelectDialog(Context context) {
 			super(context,android.R.style.Theme_Holo_Light_DialogWhenLarge_NoActionBar);
@@ -135,18 +136,33 @@ public class ModelDialogInputView <T extends IdentificableModel> extends EditTex
 		protected void onCreate(Bundle savedInstanceState) {
 		    super.onCreate(savedInstanceState);
 		    setContentView(R.layout.select_model_dialog);
-		    ListView listView = (ListView)findViewById(R.id.list_view);
-		    adapter = Pillow.getInstance(getContext()).getViewConfiguration(selectedClass).getListAdapter(getContext());
-		    listView.setOnItemClickListener(new OnItemClickListener() {
-		    	@Override
-		    	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		    		setValue(adapter.getItem(position));
+		    //ListView listView = (ListView)findViewById(R.id.list_view);
+			//adapter = Pillow.getInstance(getContext()).getViewConfiguration(selectedClass).getListAdapter(getContext());
+			//adapter.refreshList();
+			ExpandableListView listView = (ExpandableListView)findViewById(R.id.list_view);
+			adapter = Pillow.getInstance(getContext()).getViewConfiguration(selectedClass).getUsedExpandableListAdapter(getContext());
+		    /*listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					setValue(adapter.getItem(position));
 					dismiss();
-		    	}
+				}
+			});*/
+			listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+				@Override
+				public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+					T selected = adapter.getChild(groupPosition, childPosition);
+					setValue(selected);
+					new RecentlyUsedModelsController<T>(getContext(), selectedClass).used(selected);
+					dismiss();
+					return true;
+				}
 			});
-		    
-		    listView.setAdapter(adapter);
-		    adapter.refreshList();
+
+			listView.setAdapter(adapter);
+			for(int i=0; i<adapter.getGroupCount(); ++i){
+				listView.expandGroup(i);
+			}
 		    
 		    EditText editText = (EditText) findViewById(R.id.search_edit_text);
 		    editText.addTextChangedListener(new TextWatcher() {
