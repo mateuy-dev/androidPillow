@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mateuyabar.android.pillow.Listeners.ViewListener;
@@ -19,6 +18,7 @@ import com.mateuyabar.android.pillow.data.core.PillowListResult;
 import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.sync.CommonListeners;
 import com.mateuyabar.android.pillow.util.reflection.ReflectionUtil;
+import com.mateuyabar.android.pillow.view.base.IModelAdapter;
 import com.mateuyabar.util.exceptions.UnimplementedException;
 
 import java.util.ArrayList;
@@ -32,6 +32,8 @@ public class PillowUsedExpandableListAdapter<T extends IdentificableModel> exten
 	Context context;
 	Class<T> modelClass;
 	RecentlyUsedModelsController recentlyUsedModelsController;
+
+	IModelAdapter<T> modelAdapter;
 
 	int rowViewId = R.layout.list_row_layout;
 
@@ -51,6 +53,7 @@ public class PillowUsedExpandableListAdapter<T extends IdentificableModel> exten
 		this.dataSource = (IDataSource<T>) Pillow.getInstance(context).getDataSource(modelClass);
 		this.inflater = LayoutInflater.from(context);
 		this.recentlyUsedModelsController = new RecentlyUsedModelsController(context, modelClass);
+		modelAdapter = Pillow.getInstance(context).getViewConfiguration(modelClass).getModelAdapter(context);
 		loadItems();
 	}
 
@@ -126,28 +129,29 @@ public class PillowUsedExpandableListAdapter<T extends IdentificableModel> exten
 			ViewGroup parent) {
 		T model = getChild(groupPosition, childPosition);
 
-		TextView textView, titleView;
-		ImageView imageView;
-		if (convertView == null) {
-			convertView = LayoutInflater.from(context).inflate(rowViewId, parent, false);
-			textView = (TextView) convertView.findViewById(R.id.row_sub_title);
-			titleView = (TextView) convertView.findViewById(R.id.row_main_text);
-			imageView = (ImageView) convertView.findViewById(R.id.row_icon);
-			convertView.setTag(PillowListAdapter.createViewHolder(textView, titleView, imageView));
-		} else {
-			PillowListAdapter.ViewHolder viewHolder = (PillowListAdapter.ViewHolder) convertView.getTag();
-			textView = viewHolder.textView;
-			titleView = viewHolder.titleView;
-			imageView = viewHolder.imageView;
-		}
-		updateListView(model, titleView, textView, imageView);
-
-		return convertView;
+		return modelAdapter.getView(model, convertView, parent);
+//		TextView textView, titleView;
+//		ImageView imageView;
+//		if (convertView == null) {
+//			convertView = LayoutInflater.from(context).inflate(rowViewId, parent, false);
+//			textView = (TextView) convertView.findViewById(R.id.row_sub_title);
+//			titleView = (TextView) convertView.findViewById(R.id.row_main_text);
+//			imageView = (ImageView) convertView.findViewById(R.id.row_icon);
+//			convertView.setTag(PillowListAdapter.createViewHolder(textView, titleView, imageView));
+//		} else {
+//			PillowListAdapter.ViewHolder viewHolder = (PillowListAdapter.ViewHolder) convertView.getTag();
+//			textView = viewHolder.textView;
+//			titleView = viewHolder.titleView;
+//			imageView = viewHolder.imageView;
+//		}
+//		updateListView(model, titleView, textView, imageView);
+//
+//		return convertView;
 	}
 
-	public void updateListView(T model, TextView titleView, TextView textView, ImageView imageView) {
-		titleView.setText(model.toString());
-	}
+//	public void updateListView(T model, TextView titleView, TextView textView, ImageView imageView) {
+//		titleView.setText(model.toString());
+//	}
 
 
 

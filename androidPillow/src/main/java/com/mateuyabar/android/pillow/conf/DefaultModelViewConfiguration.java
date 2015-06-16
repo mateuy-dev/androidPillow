@@ -22,9 +22,11 @@ package com.mateuyabar.android.pillow.conf;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import com.mateuyabar.android.pillow.data.models.IdentificableModel;
+import com.mateuyabar.android.pillow.view.base.IModelAdapter;
 import com.mateuyabar.android.pillow.view.base.IModelListAdapter;
 import com.mateuyabar.android.pillow.view.forms.views.FormActivity;
 import com.mateuyabar.android.pillow.view.forms.views.PillowShowFragment;
+import com.mateuyabar.android.pillow.view.list.DefaultModelAdapter;
 import com.mateuyabar.android.pillow.view.list.PillowListAdapter;
 import com.mateuyabar.android.pillow.view.list.PillowListFragment;
 import com.mateuyabar.android.pillow.view.list.PillowUsedExpandableListAdapter;
@@ -59,5 +61,10 @@ public class DefaultModelViewConfiguration<T extends IdentificableModel> impleme
 	@Override
 	public PillowUsedExpandableListAdapter getUsedExpandableListAdapter(Context context) {
 		return new PillowUsedExpandableListAdapter(context, modelClass);
+	}
+
+	@Override
+	public IModelAdapter<T> getModelAdapter(Context context) {
+		return new DefaultModelAdapter<>(context);
 	}
 }
