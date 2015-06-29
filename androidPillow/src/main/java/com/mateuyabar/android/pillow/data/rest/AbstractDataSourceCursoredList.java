@@ -18,10 +18,8 @@
 
 package com.mateuyabar.android.pillow.data.rest;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.Listeners;
 import com.mateuyabar.android.pillow.PillowError;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
@@ -40,25 +38,29 @@ import java.util.ListIterator;
  * Known issues: if the reomote list is modified items may appear duplicated (if added in a allready loaded position) or skipped (if allready displayed position deleted).
  * size() is not calculated now. Returnring Integer.MAX_VALUE. When not more items found on server, we return null items;
  */
-public abstract class  AbstractDataSourceCursoredList<T extends IdentificableModel> implements List<IPillowResult<T>> {
-    public static final int LOAD_SIZE = 10;
+public abstract class  AbstractDataSourceCursoredList<T> implements List<IPillowResult<T>> {
+    public int loadSize = 10;//Default
+    public int size = Integer.MAX_VALUE;//Default
 
     List<IPillowResult<T>> data = new ArrayList<>();
-    Context context;
 
-    public AbstractDataSourceCursoredList(Context context){
-        this.context = context;
+
+    public AbstractDataSourceCursoredList(){}
+
+    public AbstractDataSourceCursoredList(int size, int loadSize) {
+        this.size = size;
+        this.loadSize = loadSize;
     }
 
     private synchronized void checkLoaded(int position){
-        if(data.size()<=position){
-            load(position);
+        while(data.size()<=position){
+            load(data.size());
         }
     }
 
     @Override
     public int size() {
-        return Integer.MAX_VALUE;
+        return size;
     }
 
     /**
@@ -67,7 +69,7 @@ public abstract class  AbstractDataSourceCursoredList<T extends IdentificableMod
      */
     private synchronized void load(int position){
         final List<PillowResult> items = new ArrayList<>();
-        for(int i =position; i<position+LOAD_SIZE; ++i){
+        for(int i =position; i<position+loadSize; ++i){
             while(data.size()<=i){
                 data.add(null);
             }
@@ -75,7 +77,7 @@ public abstract class  AbstractDataSourceCursoredList<T extends IdentificableMod
             items.add(item);
             data.set(i, item);
         }
-        IPillowResult<Collection<T>> subList = getData(LOAD_SIZE, position);
+        IPillowResult<Collection<T>> subList = getData(loadSize, position);
         subList.addListeners(new Listeners.Listener<Collection<T>>() {
             @Override
             public void onResponse(Collection<T> response) {
@@ -106,7 +108,8 @@ public abstract class  AbstractDataSourceCursoredList<T extends IdentificableMod
     @Override
     public IPillowResult<T> get(int location) {
         checkLoaded(location);
-        return data.get(location);
+        IPillowResult<T> value = data.get(location);
+        return value;
     }
 
     @Override

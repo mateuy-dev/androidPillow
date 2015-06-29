@@ -22,6 +22,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 
 import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.db.IDbMapping.IDBSelection;
@@ -137,7 +138,7 @@ public class DBModelController<T extends IdentificableModel> {
 				null,
 				null,
 				null
-				);
+		);
 		
 		return cursor;
 	}
@@ -173,6 +174,14 @@ public class DBModelController<T extends IdentificableModel> {
 		order = order!=null ? order : mapper.getDefaultModelOrder();
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor cursor = getCursor(db, selection, selectionArgs, order);
+		List<T> result = createModels(db, cursor);
+		close(db);
+		return result;
+	}
+
+	public List<T> indexRawQuery(String sql, String[] selectionArgs){
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		Cursor cursor = db.rawQuery(sql, selectionArgs);
 		List<T> result = createModels(db, cursor);
 		close(db);
 		return result;
@@ -253,6 +262,19 @@ public class DBModelController<T extends IdentificableModel> {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		save(db, model, OP_CREATE);
 		close(db);
+	}
+
+	public void createAll(List<T> models){
+		SQLiteDatabase database = dbHelper.getWritableDatabase();
+		database.beginTransaction();
+		SQLiteStatement mushroomStmt = database.compileStatement("INSERT INTO Mushroom (id, latinname, name, description, names) VALUES(?, ?, ?, ?, ?)");
+		for(int i =0; i<models.size(); ++i){
+			T model = models.get(i);
+
+		}
+		database.setTransactionSuccessful();
+		database.endTransaction();
+		close(database);
 	}
 	
 	public void cacheAll(List<T> models) {

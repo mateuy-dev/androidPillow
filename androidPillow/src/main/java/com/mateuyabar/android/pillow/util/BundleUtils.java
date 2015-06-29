@@ -77,7 +77,7 @@ public class BundleUtils {
 	private static void setClass(Bundle bundle, Class<?> clazz){
 		bundle.putSerializable(CLASS_ATTRTRIBUTE, clazz);
 	}
-	private static void setModel(Bundle bundle, IdentificableModel model){
+	private static void setModel(Bundle bundle, Object model){
 		String modelJson = new Gson().toJson(model);
 		setModel(bundle, modelJson);
 	}
@@ -114,7 +114,7 @@ public class BundleUtils {
 	 * @param model
 	 * @return
 	 */
-	public static Bundle createModelBundle(IdentificableModel model){
+	public static Bundle createModelBundle(Object model){
 		Bundle bundle = new Bundle();
 		setClass(bundle, model.getClass());
 		setModel(bundle, model);

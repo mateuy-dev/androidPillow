@@ -18,7 +18,11 @@
 
 package com.mateuyabar.util;
 
+import java.text.DecimalFormat;
+
 public class StringUtil {
+	private static final DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+
 	public static boolean isBlanck(String s){
 		return s==null || s.length()==0;
 	}
@@ -29,5 +33,13 @@ public class StringUtil {
 
 	public static String deleteSpaces(String string){
 		return trim(string).replace(" ", "");
+	}
+
+	public static String getShortPrice(Double price){
+		return decimalFormat.format(price) +"€";
+	}
+
+	public static String getFullPrice(Double price){
+		return decimalFormat.format(price) +"€";
 	}
 }

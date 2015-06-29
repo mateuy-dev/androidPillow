@@ -1,6 +1,6 @@
 //package com.mateuyabar.android.pillow.data.sync;
 //
-//import com.mateuyabar.android.pillow.IdentificableModel;
+//import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 //import com.mateuyabar.android.pillow.data.core.IPillowResult;
 //import com.mateuyabar.android.pillow.data.db.DBModelController;
 //import com.mateuyabar.android.pillow.data.rest.RestDataSource;

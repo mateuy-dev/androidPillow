@@ -50,7 +50,7 @@ public class CursorRestDataSource<T extends IdentificableModel> extends RestData
 
     private class DataSourceCursoredList extends AbstractDataSourceCursoredList<T>{
         private DataSourceCursoredList() {
-            super(getContext());
+            super();
         }
 
         @Override

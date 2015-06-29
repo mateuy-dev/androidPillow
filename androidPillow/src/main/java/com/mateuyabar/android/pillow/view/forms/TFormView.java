@@ -20,6 +20,7 @@ package com.mateuyabar.android.pillow.view.forms;
 
 
 import android.content.Context;
+import android.os.Build;
 import android.support.v7.widget.GridLayout;
 import android.view.Gravity;
 import android.view.View;
@@ -68,7 +69,19 @@ public class TFormView<T> extends FrameLayout{
 		setFocusable(true);
 		setFocusableInTouchMode(true);
 		configureLayoutParams();
-        setBackgroundDrawable(getResources().getDrawable(R.drawable.rounded_background));
+
+		setDefaultElevation(this);
+	}
+
+	public static void setDefaultElevation(View view){
+		//ViewCompat.setElevation(this, MetricUtil.dipToPixels(getContext(), 1));
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			view.setBackgroundColor(view.getResources().getColor(R.color.white));
+			view.setElevation(MetricUtil.dipToPixels(view.getContext(), 1));
+		} else {
+			view.setBackgroundDrawable(view.getResources().getDrawable(R.drawable.rounded_background));
+		}
 	}
 
     private void configureLayoutParams(){

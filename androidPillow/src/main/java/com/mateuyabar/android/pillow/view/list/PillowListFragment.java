@@ -37,7 +37,6 @@ import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.PillowError;
 import com.mateuyabar.android.pillow.R;
-import com.mateuyabar.android.pillow.data.IDataSource;
 import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.data.sync.CommonListeners;
 import com.mateuyabar.android.pillow.util.BundleUtils;
@@ -52,7 +51,7 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 	boolean hideButtons;
 	Class<T> clazz;
 	IModelListAdapter<T> listAdapter;
-	IDataSource<T> ops;
+	Pillow pillow;
 	
 	Listener<T> refreshListListener = new Listener<T>(){
 		@Override
@@ -69,23 +68,20 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-		
-		filter = BundleUtils.getModel(getArguments());
-		hideButtons = BundleUtils.getHideButtons(getArguments());
-		clazz = BundleUtils.getModelClass(getArguments());
-		
+
+		loadDataFromBundle();
+
 		View rootView = inflater.inflate(R.layout.list_fragment, container, false);
 		
 		
-		Pillow pillow = Pillow.getInstance(getActivity());
-		ops = pillow.getDataSource(clazz);
+		pillow = Pillow.getInstance(getActivity());
 		
 
 		ListView listview = (ListView) rootView.findViewById(R.id.listview);
 		ImageButton createButton = (ImageButton)rootView.findViewById(R.id.create_model_button);
 		final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
 
-		listAdapter = pillow.getViewConfiguration(clazz).getListAdapter(getActivity());
+		listAdapter = createAdapter();
 		if(filter!=null)
 			listAdapter.setFilter(filter);
 		listview.setAdapter(listAdapter);
@@ -130,6 +126,16 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 		
 		
 		return rootView;
+	}
+
+	protected void loadDataFromBundle(){
+		filter = BundleUtils.getModel(getArguments());
+		hideButtons = BundleUtils.getHideButtons(getArguments());
+		clazz = BundleUtils.getModelClass(getArguments());
+	}
+
+	public IModelListAdapter<T> createAdapter(){
+		return pillow.getViewConfiguration(clazz).getListAdapter(getActivity());
 	}
 	
 	public T getFilter() {

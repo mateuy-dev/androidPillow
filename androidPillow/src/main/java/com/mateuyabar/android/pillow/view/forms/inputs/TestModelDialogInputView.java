@@ -3,7 +3,7 @@
 //import android.content.Context;
 //import android.widget.EditText;
 //import com.mateuyabar.android.pillow.IDataSource;
-//import com.mateuyabar.android.pillow.IdentificableModel;
+//import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 //import com.mateuyabar.android.pillow.Listeners.Listener;
 //import com.mateuyabar.android.pillow.Listeners.ViewListener;
 //import com.mateuyabar.android.pillow.Pillow;
