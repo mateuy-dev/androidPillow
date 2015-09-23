@@ -46,7 +46,7 @@ import com.mateuyabar.android.pillow.view.forms.views.FormActivity;
 import com.mateuyabar.util.exceptions.BreakFastException;
 
 
-public class PillowListFragment<T extends IdentificableModel> extends Fragment {
+public class PillowListFragment<T extends IdentificableModel> extends Fragment implements OnItemClickListener{
 	T filter;
 	boolean hideButtons;
 	Class<T> clazz;
@@ -86,15 +86,9 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 			listAdapter.setFilter(filter);
 		listview.setAdapter(listAdapter);
 		
-		listview.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				T model = listAdapter.getItem(position);
-				new NavigationUtil(PillowListFragment.this).displayShowModel(model);
-			}
-		});
+		listview.setOnItemClickListener(this);
 
-		if(hideButtons){
+		if(isHideButtons()){
 			createButton.setVisibility(View.GONE);
 		} else {
 			createButton.setOnClickListener(new OnClickListener() {
@@ -128,11 +122,23 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 		return rootView;
 	}
 
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		T model = listAdapter.getItem(position);
+		displayModelDetails(model);
+	}
+
+	protected void displayModelDetails(T model) {
+		new NavigationUtil(PillowListFragment.this).displayShowModel(model);
+	}
+
 	protected void loadDataFromBundle(){
 		filter = BundleUtils.getModel(getArguments());
 		hideButtons = BundleUtils.getHideButtons(getArguments());
 		clazz = BundleUtils.getModelClass(getArguments());
 	}
+
+
 
 	public IModelListAdapter<T> createAdapter(){
 		return pillow.getViewConfiguration(clazz).getListAdapter(getActivity());
@@ -183,7 +189,8 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment {
 		}
 		
 	}
-	
-	
 
+	public boolean isHideButtons() {
+		return hideButtons;
+	}
 }

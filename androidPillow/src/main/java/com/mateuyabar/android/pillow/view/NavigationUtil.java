@@ -115,7 +115,7 @@ public class NavigationUtil {
 		return fragment.getId();
 	}
 	
-	private Context getContext() {
+	protected Context getContext() {
 		return getActivity();
 	}
 

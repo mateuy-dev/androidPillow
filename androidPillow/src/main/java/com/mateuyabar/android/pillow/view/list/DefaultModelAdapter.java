@@ -17,7 +17,7 @@ import com.mateuyabar.android.pillow.view.base.IModelAdapter;
  */
 public class DefaultModelAdapter<T> implements IModelAdapter<T>{
     Context context;
-    int rowViewId = R.layout.list_row_layout;
+    protected int rowViewId = R.layout.list_row_layout;
 
     public DefaultModelAdapter(Context context) {
         this.context = context;
@@ -54,6 +54,10 @@ public class DefaultModelAdapter<T> implements IModelAdapter<T>{
 
     public Context getContext() {
         return context;
+    }
+
+    protected void setRowViewId(int rowViewId) {
+        this.rowViewId = rowViewId;
     }
 
     /**

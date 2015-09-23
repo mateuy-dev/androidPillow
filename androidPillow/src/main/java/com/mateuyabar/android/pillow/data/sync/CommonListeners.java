@@ -100,6 +100,9 @@ public class CommonListeners {
 		public void onErrorResponse(PillowError error) {
 			if(error.getCause() instanceof NoConnectionError){
 				Log.i(Pillow.LOG_ID, error.getMessage());
+			/*} else if(error.getCause() instanceof ServerError) {
+				ServerError serverError = (ServerError) error.getCause();
+				//serverError.networkResponse.statusCode;*/
 			} else {
 				BreakFastException throwable = new BreakFastException(error.getCause());
 				if(Thread.currentThread().getId()!=initialThreadId){

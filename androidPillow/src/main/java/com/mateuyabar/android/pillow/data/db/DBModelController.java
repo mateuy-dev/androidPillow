@@ -95,7 +95,7 @@ public class DBModelController<T extends IdentificableModel> {
 		return count;
 	}
 	
-	private void close(SQLiteDatabase db) {
+	protected void close(SQLiteDatabase db) {
 //		db.close();
 	}
 
@@ -150,7 +150,11 @@ public class DBModelController<T extends IdentificableModel> {
 		}
 		return result;
 	}
-	
+
+	protected IDbMapping<T> getMapper() {
+		return mapper;
+	}
+
 	/**
 	 * @return All the models
 	 */
@@ -240,7 +244,7 @@ public class DBModelController<T extends IdentificableModel> {
 	 * @param cursor
 	 * @return new model
 	 */
-	protected T createModel(SQLiteDatabase db, Cursor cursor, boolean addRelations) {
+	public T createModel(SQLiteDatabase db, Cursor cursor, boolean addRelations) {
 		String id = cursor.getString(cursor.getColumnIndex(COLUMN_NAME_ID));
 		T model =  mapper.createModel(cursor, id);
 		if(addRelations)

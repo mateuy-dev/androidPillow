@@ -38,61 +38,14 @@ public class PillowListAdapter<T extends IdentificableModel> extends PillowBaseL
 		modelAdapter = Pillow.getInstance(context).getViewConfiguration(clazz).getModelAdapter(context);
 	}
 
-
-//	public void updateListView(T model, TextView titleView, TextView textView, ImageView imageView){
-//		textView.setText(model.getId());
-//		titleView.setText(model.toString());
-//	}
 	
 	@Override
 	public View getView(T model, View convertView, ViewGroup parent) {
-		return modelAdapter.getView(model,convertView,parent);
-
-//		TextView textView, titleView;
-//		ImageView imageView;
-//		if (convertView == null) {
-//			convertView = LayoutInflater.from(getContext()).inflate(rowViewId, parent, false);
-//			textView = (TextView) convertView.findViewById(R.id.row_sub_title);
-//			titleView = (TextView) convertView.findViewById(R.id.row_main_text);
-//			imageView = (ImageView) convertView.findViewById(R.id.row_icon);
-//			convertView.setTag(createViewHolder(textView, titleView, imageView));
-//		} else {
-//			ViewHolder viewHolder = (ViewHolder) convertView.getTag();
-//			textView = viewHolder.textView;
-//			titleView = viewHolder.titleView;
-//			imageView = viewHolder.imageView;
-//		}
-//		updateListView(model, titleView, textView, imageView);
-//
-//		return convertView;
+		return modelAdapter.getView(model, convertView, parent);
 	}
 
-//
-//	public void setRowViewId(int rowViewId) {
-//		this.rowViewId = rowViewId;
-//	}
-//
-//
-//	public static Object createViewHolder(TextView textView, TextView titleView, ImageView imageView) {
-//		return new ViewHolder(textView, titleView, imageView);
-//	}
-//
-//	/**
-//	 * ViewHolder
-//	 */
-//	public static class ViewHolder {
-//		public final TextView textView;
-//		public final TextView titleView;
-//		public final ImageView imageView;
-//
-//
-//		public ViewHolder(TextView textView, TextView titleView, ImageView imageView) {
-//			this.textView = textView;
-//			this.titleView = titleView;
-//			this.imageView = imageView;
-//		}
-//	}
-	
 
-	
+	public IModelAdapter<T> getModelAdapter() {
+		return modelAdapter;
+	}
 }

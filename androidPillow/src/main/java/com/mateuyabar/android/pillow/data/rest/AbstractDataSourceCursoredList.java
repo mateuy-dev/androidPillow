@@ -114,7 +114,7 @@ public abstract class  AbstractDataSourceCursoredList<T> implements List<IPillow
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return size()==0;
     }
 
     @NonNull
