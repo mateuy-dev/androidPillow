@@ -28,7 +28,7 @@ import com.mateuyabar.android.pillow.view.base.IModelAdapter;
 import com.mateuyabar.android.pillow.view.base.PillowBaseListAdapter;
 import com.mateuyabar.android.pillow.views.R;
 
-
+@Deprecated
 public class PillowListAdapter<T extends IdentificableModel> extends PillowBaseListAdapter<T> {
 	int rowViewId = R.layout.list_row_layout;
 	IModelAdapter<T> modelAdapter;

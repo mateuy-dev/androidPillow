@@ -44,6 +44,7 @@ import com.mateuyabar.android.pillow.view.base.IModelListAdapter;
 import com.mateuyabar.android.pillow.views.R;
 
 
+@Deprecated
 public class PillowListFragment<T extends IdentificableModel> extends Fragment implements OnItemClickListener{
 	T filter;
 	boolean hideButtons;

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidpillow xmlns:android="http://schemas.android.com/apk/res/android">
+    <dbhelper class="com.mateuyabar.android.pillow.androidpillow.DbHelper"/>
+    <modelConfigurations class="com.mateuyabar.android.pillow.androidpillow.PillowConfiguration"/>
+    <downloadTimeInterval value="36000"/>
+    <maxResponseWaitTime value="10000"/>
+    <dbMultiThread value="true"/>
+    <url value="http://192.168.2.5:3000"/>
+</androidpillow>
