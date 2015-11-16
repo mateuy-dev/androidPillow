@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/androidPillow.iml" filepath="$PROJECT_DIR$/androidPillow.iml" />
-      <module fileurl="file://$PROJECT_DIR$/androidPillow/androidPillow-androidPillow.iml" filepath="$PROJECT_DIR$/androidPillow/androidPillow-androidPillow.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AndroidPillow.iml" filepath="$PROJECT_DIR$/AndroidPillow.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pillowdata/pillowdata.iml" filepath="$PROJECT_DIR$/pillowdata/pillowdata.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pillowviews/pillowviews.iml" filepath="$PROJECT_DIR$/pillowviews/pillowviews.iml" />
     </modules>
   </component>
 </project>
-
