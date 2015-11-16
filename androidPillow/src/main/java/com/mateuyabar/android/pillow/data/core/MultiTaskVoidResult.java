@@ -48,7 +48,7 @@ public class MultiTaskVoidResult extends PillowResult<Void> implements Listener,
 	
 	private synchronized  void checkLastOperationFinished() {
 		if(lastOperationAdded && operationsFinished == subOperations.size()){
-			if(error!=null)
+			if(error==null)
 				setResult(null);
 			else
 				setError(error);

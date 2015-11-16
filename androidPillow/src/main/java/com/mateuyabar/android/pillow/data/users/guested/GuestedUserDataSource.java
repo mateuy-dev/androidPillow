@@ -218,4 +218,9 @@ public class GuestedUserDataSource<T extends IGuestedUser> extends SynchSingleIn
 		return result;
 	}
 
+	@Override
+	public IPillowResult<Void> resetAuthentication() {
+		return remove();
+	}
+
 }

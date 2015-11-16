@@ -5,8 +5,9 @@ apply plugin: "com.jfrog.bintray"
 
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.1"
+    useLibrary  'org.apache.http.legacy'
 
     defaultConfig {
         minSdkVersion 8
@@ -27,8 +28,8 @@ dependencies {
     compile 'com.mcxiaoke.volley:library:1.+'
     compile 'com.shamanland:fab:0.0.8'
     compile 'com.google.code.gson:gson:2.2.4'
-    compile 'com.android.support:appcompat-v7:22.1.0'
-    compile 'com.android.support:gridlayout-v7:22.1.0'
+    compile 'com.android.support:appcompat-v7:23+'
+    compile 'com.android.support:gridlayout-v7:23+'
     //compile 'com.android.support:design:22.2.0'
 
     //compile 'in.srain.cube:grid-view-with-header-footer:1.0.12'

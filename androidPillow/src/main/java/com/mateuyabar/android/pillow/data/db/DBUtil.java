@@ -71,6 +71,13 @@ public class DBUtil {
 		return "DROP TABLE IF EXISTS "+mapping.getTableName();
 	}
 
+	public static Integer getInteger(Cursor cursor, int columnIndex){
+		if (cursor.isNull (columnIndex))
+			return null;
+		else
+			return cursor.getInt(columnIndex);
+	}
+
 	public static boolean getBoolean(Cursor cursor, int columnIndex){
 		int value = cursor.getInt(columnIndex);
 		return value==DBUtil.BOOLEAN_TRUE ? true : false;
@@ -168,6 +175,8 @@ public class DBUtil {
 	}
 	
 	public static <T> T dbToEnum(Cursor cursor, int columnIndex, Class<T> enumClass){
+		if (cursor.isNull (columnIndex))
+			return null;
 		int id = cursor.getInt(columnIndex);
 		T[] values = (T[]) enumClass.getEnumConstants();
 		if(enumClass.isAssignableFrom(IdentificableEnum.class)){

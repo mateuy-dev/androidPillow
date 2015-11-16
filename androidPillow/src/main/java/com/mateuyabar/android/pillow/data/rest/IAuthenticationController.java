@@ -36,6 +36,13 @@ public interface IAuthenticationController {
      */
 	public IPillowResult<AuthenticationData> getAuthentication();
 
+
+	/**
+	 * Ressets current authetication. Called, for example, the current authentication does not work
+	 */
+	public IPillowResult<Void> resetAuthentication();
+
+
     /**
      * No authentication required.
      */
@@ -43,6 +50,11 @@ public interface IAuthenticationController {
 		@Override
 		public IPillowResult<AuthenticationData> getAuthentication() {
 			return new PillowResult<AuthenticationData>(new AuthenticationData());
+		}
+
+		@Override
+		public IPillowResult<Void> resetAuthentication() {
+			return PillowResult.newVoidResult();
 		}
 	}
 	

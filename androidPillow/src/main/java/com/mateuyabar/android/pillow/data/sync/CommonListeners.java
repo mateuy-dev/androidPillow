@@ -100,16 +100,18 @@ public class CommonListeners {
 		public void onErrorResponse(PillowError error) {
 			if(error.getCause() instanceof NoConnectionError){
 				Log.i(Pillow.LOG_ID, error.getMessage());
-			/*} else if(error.getCause() instanceof ServerError) {
+				return;
+			} /*else if(error.getCause() instanceof ServerError) {
 				ServerError serverError = (ServerError) error.getCause();
-				//serverError.networkResponse.statusCode;*/
-			} else {
-				BreakFastException throwable = new BreakFastException(error.getCause());
-				if(Thread.currentThread().getId()!=initialThreadId){
-					throwable.setStackTrace(originalStack);
+				if(serverError.networkResponse.statusCode == HttpURLConnection.HTTP_UNAUTHORIZED){
+
 				}
-				throw throwable;
+			}*/
+			BreakFastException throwable = new BreakFastException(error.getCause());
+			if(Thread.currentThread().getId()!=initialThreadId){
+				throwable.setStackTrace(originalStack);
 			}
+			throw throwable;
 		}
 	};
 	
@@ -247,7 +249,20 @@ public class CommonListeners {
 		}
 
 		public abstract T subTask(T response);
+	}
 
-		
+	public static class DisplayMessageListener<T> implements ViewListener<T>{
+		int messageId;
+		Context context;
+
+		public DisplayMessageListener(Context context, int messageId) {
+			this.context = context;
+			this.messageId = messageId;
+		}
+
+		@Override
+		public void onResponse(T response) {
+			DisplayMessages.info(context, messageId);
+		}
 	}
 }

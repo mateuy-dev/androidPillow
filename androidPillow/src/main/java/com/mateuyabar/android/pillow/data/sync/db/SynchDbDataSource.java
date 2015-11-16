@@ -42,6 +42,11 @@ public class SynchDbDataSource<T extends IdentificableModel> extends SynchDataSo
     }
 
     @Override
+    public IPillowResult<Integer> count(T model) {
+        return getLocalDataSource().count(model);
+    }
+
+    @Override
     public IDbMapping<T> getDbMapping() {
         return getLocalDataSource().getDbMapping();
     }

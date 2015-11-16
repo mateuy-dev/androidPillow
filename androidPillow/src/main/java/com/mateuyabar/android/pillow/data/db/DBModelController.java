@@ -79,6 +79,11 @@ public class DBModelController<T extends IdentificableModel> {
 	public int getCount(){
 		return getColumnIntegerValue(null, null);
 	}
+
+	public int getCount(T filer) {
+		IDBSelection selection = mapper.getSelection(filer);
+		return getCount(selection.getSelection(), selection.getArgs());
+	}
 	
 	public int getCount(String selection, String[] selectionArgs){
 		SQLiteDatabase db = dbHelper.getReadableDatabase();

@@ -19,7 +19,6 @@
 package com.mateuyabar.android.pillow.view.list;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -42,8 +41,6 @@ import com.mateuyabar.android.pillow.data.sync.CommonListeners;
 import com.mateuyabar.android.pillow.util.BundleUtils;
 import com.mateuyabar.android.pillow.view.NavigationUtil;
 import com.mateuyabar.android.pillow.view.base.IModelListAdapter;
-import com.mateuyabar.android.pillow.view.forms.views.FormActivity;
-import com.mateuyabar.util.exceptions.BreakFastException;
 
 
 public class PillowListFragment<T extends IdentificableModel> extends Fragment implements OnItemClickListener{
@@ -178,15 +175,7 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment i
 	}
 	
 	protected void createModel(){
-		try {
-			Intent intent = new Intent(getActivity(), FormActivity.class);
-			T model = clazz.newInstance();
-			Bundle bundle = BundleUtils.createIdBundle(model);
-			intent.putExtras(bundle);
-			getActivity().startActivity(intent);
-		} catch (Exception e) {
-			new BreakFastException(e);
-		}
+		new NavigationUtil(this).displayCreateModel(clazz);
 		
 	}
 

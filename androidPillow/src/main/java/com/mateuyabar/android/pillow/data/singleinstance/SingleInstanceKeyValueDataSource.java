@@ -99,6 +99,12 @@ public class SingleInstanceKeyValueDataSource<T extends IdentificableModel> impl
     }
 
     @Override
+    public IPillowResult<Void> remove() {
+        synchDestroy();
+        return PillowResult.newVoidResult();
+    }
+
+    @Override
     public PillowResult<Boolean> exists() {
         return new PillowResult<>(synchronExists());
     }
@@ -151,6 +157,12 @@ public class SingleInstanceKeyValueDataSource<T extends IdentificableModel> impl
 
     public boolean synchronExists(){
         return getJson()!=null;
+    }
+
+    public void synchDestroy(){
+        preferences.edit().remove(modelAtt).remove(dirtyAtt).commit();
+
+
     }
 
     private String getJson(){

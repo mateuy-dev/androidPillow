@@ -84,7 +84,9 @@ public class MultiThreadDbDataSource<T extends IdentificableModel> implements IS
 			}
 		});
 	}
-	
+
+
+
 	@Override
 	public IPillowResult<Collection<T>> index(final String selection, final String[] selectionArgs, final String order) {
 		return execute(new OperationRunnable<Collection<T>>(){
@@ -144,6 +146,16 @@ public class MultiThreadDbDataSource<T extends IdentificableModel> implements IS
 			@Override
 			protected IPillowResult<Integer> createMainPillowResult() {
 				return dataSource.count(selection, selectionArgs);
+			}
+		});
+	}
+
+	@Override
+	public IPillowResult<Integer> count(final T filter) {
+		return execute(new OperationRunnable<Integer>() {
+			@Override
+			protected IPillowResult<Integer> createMainPillowResult() {
+				return dataSource.count(filter);
 			}
 		});
 	}

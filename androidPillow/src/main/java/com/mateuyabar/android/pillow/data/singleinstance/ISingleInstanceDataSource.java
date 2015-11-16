@@ -21,6 +21,8 @@ public interface ISingleInstanceDataSource<T extends IdentificableModel> extends
      */
     public IPillowResult<T> set(T model);
 
+    public IPillowResult<Void> remove();
+
     /**
      * @return true if an instance has been saved
      */

@@ -29,5 +29,6 @@ import java.util.Collection;
  */
 public interface IExtendedDataSource<T extends IdentificableModel> extends IDataSource<T>{
 	public IPillowResult<Collection<T>> index(T filter);
+	public IPillowResult<Integer> count(T filter);
 
 }

@@ -30,6 +30,8 @@ import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.conf.ModelViewConfiguration;
 import com.mateuyabar.android.pillow.util.BundleUtils;
+import com.mateuyabar.android.pillow.view.forms.views.FormActivity;
+import com.mateuyabar.util.exceptions.BreakFastException;
 
 public class NavigationUtil {
 	Fragment fragment;
@@ -56,6 +58,18 @@ public class NavigationUtil {
 		Bundle bunlde = BundleUtils.createIdBundle(model);
 		newFragment.setArguments(bunlde);
 		return newFragment;
+	}
+
+	public <T extends IdentificableModel> void displayCreateModel(Class<T> clazz){
+		try {
+			Intent intent = new Intent(getActivity(), FormActivity.class);
+			T model = clazz.newInstance();
+			Bundle bundle = BundleUtils.createIdBundle(model);
+			intent.putExtras(bundle);
+			getActivity().startActivity(intent);
+		} catch (Exception e) {
+			throw new BreakFastException(e);
+		}
 	}
 	
 	public void displayEditModel(IdentificableModel model){

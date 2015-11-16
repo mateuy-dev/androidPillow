@@ -34,6 +34,11 @@ public class SynchSingleInstanceDataSource<T extends IdentificableModel> extends
     }
 
     @Override
+    public IPillowResult<Void> remove() {
+        return getLocalDataSource().remove();
+    }
+
+    @Override
     public IPillowResult<T> get() {
         return getLocalDataSource().get();
     }

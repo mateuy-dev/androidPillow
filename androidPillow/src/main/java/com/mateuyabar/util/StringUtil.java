@@ -46,4 +46,18 @@ public class StringUtil {
 	public static String capitalizeFirst(String string){
 		return string.substring(0,1).toUpperCase() + string.substring(1);
 	}
+
+	public static String toString(Integer integer, String def){
+		if(integer==null)
+			return def;
+		return integer.toString();
+	}
+
+	public static Integer toInteger(String string){
+		try {
+			return Integer.valueOf(string);
+		}catch(Exception e){
+			return null;
+		}
+	}
 }

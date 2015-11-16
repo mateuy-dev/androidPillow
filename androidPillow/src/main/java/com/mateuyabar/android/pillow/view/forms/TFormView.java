@@ -45,6 +45,7 @@ public class TFormView<T> extends FrameLayout{
 	T model;
 	boolean editable;
     boolean singleColumn;
+	boolean hideLabels = false;
     IValidator<T> validator;
 	GridLayout gridLayout;
 
@@ -54,7 +55,9 @@ public class TFormView<T> extends FrameLayout{
 		this.editable = editable;
 		init();
 	}
-	
+
+
+
 	private void init() {
         //assuming singleCloumn == false
 
@@ -109,6 +112,10 @@ public class TFormView<T> extends FrameLayout{
         }
 
     }
+
+	public void setHideLabels(boolean hideLabels) {
+		this.hideLabels = hideLabels;
+	}
 
     /**
      * @return validator used. If not specified with a set, the pillow configuration is used or Default validator by default
@@ -196,7 +203,10 @@ public class TFormView<T> extends FrameLayout{
 			GridLayout.LayoutParams inputParams = new GridLayout.LayoutParams();
             inputParams.setGravity(Gravity.LEFT);
 			input.setLayoutParams(inputParams);
-			
+
+			if(hideLabels)
+				label.setVisibility(GONE);
+
 			gridLayout.addView(label);
 			gridLayout.addView(input);
 			first = false;

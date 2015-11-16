@@ -115,6 +115,13 @@ public class DbDataSource<T extends IdentificableModel> implements ISynchLocalDb
 		int result = db.getCount(selection, selectionArgs);
 		return new PillowResult<Integer>(result);
 	}
+
+	@Override
+	public PillowResult<Integer> count(T filter) {
+		DBModelController<T> db =getDbModelController();
+		int result = db.getCount(filter);
+		return new PillowResult<Integer>(result);
+	}
 	
 	@Override
 	public IPillowResult<T> setAsNotDirty(T model){

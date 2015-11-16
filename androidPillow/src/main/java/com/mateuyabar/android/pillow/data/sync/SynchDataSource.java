@@ -41,8 +41,6 @@ import java.util.concurrent.TimeUnit;
 
 public class SynchDataSource<T extends IdentificableModel> implements ISynchDataSource<T>{
 	private static ThreadPoolExecutor operationthreadPool = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
-	
-	
 	RestDataSource<T> restDataSource;
 
 

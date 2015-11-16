@@ -86,6 +86,7 @@ public class RailsRestMapping<T extends IdentificableModel> implements IRestMapp
 	@Override
 	public Gson getSerializer(){
 		GsonBuilder builder = new GsonBuilder();
+		builder.serializeNulls();
 		builder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
 		builder.registerTypeAdapterFactory(new RailsEnumAdapterFactory());
 		builder.setDateFormat(DBUtil.DATE_STRING_FORMAT);
