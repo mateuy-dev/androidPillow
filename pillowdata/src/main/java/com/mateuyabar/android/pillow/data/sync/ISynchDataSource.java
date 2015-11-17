@@ -19,9 +19,9 @@
 package com.mateuyabar.android.pillow.data.sync;
 
 import com.mateuyabar.android.pillow.data.IDataSource;
+import com.mateuyabar.android.pillow.data.IRestDataSource;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
 import com.mateuyabar.android.pillow.data.models.IdentificableModel;
-import com.mateuyabar.android.pillow.data.rest.RestDataSource;
 
 import java.util.Collection;
 
@@ -30,5 +30,5 @@ public interface ISynchDataSource<T extends IdentificableModel> extends IDataSou
 	public IPillowResult<Void> sendDirty();
 	public IPillowResult<Collection<T>> download();
 	public Class<T> getModelClass();
-	public RestDataSource<T> getRestDataSource();
+	public IRestDataSource<T> getRestDataSource();
 }

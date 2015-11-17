@@ -22,6 +22,8 @@ import android.content.Context;
 
 import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.PillowError;
+import com.mateuyabar.android.pillow.data.IDataSource;
+import com.mateuyabar.android.pillow.data.IRestDataSource;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
 import com.mateuyabar.android.pillow.data.core.MultiTaskVoidResult;
 import com.mateuyabar.android.pillow.data.core.PillowResult;
@@ -41,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SynchDataSource<T extends IdentificableModel> implements ISynchDataSource<T>{
 	private static ThreadPoolExecutor operationthreadPool = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
-	RestDataSource<T> restDataSource;
+	IRestDataSource<T> restDataSource;
 
 
 	IAuthenticationController authenticationData;
@@ -49,33 +51,37 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 	ISynchLocalDataSource<T> localDataSource;
 	//ILocalSynchDataSource<T> dbModelController;
 
-	IRestMapping<T> restMap;
+//	IRestMapping<T> restMap;
 	Context context;
 	Class<T> modelClass;
 	
 	//ensures that no more than one syncrhonization process is beeing done at the same time
 	Object synchronizationLock;
-	
-	public SynchDataSource(Class<T> modelClass, ISynchLocalDataSource<T> localDataSource, IRestMapping<T> restMap, Context context, IAuthenticationController authenticationData) {
+
+	public SynchDataSource(Class<T> modelClass, ISynchLocalDataSource<T> localDataSource, IRestDataSource<T> restDataSource, Context context, IAuthenticationController authenticationData) {
 		this.modelClass=modelClass;
 		this.context=context;
 		this.authenticationData=authenticationData;
+		this.restDataSource = restDataSource;
 
-		restDataSource = new RestDataSource<T>(restMap, context, authenticationData);
 
 //		localDataSource = new DbDataSource<T>(context, dbFuncs, dbHelper, deletedEntries);
 //		if(Pillow.getInstance(context).getConfig().isDbMultiThread()){
 		this.localDataSource = localDataSource;
-		
+
 		//dbModelController = localDataSource.getDbModelController();
-		this.restMap=restMap;
-		
+
+	}
+
+	public SynchDataSource(Class<T> modelClass, ISynchLocalDataSource<T> localDataSource, IRestMapping<T> restMap, Context context, IAuthenticationController authenticationData) {
+		this(modelClass, localDataSource, new RestDataSource<T>(restMap, context, authenticationData), context, authenticationData);
+
 	}
 	public SynchDataSource(Class<T> modelClass, ISynchLocalDataSource<T> localDataSource, IRestMapping<T> restMap, Context context) {
 		this(modelClass, localDataSource, restMap, context, null);
 	}
 	
-	public RestDataSource<T> getRestDataSource() {
+	public IRestDataSource<T> getRestDataSource() {
 		return restDataSource;
 	}
 	

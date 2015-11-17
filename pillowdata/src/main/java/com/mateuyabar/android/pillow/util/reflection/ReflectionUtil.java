@@ -50,6 +50,19 @@ public class ReflectionUtil {
         return fields.toArray(new Field[]{});
     }
 
+	public static Field getStoredField(Class type, String name) {
+		List<Field> fields = new ArrayList<Field>();
+		for (Class<?> c = type; c != null; c = c.getSuperclass()) {
+			Field[] innerFields = c.getDeclaredFields();
+			for(Field field:innerFields){
+				if(!field.isSynthetic() &&  !isTransient(field) && field.getName().equals(name)){
+					return field;
+				}
+			}
+		}
+		return null;
+	}
+
 	public static boolean isTransient(Field field){
 		return Modifier.isTransient(field.getModifiers());
 	}

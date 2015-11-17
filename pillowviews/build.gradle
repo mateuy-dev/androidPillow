@@ -29,5 +29,6 @@ dependencies {
     compile 'com.shamanland:fab:0.0.8'
     compile 'com.android.support:appcompat-v7:23+'
     compile 'com.android.support:gridlayout-v7:23+'
+    compile 'com.android.support:design:23.0.0'
     compile 'com.mateuyabar:my-android-base:0.0.4'
 }

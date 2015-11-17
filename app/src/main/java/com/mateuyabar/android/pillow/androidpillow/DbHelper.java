@@ -9,7 +9,7 @@ import com.mateuyabar.android.pillow.AbstractDBHelper;
 
 public class DbHelper extends AbstractDBHelper {
 	// If you change the database schema, you must increment the database version.
-    public static int DATABASE_VERSION = 1;
+    public static int DATABASE_VERSION = 2;
 	public static String DATABASE_NAME = "pillow_sample.db";
 	
 	

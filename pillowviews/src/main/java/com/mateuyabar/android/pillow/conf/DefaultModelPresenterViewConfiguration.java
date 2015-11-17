@@ -21,21 +21,20 @@ package com.mateuyabar.android.pillow.conf;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
+
 import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.view.base.IModelAdapter;
 import com.mateuyabar.android.pillow.view.base.IModelListAdapter;
 import com.mateuyabar.android.pillow.view.forms.views.FormActivity;
 import com.mateuyabar.android.pillow.view.forms.views.PillowShowFragment;
 import com.mateuyabar.android.pillow.view.list.DefaultModelAdapter;
-import com.mateuyabar.android.pillow.view.list.PillowListAdapter;
-import com.mateuyabar.android.pillow.view.list.PillowListFragment;
 import com.mateuyabar.android.pillow.view.list.PillowUsedExpandableListAdapter;
 
-@Deprecated
-public class DefaultModelViewConfiguration<T extends IdentificableModel> implements ModelViewConfiguration<T>{
+
+public class DefaultModelPresenterViewConfiguration<T extends IdentificableModel> implements ModelViewConfiguration<T>{
 	Class<T> modelClass;
-	
-	public DefaultModelViewConfiguration(Class<T> modelClass) {
+
+	public DefaultModelPresenterViewConfiguration(Class<T> modelClass) {
 		this.modelClass = modelClass;
 	}
 
@@ -51,12 +50,12 @@ public class DefaultModelViewConfiguration<T extends IdentificableModel> impleme
 
 	@Override
 	public IModelListAdapter<T> getListAdapter(Context context) {
-		return new PillowListAdapter<T>(context, modelClass);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Fragment getListFragment() {
-		return new PillowListFragment<IdentificableModel>();
+		return new com.mateuyabar.android.pillow.view.fragments.PillowListFragment<>();
 	}
 
 	@Override
@@ -66,7 +65,7 @@ public class DefaultModelViewConfiguration<T extends IdentificableModel> impleme
 
 	@Override
 	public PillowUsedExpandableListAdapter getUsedExpandableListAdapter(Context context) {
-		return new PillowUsedExpandableListAdapter(context, modelClass);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

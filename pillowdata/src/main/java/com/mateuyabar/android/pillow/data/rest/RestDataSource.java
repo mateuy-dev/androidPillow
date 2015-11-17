@@ -29,7 +29,7 @@ import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.PillowConfigXml;
 import com.mateuyabar.android.pillow.PillowError;
-import com.mateuyabar.android.pillow.data.IDataSource;
+import com.mateuyabar.android.pillow.data.IRestDataSource;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
 import com.mateuyabar.android.pillow.data.core.PillowResultListener;
 import com.mateuyabar.android.pillow.data.db.MultiThreadDbDataSource.OperationRunnable;
@@ -44,7 +44,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class RestDataSource<T> implements IDataSource<T> {
+public class RestDataSource<T> implements IRestDataSource<T> {
     private static ThreadPoolExecutor dbThreadPool = new ThreadPoolExecutor(1, 1, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
     public static final String LOG_ID = Pillow.LOG_ID +" - RestDataSource";

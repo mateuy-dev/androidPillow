@@ -26,7 +26,6 @@ public class PillowListFragment<T extends IdentificableModel> extends PillowBase
     boolean hideButtons;
     Class<T> modelClass;
     PillowListAdapter<T> listAdapter;
-
     SwipeRefreshLayout swipeRefreshLayout;
 
 

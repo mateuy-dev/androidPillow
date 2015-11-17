@@ -15,7 +15,6 @@ import com.mateuyabar.android.pillow.view.base.IModelAdapter;
  *
  * @param <T>
  */
-@Deprecated
 public class DefaultModelAdapter<T> implements IModelAdapter<T>{
     Context context;
     protected int rowViewId = R.layout.list_row_layout;

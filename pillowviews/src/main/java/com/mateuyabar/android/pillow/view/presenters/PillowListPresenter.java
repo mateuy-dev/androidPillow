@@ -45,7 +45,7 @@ public class PillowListPresenter<T extends IdentificableModel> extends PillowMod
     }
 
     private void loadData(){
-        index().addListeners(new Listeners.Listener<Collection<T>>() {
+        index().addListeners(new Listeners.ViewListener<Collection<T>>() {
             @Override
             public void onResponse(Collection<T> models) {
                 view.render(models);

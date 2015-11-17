@@ -10,7 +10,7 @@ public abstract class PillowBaseFragment extends PresenterFragment {
         return PillowView.getInstance(getContext());
     }
 
-    NavigationUtil getNavigation(){
+    public NavigationUtil getNavigation(){
         return getPillowView().getNavigation(this);
     }
 }
