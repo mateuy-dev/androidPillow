@@ -30,4 +30,7 @@
 
     <string name="recently_used_items">Recently used</string>
     <string name="all_items">All</string>
+
+    <string name="drawer_all">All Talks</string>
+
 </resources>

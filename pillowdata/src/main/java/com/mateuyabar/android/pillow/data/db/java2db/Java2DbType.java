@@ -8,5 +8,6 @@ import android.database.Cursor;
 public interface Java2DbType {
     boolean accepts(Class<?> fieldClass);
     Object javaToDb(Object value);
-    Object dbToJava(Cursor cursor, int columnIndex,  Class<?> fieldClass);
+    Object dbToJava(Cursor cursor, String name,  Class<?> fieldClass);
+    String getDbType();
 }

@@ -9,23 +9,27 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Deprecated
-public class DateJava2Db implements Java2DbType {
+public class DateJava2Db extends BaseSingleClassNullableJava2DbType<Date> {
     @Override
-    public boolean accepts(Class<?> fieldClass) {
-        return Date.class.isAssignableFrom(fieldClass);
+    public Class<Date> getJavaFiledClass() {
+        return Date.class;
     }
 
     @Override
-    public String javaToDb(Object value) {
-        if(value==null) return null;
+    protected Object javaToDbNotNull(Date value) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(DBUtil.DATE_TIME_STRING_FORMAT);
         return dateFormat.format(value);
     }
 
     @Override
-    public Date dbToJava(Cursor cursor, int columnIndex, Class<?> fieldClass) {
+    protected Date dbToJavaNotNull(Cursor cursor, int columnIndex) {
         String date = cursor.getString(columnIndex);
         return dbToDate(date);
+    }
+
+    @Override
+    public String getDbType() {
+        return  DBUtil.CALENDAR_TYPE;
     }
 
     public static Date dbToDate(String date){

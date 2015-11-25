@@ -1,8 +1,6 @@
 package com.mateuyabar.android.pillow;
 
 import android.content.Context;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 
 import com.mateuyabar.android.pillow.conf.IModelViewConfigurations;
 import com.mateuyabar.android.pillow.conf.ModelViewConfiguration;
@@ -15,7 +13,6 @@ import com.mateuyabar.android.pillow.view.NavigationUtil;
  */
 public class PillowView {
     private static PillowView pillowView;
-
     public static synchronized PillowView getInstance(Context context){
         if(pillowView==null){
             pillowView = new PillowView();
@@ -28,6 +25,7 @@ public class PillowView {
     Pillow pillow;
     Context context;
     ModelViewConfigurationFactory modelViewConfigurationFactory;
+    NavigationUtil navigation;
 
     private void init(Context context) {
         this.context=context;
@@ -42,11 +40,12 @@ public class PillowView {
         return modelViewConfigurationFactory.getModelViewConfiguration(modelClass);
     }
 
-    public NavigationUtil getNavigation(Fragment fragment){
-        return new NavigationUtil(fragment);
+    public void configureNavigation(NavigationUtil navigation){
+        this.navigation = navigation;
     }
 
-    public NavigationUtil getNavigation(FragmentActivity activity, int viewId){
-        return new NavigationUtil(activity, viewId);
+    public NavigationUtil getNavigation(){
+        return navigation;
     }
+
 }

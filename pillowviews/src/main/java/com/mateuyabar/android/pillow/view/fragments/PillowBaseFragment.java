@@ -11,6 +11,6 @@ public abstract class PillowBaseFragment extends PresenterFragment {
     }
 
     public NavigationUtil getNavigation(){
-        return getPillowView().getNavigation(this);
+        return getPillowView().getNavigation();
     }
 }

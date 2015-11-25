@@ -21,8 +21,9 @@ package com.mateuyabar.android.pillow.data.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.Pillow;
+import com.mateuyabar.android.pillow.data.db.java2db.Java2DbManager;
+import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.util.reflection.ReflectionUtil;
 import com.mateuyabar.android.pillow.util.reflection.ValuesTypes.BelongsToOnDelete;
 import com.mateuyabar.android.pillow.util.reflection.ValuesTypes.OrderBy;
@@ -32,8 +33,6 @@ import com.mateuyabar.util.exceptions.UnimplementedException;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMapping<T>{
@@ -45,7 +44,9 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 	String[][] atts;
 	boolean orderByLoaded=false;
 	String orderBy;
-	
+
+	Java2DbManager java2DbManager = new Java2DbManager();
+
 	public ReflectionDbMapping(Class<T> modelClass){
 		this.modelClass=modelClass;
 	}
@@ -114,7 +115,7 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
         try {
             field.setAccessible(true);
             Object value = field.get(model);
-            return DBUtil.dbValue(value);
+            return java2DbManager.javaToDb(value);
         } catch (Exception e) {
             throw new BreakFastException(e);
         }
@@ -146,30 +147,22 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
             value = cursor.getString(cursor.getColumnIndex(fieldName));
         } else if(ReflectionUtil.isInt(fieldClass)){
             value = cursor.getInt(cursor.getColumnIndex(fieldName));
-        }else  if(ReflectionUtil.isBoolean(fieldClass)){
-            value = DBUtil.getBoolean(cursor, cursor.getColumnIndex(fieldName));
         } else if(Double.class.isAssignableFrom(fieldClass)){
             value = cursor.getDouble(cursor.getColumnIndex(fieldName));
         } else if(Long.class.isAssignableFrom(fieldClass)){
             value = cursor.getLong(cursor.getColumnIndex(fieldName));
-        } else if(Calendar.class.isAssignableFrom(fieldClass)){
-            value = DBUtil.getCalendar(cursor, cursor.getColumnIndex(fieldName));
-        } else if(Date.class.isAssignableFrom(fieldClass)){
-            value = DBUtil.getDate(cursor, cursor.getColumnIndex(fieldName));
-        } else if(Enum.class.isAssignableFrom(fieldClass)){
-            value = DBUtil.dbToEnum(cursor, cursor.getColumnIndex(fieldName), fieldClass);
-        } else if(ReflectionUtil.isEmbeddable(fieldClass)){
-            //Embeddable model
-            Object embedModel;
-            try {
-                embedModel = fieldClass.newInstance();
-            } catch (Exception e) {
-                throw new BreakFastException();
-            }
-            fillModel(cursor, embedModel, fieldName+EMBEDDED_MODEL_ATTRIBUTE_SEPARATOR);
-            value = embedModel;
-        } else {
-            throw new UnimplementedException();
+        } else if(ReflectionUtil.isEmbeddable(fieldClass)) {
+			//Embeddable model
+			Object embedModel;
+			try {
+				embedModel = fieldClass.newInstance();
+			} catch (Exception e) {
+				throw new BreakFastException();
+			}
+			fillModel(cursor, embedModel, fieldName + EMBEDDED_MODEL_ATTRIBUTE_SEPARATOR);
+			value = embedModel;
+		} else {
+			value = java2DbManager.dbToJava(cursor, fieldName, fieldClass);
         }
         return (T) value;
     }
@@ -261,20 +254,12 @@ public class ReflectionDbMapping<T extends IdentificableModel> implements IDbMap
 			type = DBUtil.STRING_TYPE;
 		} else if(ReflectionUtil.isInt(fieldClass)){
 			type = DBUtil.INT_TYPE;
-		} else if(ReflectionUtil.isBoolean(fieldClass)){
-			type = DBUtil.BOOLEAN_TYPE;
 		} else if(Double.class.isAssignableFrom(fieldClass)){
 			type = DBUtil.DOUBLE_TYPE;
 		} else if(Long.class.isAssignableFrom(fieldClass)){
 			throw new UnimplementedException();
-		} else if(Calendar.class.isAssignableFrom(fieldClass)){
-			type = DBUtil.CALENDAR_TYPE;
-		} else if(Date.class.isAssignableFrom(fieldClass)){
-			type = DBUtil.DATE_TYPE;
-		} else if(Enum.class.isAssignableFrom(fieldClass)){
-			type = DBUtil.ENUM_TYPE;
 		} else {
-			throw new UnimplementedException(fieldClass.toString());
+			type = java2DbManager.getDbType(fieldClass);
 		}
 		return type;
 	}

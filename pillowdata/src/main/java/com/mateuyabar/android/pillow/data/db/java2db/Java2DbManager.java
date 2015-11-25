@@ -1,5 +1,7 @@
 package com.mateuyabar.android.pillow.data.db.java2db;
 
+import android.database.Cursor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +10,11 @@ public class Java2DbManager {
 
     public Java2DbManager(){
         java2DbTypes.add(new BooleanJava2Db());
+        java2DbTypes.add(new CalendarJava2Db());
+        java2DbTypes.add(new DateJava2Db());
+        java2DbTypes.add(new EnumJava2Db<>());
+        java2DbTypes.add(new DateTimeZoneJava2Db());
+        java2DbTypes.add(new InstantJava2DB());
     }
 
     public Java2DbType get(Class<?> clazz){
@@ -16,7 +23,30 @@ public class Java2DbManager {
             if(conversor.accepts(clazz))
                 return conversor;
         }
-        throw new UnsupportedOperationException("Class not supported"+clazz);
+        return null;
+    }
+
+    public String getDbType(Class<?> clazz){
+        return get(clazz).getDbType();
+    }
+
+    public Object javaToDb(Object value){
+        if(value==null)
+            return null;
+        Java2DbType java2DbType = get(value.getClass());
+        if(java2DbType!=null)
+            return java2DbType.javaToDb(value);
+        else
+            return value;
+    }
+
+
+    public Object dbToJava(Cursor cursor, String columnName,  Class<?> fieldClass){
+        Java2DbType java2DbType = get(fieldClass);
+        if(java2DbType!=null)
+            return java2DbType.dbToJava(cursor, columnName, fieldClass);
+        else
+            throw new UnsupportedOperationException(fieldClass.toString());
     }
 
 }

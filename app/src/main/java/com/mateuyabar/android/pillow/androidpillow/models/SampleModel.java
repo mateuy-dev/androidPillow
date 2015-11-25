@@ -3,10 +3,12 @@ package com.mateuyabar.android.pillow.androidpillow.models;
 import com.mateuyabar.android.pillow.data.models.AbstractIdentificableModel;
 
 public class SampleModel extends AbstractIdentificableModel {
-    String name;
-    Integer integer;
-    Boolean booleanAtt;
+    public enum SampleEnum {option1, option2};
 
+
+    String name;
+    int integer;
+    SampleEnum sampleEnum;
 
     public String getName() {
         return name;
@@ -24,12 +26,12 @@ public class SampleModel extends AbstractIdentificableModel {
         this.integer = integer;
     }
 
-    public Boolean getBooleanAtt() {
-        return booleanAtt;
+    public SampleEnum getSampleEnum() {
+        return sampleEnum;
     }
 
-    public void setBooleanAtt(Boolean booleanAtt) {
-        this.booleanAtt = booleanAtt;
+    public void setSampleEnum(SampleEnum sampleEnum) {
+        this.sampleEnum = sampleEnum;
     }
 
     @Override

@@ -22,7 +22,6 @@ import android.content.Context;
 
 import com.mateuyabar.android.pillow.Listeners.Listener;
 import com.mateuyabar.android.pillow.PillowError;
-import com.mateuyabar.android.pillow.data.IDataSource;
 import com.mateuyabar.android.pillow.data.IRestDataSource;
 import com.mateuyabar.android.pillow.data.core.IPillowResult;
 import com.mateuyabar.android.pillow.data.core.MultiTaskVoidResult;
@@ -173,8 +172,25 @@ public class SynchDataSource<T extends IdentificableModel> implements ISynchData
 
 				List<T> createdModels= localDataSource.getDirty(ISynchLocalDataSource.DIRTY_STATUS_CREATED);
 				for(T model : createdModels){
-					T created = restDataSource.create(model).get();
-					localDataSource.setAsNotDirty(created).await();
+					T created = null;
+					try {
+						created = restDataSource.create(model).get();
+					}catch (final PillowError createError){
+						//Maybe the item has allready been created but the app did not recieve the response.
+						//TODO only do this if 500 error
+						try {
+							T existing = restDataSource.show(model).get();
+							//Existing is !=null
+							localDataSource.setAsNotDirty(existing);
+						}catch (PillowError showError){
+							//THe item is not there, we send the original error
+							throw createError;
+						}
+					}
+					if(created !=null) {
+						localDataSource.setAsNotDirty(created).await();
+					}
+
 				}
 				List<T> updatedModels= localDataSource.getDirty(ISynchLocalDataSource.DIRTY_STATUS_UPDATED);
 				for(T model : updatedModels){

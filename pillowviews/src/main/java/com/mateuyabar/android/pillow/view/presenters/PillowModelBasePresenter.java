@@ -14,7 +14,7 @@ public abstract class PillowModelBasePresenter<T extends IdentificableModel> ext
         this.modelClass = modelClass;
     }
 
-    public <T> IDataSource<T> getDataSource() {
-        return (IDataSource<T>) super.getDataSource(modelClass);
+    public IDataSource<T> getDataSource() {
+        return super.getDataSource(modelClass);
     }
 }

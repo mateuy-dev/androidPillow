@@ -21,13 +21,11 @@ package com.mateuyabar.android.pillow.data.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import com.mateuyabar.android.pillow.data.models.IdentificableEnum;
-import com.mateuyabar.util.exceptions.BreakFastException;
+import com.mateuyabar.util.StringUtil;
 import com.mateuyabar.util.exceptions.UnimplementedException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
@@ -39,6 +37,7 @@ public class DBUtil {
 	public static final String BOOLEAN_TYPE = " INTEGER";
 	public static final String TIMESTAMP_TYPE = " INTEGER";
 	public static final String INT_TYPE = " INTEGER";
+	public static final String LONG_TYPE = INT_TYPE;
 	public static final String DECIMAL_TYPE = " INTEGER";
 	public static final String DOUBLE_TYPE = " DOUBLE";
 	public static final String CALENDAR_TYPE = "  TEXT";
@@ -47,10 +46,15 @@ public class DBUtil {
 	
 	
 	public static String createTable(IDbMapping<?> mapping){
-		return "CREATE TABLE " + mapping.getTableName() 
-				+" (" + DBModelController.COMMON_MODEL_ATTRIBUTES + DBUtil.COMMA_SEP + 
-				DBModelController.creteAttsString(mapping.getAttributes()) 
-				+ addForeignKeys(mapping)+");";
+		StringBuilder sqlBuilder = new StringBuilder();
+		sqlBuilder.append("CREATE TABLE " + mapping.getTableName());
+		sqlBuilder.append(" (" + DBModelController.COMMON_MODEL_ATTRIBUTES);
+		String attributes = DBModelController.creteAttsString(mapping.getAttributes());
+		if(!StringUtil.isBlanck(attributes)){
+			sqlBuilder.append(DBUtil.COMMA_SEP + attributes);
+		}
+		sqlBuilder.append(addForeignKeys(mapping)+");");
+		return sqlBuilder.toString();
 	} 
 
 
@@ -78,52 +82,87 @@ public class DBUtil {
 			return cursor.getInt(columnIndex);
 	}
 
-	public static boolean getBoolean(Cursor cursor, int columnIndex){
-		int value = cursor.getInt(columnIndex);
-		return value==DBUtil.BOOLEAN_TRUE ? true : false;
-	}
-	
-	public static Date getDate(Cursor cursor, int columnIndex){
-		String value = cursor.getString(columnIndex);
-		return dbToDate(value);
-	}
-	
-	public static Calendar getCalendar(Cursor cursor, int columnIndex){
-		String value = cursor.getString(columnIndex);
-		return dbToCalendar(value);
-	}
-	
+//	public static boolean getBoolean(Cursor cursor, int columnIndex){
+//		int value = cursor.getInt(columnIndex);
+//		return value==DBUtil.BOOLEAN_TRUE ? true : false;
+//	}
+//
+//	public static Date getDate(Cursor cursor, int columnIndex){
+//		String value = cursor.getString(columnIndex);
+//		return dbToDate(value);
+//	}
+//
+//	public static Calendar getCalendar(Cursor cursor, int columnIndex){
+//		String value = cursor.getString(columnIndex);
+//		return dbToCalendar(value);
+//	}
+//
 	public static final String DATE_STRING_FORMAT = "yyyy-MM-dd";
 	public static final String DATE_TIME_STRING_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	
-	public static String calendarToDb(Calendar date){
-		if(date==null) return null;
-		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
-		return dateFormat.format(date.getTime());
-	}
-	
-	/**
-	 * Converts a date to string for json or database storage
-	 * @param date
-	 * @return
-	 */
-	public static String dateToDb(Object date){
+
+
+//
+//	public static String calendarToDb(Calendar date){
+//		if(date==null) return null;
+//		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
+//		return dateFormat.format(date.getTime());
+//	}
+//
+//	/**
+//	 * Converts a date to string for json or database storage
+//	 * @param date
+//	 * @return
+//	 */
+//	public static String dateToDb(Object date){
+//		if(date==null) return null;
+//		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
+//		return dateFormat.format(date);
+//	}
+//
+//	public static Integer booleanToDb(Object value){
+//		if(value==null) return null;
+//		return ((Boolean)value) ? DBUtil.BOOLEAN_TRUE : DBUtil.BOOLEAN_FALSE;
+//	}
+//
+//	/**
+//	 * Converts a String obtained from json or DB to date for model usage
+//	 * @param date
+//	 * @return
+//	 */
+//	public static Date dbToDate(String date){
+//		if(date==null) return null;
+//		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
+//		try {
+//			return dateFormat.parse(date);
+//		} catch (ParseException e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+//	}
+//
+//	/**
+//	 * Converts a String obtained from json or DB to date for model usage
+//	 * @param date
+//	 * @return
+//	 */
+//	public static Calendar dbToCalendar(String date){
+//		if(date==null) return null;
+//		Calendar cal = Calendar.getInstance();
+//		cal.setTime(dbToDate(date));
+//		return cal;
+//	}
+////
+	public static String dateTimeToDb(Date date){
 		if(date==null) return null;
 		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
 		return dateFormat.format(date);
+
+//		if(date==null) return null;
+//		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
+//		return dateFormat.format(date);
 	}
-	
-	public static Integer booleanToDb(Object value){
-		if(value==null) return null;
-		return ((Boolean)value) ? DBUtil.BOOLEAN_TRUE : DBUtil.BOOLEAN_FALSE;
-	}
-	
-	/**
-	 * Converts a String obtained from json or DB to date for model usage
-	 * @param date
-	 * @return
-	 */
-	public static Date dbToDate(String date){
+////
+	public static Date dbToDateTime(String date){
 		if(date==null) return null;
 		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
 		try {
@@ -133,80 +172,49 @@ public class DBUtil {
 			return null;
 		}
 	}
-	
-	/**
-	 * Converts a String obtained from json or DB to date for model usage
-	 * @param date
-	 * @return
-	 */
-	public static Calendar dbToCalendar(String date){
-		if(date==null) return null;
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(dbToDate(date));
-		return cal;
-	}
-//	
-	public static String dateTimeToDb(Date date){
-		return dateToDb(date);
-//		if(date==null) return null;
-//		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
-//		return dateFormat.format(date);
-	}
-//	
-	public static Date dbToDateTime(String date){
-		return dbToDate(date);
-//		if(date==null) return null;
-//		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_TIME_STRING_FORMAT);
-//		try {
-//			return dateFormat.parse(date);
-//		} catch (ParseException e) {
-//			e.printStackTrace();
+//
+//	public static Integer enumToDb(Enum<?> value){
+//		if(value==null)
 //			return null;
+//		if(value instanceof IdentificableEnum){
+//			((IdentificableEnum)value).getId();
 //		}
-	}
-	
-	public static Integer enumToDb(Enum<?> value){
-		if(value==null)
-			return null;
-		if(value instanceof IdentificableEnum){
-			((IdentificableEnum)value).getId();
-		}
-		return value.ordinal();
-	}
-	
-	public static <T> T dbToEnum(Cursor cursor, int columnIndex, Class<T> enumClass){
-		if (cursor.isNull (columnIndex))
-			return null;
-		int id = cursor.getInt(columnIndex);
-		T[] values = (T[]) enumClass.getEnumConstants();
-		if(enumClass.isAssignableFrom(IdentificableEnum.class)){
-			for(T value:values){
-				if(((IdentificableEnum)value).getId() == id){
-					return value;
-				}
-			}
-		} else {
-			return (T) values[id];
-		}
-		throw new BreakFastException();
-	}
+//		return value.ordinal();
+//	}
+//
+//	public static <T> T dbToEnum(Cursor cursor, int columnIndex, Class<T> enumClass){
+//		if (cursor.isNull (columnIndex))
+//			return null;
+//		int id = cursor.getInt(columnIndex);
+//		T[] values = (T[]) enumClass.getEnumConstants();
+//		if(enumClass.isAssignableFrom(IdentificableEnum.class)){
+//			for(T value:values){
+//				if(((IdentificableEnum)value).getId() == id){
+//					return value;
+//				}
+//			}
+//		} else {
+//			return (T) values[id];
+//		}
+//		throw new BreakFastException();
+//	}
 	
 	public static String createUUID() {
 		return UUID.randomUUID().toString();
 	}
 
-    public static Object dbValue(Object value) {
-        if(value instanceof Calendar){
-            value = DBUtil.calendarToDb((Calendar)value);
-        } else if(value instanceof Date){
-            value = DBUtil.dateToDb((Date)value);
-        } else if(value instanceof Enum){
-            value = DBUtil.enumToDb((Enum<?>) value);
-        } else if(value instanceof Boolean){
-            value = DBUtil.booleanToDb(value);
-        }
-        return value;
-    }
+//    public static Object dbValue(Object value) {
+//        if(value instanceof Calendar){
+//            value = DBUtil.calendarToDb((Calendar)value);
+//        } else if(value instanceof Date){
+//            value = DBUtil.dateToDb((Date)value);
+//        } else if(value instanceof Enum){
+//            value = DBUtil.enumToDb((Enum<?>) value);
+//        } else if(value instanceof Boolean){
+//            value = DBUtil.booleanToDb(value);
+//        }
+//        return value;
+//    }
 
     /**
      * Helper method to allow to put a value of type Object to ContentValues. It also allows to store complex methods (like embeddable models)

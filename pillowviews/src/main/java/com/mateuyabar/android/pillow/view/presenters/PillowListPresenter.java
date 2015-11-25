@@ -12,7 +12,7 @@ import com.mateuyabar.android.pillow.view.CommonViewListeners;
 
 import java.util.Collection;
 
-public class PillowListPresenter<T extends IdentificableModel> extends PillowModelBasePresenter {
+public class PillowListPresenter<T extends IdentificableModel> extends PillowModelBasePresenter<T> {
     ViewRenderer view;
     T filter;
     boolean dataLoaded = false;
@@ -44,15 +44,17 @@ public class PillowListPresenter<T extends IdentificableModel> extends PillowMod
             return dataSource.index();
     }
 
-    private void loadData(){
-        index().addListeners(new Listeners.ViewListener<Collection<T>>() {
-            @Override
-            public void onResponse(Collection<T> models) {
-                view.render(models);
-                dataLoaded = true;
-            }
-        }, CommonViewListeners.defaultErrorListener);
+    protected void loadData(){
+        index().addListeners(onModelsLoadedListener, CommonViewListeners.defaultErrorListener);
     }
+
+    protected Listeners.ViewListener<Collection<T>> onModelsLoadedListener = new Listeners.ViewListener<Collection<T>>() {
+        @Override
+        public void onResponse(Collection<T> models) {
+            view.render(models);
+            dataLoaded = true;
+        }
+    };
 
     public void synchronizeModels() {
         getPillow().getSynchManager().download(true).addListeners(new Listeners.ViewListener<Void>() {

@@ -6,7 +6,12 @@ import com.mateuyabar.android.pillow.data.db.DBUtil;
 import com.mateuyabar.android.pillow.util.reflection.ReflectionUtil;
 
 
-public class BooleanJava2Db implements Java2DbType {
+public class BooleanJava2Db extends BaseSingleClassJava2DbType<Boolean> {
+    @Override
+    public Class<Boolean> getJavaFiledClass() {
+        return Boolean.class;
+    }
+
     @Override
     public boolean accepts(Class<?> value) {
         return ReflectionUtil.isBoolean(value);
@@ -24,5 +29,8 @@ public class BooleanJava2Db implements Java2DbType {
         return value== DBUtil.BOOLEAN_TRUE ? Boolean.TRUE : Boolean.FALSE;
     }
 
-
+    @Override
+    public String getDbType() {
+        return  DBUtil.BOOLEAN_TYPE;
+    }
 }

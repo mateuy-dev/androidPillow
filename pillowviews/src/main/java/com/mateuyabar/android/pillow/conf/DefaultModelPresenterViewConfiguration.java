@@ -26,7 +26,7 @@ import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.view.base.IModelAdapter;
 import com.mateuyabar.android.pillow.view.base.IModelListAdapter;
 import com.mateuyabar.android.pillow.view.forms.views.FormActivity;
-import com.mateuyabar.android.pillow.view.forms.views.PillowShowFragment;
+import com.mateuyabar.android.pillow.view.fragments.PillowShowFragment;
 import com.mateuyabar.android.pillow.view.list.DefaultModelAdapter;
 import com.mateuyabar.android.pillow.view.list.PillowUsedExpandableListAdapter;
 
@@ -60,7 +60,7 @@ public class DefaultModelPresenterViewConfiguration<T extends IdentificableModel
 
 	@Override
 	public Fragment getShowFragment() {
-		return new PillowShowFragment<IdentificableModel>();
+		return new PillowShowFragment<>();
 	}
 
 	@Override

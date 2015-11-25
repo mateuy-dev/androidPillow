@@ -23,8 +23,8 @@ import java.util.Collection;
 public class PillowListFragment<T extends IdentificableModel> extends PillowBaseFragment implements AdapterView.OnItemClickListener, PillowListPresenter.ViewRenderer<T>{
     PillowListPresenter<T> presenter;
     T filter;
-    boolean hideButtons;
-    Class<T> modelClass;
+    protected boolean hideButtons;
+    protected Class<T> modelClass;
     PillowListAdapter<T> listAdapter;
     SwipeRefreshLayout swipeRefreshLayout;
 
@@ -32,9 +32,14 @@ public class PillowListFragment<T extends IdentificableModel> extends PillowBase
     @Override
     public void onCreate(Bundle savedInstanceState) {
         loadDataFromBundle();
-        presenter = new PillowListPresenter(getContext(), modelClass);
-        presenter.initialize(this);
+        presenter = preparePresenter();
         super.onCreate(savedInstanceState);
+    }
+
+    protected PillowListPresenter<T> preparePresenter() {
+        PillowListPresenter<T> presenter =  new PillowListPresenter(getContext(), modelClass);
+        presenter.initialize(this);
+        return presenter;
     }
 
     @Nullable
@@ -73,6 +78,11 @@ public class PillowListFragment<T extends IdentificableModel> extends PillowBase
 
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     protected void loadDataFromBundle(){

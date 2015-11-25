@@ -8,25 +8,30 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 @Deprecated
-public class CalendarJava2Db implements Java2DbType {
+public class CalendarJava2Db extends BaseSingleClassNullableJava2DbType<Calendar> {
     @Override
-    public boolean accepts(Class<?> fieldClass) {
-        return Calendar.class.isAssignableFrom(fieldClass);
+    public Class<Calendar> getJavaFiledClass() {
+        return Calendar.class;
     }
 
     @Override
-    public Object javaToDb(Object date) {
-        if(date==null) return null;
+    protected Object javaToDbNotNull(Calendar date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(DBUtil.DATE_TIME_STRING_FORMAT);
-        return dateFormat.format(((Calendar)date).getTime());
+        return dateFormat.format(date.getTime());
     }
 
+
+
     @Override
-    public Object dbToJava(Cursor cursor, int columnIndex, Class<?> fieldClass) {
+    public Calendar dbToJavaNotNull(Cursor cursor, int columnIndex) {
         String date = cursor.getString(columnIndex);
-        if(date==null) return null;
         Calendar cal = Calendar.getInstance();
         cal.setTime(DateJava2Db.dbToDate(date));
         return cal;
+    }
+
+    @Override
+    public String getDbType() {
+        return  DBUtil.CALENDAR_TYPE;
     }
 }
