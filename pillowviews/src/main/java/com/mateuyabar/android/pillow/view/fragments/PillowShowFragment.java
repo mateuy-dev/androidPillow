@@ -1,17 +1,23 @@
 package com.mateuyabar.android.pillow.view.fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mateuyabar.android.cleanbase.Component;
 import com.mateuyabar.android.pillow.Pillow;
 import com.mateuyabar.android.pillow.data.IDataSource;
 import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.util.BundleUtils;
+import com.mateuyabar.android.pillow.view.NavigationUtil;
 import com.mateuyabar.android.pillow.view.forms.TFormView;
 import com.mateuyabar.android.pillow.view.presenters.PillowShowPresenter;
+import com.mateuyabar.android.pillow.views.R;
 
 
 public class PillowShowFragment<T extends IdentificableModel> extends PillowBaseFragment implements PillowShowPresenter.ViewRenderer<T> {
@@ -24,7 +30,7 @@ public class PillowShowFragment<T extends IdentificableModel> extends PillowBase
     PillowShowPresenter<T> presenter;
 
     @Override
-    public Component getPresenter() {
+    public PillowShowPresenter<T> getPresenter() {
         return presenter;
     }
 
@@ -33,6 +39,7 @@ public class PillowShowFragment<T extends IdentificableModel> extends PillowBase
         loadDataFromBundle();
         presenter = preparePresenter();
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     protected void loadDataFromBundle() {
@@ -63,5 +70,49 @@ public class PillowShowFragment<T extends IdentificableModel> extends PillowBase
 
     public String getModelId() {
         return modelId;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.show_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        if(item.getItemId() == R.id.menu_action_edit){
+            editModel();
+            return true;
+        }
+        if(item.getItemId() == R.id.menu_action_delete){
+            deleteModel();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void editModel() {
+        new NavigationUtil(this).displayEditModel(getPresenter().getModel());
+    }
+
+    private void deleteModel() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.delete_warn_title).setMessage(R.string.delete_warn_text).setPositiveButton(R.string.delete_warn_ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                getPresenter().deleteModel();
+            }
+        }).setNegativeButton(R.string.delete_warn_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        builder.create().show();
+    }
+
+    @Override
+    public void onModelDeleted() {
+        getFragmentManager().popBackStack();
     }
 }

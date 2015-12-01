@@ -116,11 +116,18 @@ public class NavigationUtil {
 		newFragment.setArguments(bunlde);
 		changeFragment(newFragment);
 	}
-	
+
 	public void changeFragment(Fragment newFragment){
+		changeFragment(newFragment, true);
+	}
+
+	public void changeFragment(Fragment newFragment, boolean addToBackStack){
 		FragmentManager manager = getActivity().getSupportFragmentManager();
 		FragmentTransaction transaction = manager.beginTransaction();
-		transaction.replace(getFragmentId(), newFragment).addToBackStack(null).commit();
+		transaction = transaction.replace(getFragmentId(), newFragment);
+		if(addToBackStack)
+			transaction.addToBackStack(null);
+		transaction.commit();
 	}
 
 	private FragmentActivity getActivity() {

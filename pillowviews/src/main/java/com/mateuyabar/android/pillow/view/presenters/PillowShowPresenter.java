@@ -21,7 +21,6 @@ public class PillowShowPresenter<T extends IdentificableModel> extends PillowMod
 
     public void initialize(ViewRenderer<T> view){
         this.view = view;
-        loadModel();
     }
 
     public String getModelId() {
@@ -32,6 +31,11 @@ public class PillowShowPresenter<T extends IdentificableModel> extends PillowMod
         this.modelId = modelId;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadModel();
+    }
 
     public void loadModel(){
         T idModel;
@@ -50,11 +54,21 @@ public class PillowShowPresenter<T extends IdentificableModel> extends PillowMod
         }, CommonListeners.defaultErrorListener);
     }
 
-    protected T getModel() {
+    public T getModel() {
         return model;
+    }
+
+    public void deleteModel() {
+        getDataSource().destroy(getModel()).addListeners(new Listeners.ViewListener<Void>() {
+            @Override
+            public void onResponse(Void response) {
+                view.onModelDeleted();
+            }
+        }, CommonListeners.defaultErrorListener);
     }
 
     public interface ViewRenderer<T> {
         void render(T model);
+        void onModelDeleted();
     }
 }

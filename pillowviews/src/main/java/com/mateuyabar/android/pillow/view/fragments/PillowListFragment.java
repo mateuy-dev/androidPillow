@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.mateuyabar.android.pillow.data.models.IdentificableModel;
 import com.mateuyabar.android.pillow.util.BundleUtils;
@@ -27,6 +28,7 @@ public class PillowListFragment<T extends IdentificableModel> extends PillowBase
     protected Class<T> modelClass;
     PillowListAdapter<T> listAdapter;
     SwipeRefreshLayout swipeRefreshLayout;
+    TextView noElementsTextView;
 
 
     @Override
@@ -49,6 +51,7 @@ public class PillowListFragment<T extends IdentificableModel> extends PillowBase
         ListView listview = (ListView) rootView.findViewById(R.id.listview);
         ImageButton createButton = (ImageButton)rootView.findViewById(R.id.create_model_button);
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
+        noElementsTextView = (TextView) rootView.findViewById(R.id.no_elements_text_view);
 
         if(filter!=null)
             getPresenter().setFilter(filter);
@@ -129,6 +132,7 @@ public class PillowListFragment<T extends IdentificableModel> extends PillowBase
     @Override
     public void render(Collection<T> models) {
         getListAdapter().setModels(new ArrayList<T>(models));
+        noElementsTextView.setVisibility(models.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     @Override

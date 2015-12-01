@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="save">GUARDAR</string>
+
+    <string name="ic_action_edit">Editar</string>
+    <string name="ic_action_delete">Eliminar</string>
+
+    <string name="action_bar_form_title_create">Crear %1$s</string>
+    <string name="action_bar_form_title_update">Actualitzar %1$s</string>
+
+    <string name="error_not_null">%1$s no pot estar buit</string>
+    <string name="error_not_empty">%1$s no pot estar buit</string>
+    <string name="error_max">%1$s ha de ser menor que %2$s</string>
+    <string name="error_min">%1$s ha de ser major que %2$s</string>
+    <string name="error_greater_than">%1$s ha de ser major que %2$s</string>
+
+    <string name="add_another_one">afegeix-ne un altre</string>
+
+
+    <string name="LoginData_email">email</string>
+    <string name="LoginData_password">contrasenya</string>
+    <string name="logged_as">Has iniciat sessió com %1$s</string>
+    <string name="guest">invitat</string>
+    <string name="sign_in">Entra</string>
+    <string name="sign_out">Sortir</string>
+    <string name="sign_up">Crear Compte</string>
+
+    <string name="no_connection_error">No hi ha connexió</string>
+
+    <string name="recently_used_items">Usats recenment</string>
+    <string name="all_items">Tots</string>
+    <string name="drawer_all">Totes les tasques</string>
+
+    <string name="delete_warn_title">Eliminar</string>
+    <string name="delete_warn_text">Estàs segur que vols eliminar aquest element?</string>
+    <string name="delete_warn_ok">Eliminar</string>
+    <string name="delete_warn_cancel">Cancelar</string>
+
+    <string name="list_no_elements_found">No hi ha cap element</string>
+
+</resources>

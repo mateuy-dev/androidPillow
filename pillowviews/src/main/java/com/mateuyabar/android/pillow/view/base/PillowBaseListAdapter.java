@@ -52,11 +52,13 @@ public abstract class PillowBaseListAdapter<T extends IdentificableModel> extend
 	ErrorListener donwloadErrorListener = CommonListeners.defaultErrorListener;
 	ErrorListener refreshListErrorListener = CommonListeners.defaultErrorListener;
 	BasicFilter basicFilter = new BasicFilter();
+	Pillow pillow;
 
 	public PillowBaseListAdapter(Context context, Class<T> clazz) {
 		super();
 		this.context = context;
-		this.dataSource = (IDataSource<T>) Pillow.getInstance(context).getDataSource(clazz);
+		this.pillow  = Pillow.getInstance(context);
+		this.dataSource = (IDataSource<T>) pillow.getDataSource(clazz);
 	}
 
 	public void refreshList(){
@@ -130,6 +132,10 @@ public abstract class PillowBaseListAdapter<T extends IdentificableModel> extend
 
 	protected IDataSource<T> getDataSource() {
 		return dataSource;
+	}
+
+	protected Pillow getPillow(){
+		return pillow;
 	}
 	
 	public void setFilter(T filter) {

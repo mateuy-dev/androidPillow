@@ -65,7 +65,8 @@ public class DefaultModelPresenterViewConfiguration<T extends IdentificableModel
 
 	@Override
 	public PillowUsedExpandableListAdapter getUsedExpandableListAdapter(Context context) {
-		throw new UnsupportedOperationException();
+		//TODO We are not using presenter patter here. Fix this.
+		return new PillowUsedExpandableListAdapter(context, modelClass);
 	}
 
 	@Override

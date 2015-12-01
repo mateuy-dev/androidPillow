@@ -38,7 +38,6 @@ public class PillowListAdapter<T extends IdentificableModel> extends PillowBaseL
 		modelAdapter = PillowView.getInstance(context).getViewConfiguration(clazz).getModelAdapter(context);
 	}
 
-	
 	@Override
 	public View getView(T model, View convertView, ViewGroup parent) {
 		return modelAdapter.getView(model, convertView, parent);

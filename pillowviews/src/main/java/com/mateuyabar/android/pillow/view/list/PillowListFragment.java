@@ -109,7 +109,7 @@ public class PillowListFragment<T extends IdentificableModel> extends Fragment i
 						listAdapter.refreshList();
 						swipeRefreshLayout.setRefreshing(false);
 					}
-				}, new Listeners.ErrorListener() {
+				}, new Listeners.ViewErrorListener() {
 					@Override
 					public void onErrorResponse(PillowError error) {
 						swipeRefreshLayout.setRefreshing(false);

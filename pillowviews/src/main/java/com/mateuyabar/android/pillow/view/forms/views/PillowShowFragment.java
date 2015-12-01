@@ -40,6 +40,11 @@ import com.mateuyabar.android.pillow.view.NavigationUtil;
 import com.mateuyabar.android.pillow.view.forms.TFormView;
 import com.mateuyabar.util.exceptions.BreakFastException;
 
+/**
+ * Use PillowShowFragment with presenter on com.mateuyabar.android.pillow.view.fragments
+ * @param <T>
+ */
+@Deprecated
 public class PillowShowFragment<T extends IdentificableModel> extends Fragment{
 	String modelId;
 	TFormView<T> formView;
@@ -138,17 +143,17 @@ public class PillowShowFragment<T extends IdentificableModel> extends Fragment{
 	
 	private void deleteModel() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setTitle("Delete").setMessage("are you sure...?").setPositiveButton("OK", new OnClickListener() {
+        builder.setTitle(R.string.delete_warn_title).setMessage(R.string.delete_warn_text).setPositiveButton(R.string.delete_warn_ok, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				getDataSource().destroy(getModel()).addListeners(new ViewListener<Void>() {
                     @Override
                     public void onResponse(Void response) {
-                        new NavigationUtil(PillowShowFragment.this).displayListModel(getModel().getClass());
+                        getFragmentManager().popBackStack();
                     }
                 }, CommonListeners.defaultErrorListener);
 			}
-		}).setNegativeButton("cancel", new OnClickListener() {
+		}).setNegativeButton(R.string.delete_warn_cancel, new OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 			}
